@@ -6,17 +6,18 @@ export async function analyzeMedicalReport(formData: FormData) {
   const file = formData.get("file") as File;
   if (!file) throw new Error("No file uploaded");
 
-  // Convert File to Base64 for Gemini
+  // Convert File to Base64 for Gemini processing
   const bytes = await file.arrayBuffer();
   const base64Data = Buffer.from(bytes).toString("base64");
 
   const prompt = `
-    Analyze this medical report image. 
-    1. Extract test names and values.
-    2. Explain what each test means in simple, non-alarming terms.
-    3. Compare values to standard ranges if visible.
-    4. Provide a "Key Takeaway" section.
-    5. Format the output in clean Markdown.
+    Analyze this medical report image or PDF. 
+    1. Extract test names, values, and reference ranges.
+    2. Explain what each test means in simple, everyday language.
+    3. If a value is high or low, explain what that *might* be associated with, but do not diagnose.
+    4. Provide a "Summary" section at the end.
+    
+    STRICT SAFETY: Always end with: "This is for educational purposes only. Consult your doctor for clinical advice."
   `;
 
   try {
@@ -28,6 +29,6 @@ export async function analyzeMedicalReport(formData: FormData) {
     return result.response.text();
   } catch (error) {
     console.error("AI Analysis Error:", error);
-    return "Sorry, I couldn't analyze this report. Please ensure the image is clear.";
+    return "I'm sorry, I couldn't process this document. Please ensure the image is clear and try again.";
   }
 }
