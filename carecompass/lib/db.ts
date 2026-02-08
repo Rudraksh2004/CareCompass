@@ -5,33 +5,35 @@ import {
   query, 
   where, 
   getDocs, 
-  serverTimestamp,
+  serverTimestamp, 
   orderBy 
 } from "firebase/firestore";
 
-// Save a simplified report analysis
-export async function saveReport(userId: string, fileName: string, analysis: string) {
+// Save a report to Firestore
+export async function saveReportToDb(userId: string, fileName: string, analysis: string) {
   try {
-    const docRef = await addDoc(collection(db, "reports"), {
+    await addDoc(collection(db, "reports"), {
       userId,
       fileName,
       analysis,
       createdAt: serverTimestamp(),
     });
-    return docRef.id;
-  } catch (e) {
-    console.error("Error adding document: ", e);
+  } catch (error) {
+    console.error("Firestore Save Error:", error);
   }
 }
 
-// Fetch user's report history
-export async function getUserReports(userId: string) {
+// Fetch all reports for a specific user
+export async function getUserReportHistory(userId: string) {
   const q = query(
-    collection(db, "reports"), 
+    collection(db, "reports"),
     where("userId", "==", userId),
     orderBy("createdAt", "desc")
   );
-  
+
   const querySnapshot = await getDocs(q);
-  return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  return querySnapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data()
+  }));
 }
