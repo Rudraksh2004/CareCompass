@@ -37,3 +37,16 @@ export async function getUserReportHistory(userId: string) {
     ...doc.data()
   }));
 }
+
+//Add Medication to Firestore
+export async function addMedication(userId: string, medData: { name: string, dose: string, frequency: string }) {
+  try {
+    await addDoc(collection(db, "meds"), {
+      userId,
+      ...medData,
+      createdAt: serverTimestamp(),
+    });
+  } catch (e) {
+    console.error("Error adding medication:", e);
+  }
+}
