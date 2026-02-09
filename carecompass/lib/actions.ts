@@ -8,23 +8,23 @@ export async function analyzeMedicalReport(formData: FormData) {
   const bytes = await file.arrayBuffer();
   const base64Data = Buffer.from(bytes).toString("base64");
 
-  const safetyPrompt = `
-    You are CareCompass AI. Analyze this medical report.
-    1. Explain test names and values simply.
-    2. Do not diagnose. 
-    3. End with: "This is for educational purposes only."
-  `;
-
   try {
-    // We pass the prompt as the first part of the array
+    // We pass parts explicitly to ensure the API receives them correctly
     const result = await medicalModel.generateContent([
-      { text: safetyPrompt },
-      { inlineData: { data: base64Data, mimeType: file.type } },
+      { text: "Analyze this medical report. Explain results in simple English. Do not diagnose. End with a medical disclaimer." },
+      {
+        inlineData: {
+          data: base64Data,
+          mimeType: file.type,
+        },
+      },
     ]);
-    
-    return result.response.text();
+
+    const response = await result.response;
+    return response.text();
   } catch (error: any) {
-    console.error("Gemini Error Details:", error.message);
-    return "AI Error: " + error.message; // This will help us see the REAL error on screen
+    console.error("Gemini Error:", error);
+    // This helps us see the actual error message in the UI
+    return `Analysis failed: ${error.message || "Unknown AI error"}`;
   }
 }
