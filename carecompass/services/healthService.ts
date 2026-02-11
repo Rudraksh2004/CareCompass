@@ -8,6 +8,7 @@ import {
   orderBy,
   serverTimestamp,
 } from "firebase/firestore";
+import { deleteDoc, doc } from "firebase/firestore";
 
 export const addHealthLog = async (
   userId: string,
@@ -39,4 +40,8 @@ export const getHealthLogs = async (
     id: doc.id,
     ...doc.data(),
   }));
+};
+
+export const deleteHealthLog = async (id: string) => {
+  await deleteDoc(doc(db, "health_logs", id));
 };

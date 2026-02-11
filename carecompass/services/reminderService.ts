@@ -8,6 +8,7 @@ import {
   orderBy,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { deleteDoc, doc } from "firebase/firestore";
 
 export const addReminder = async (
   userId: string,
@@ -37,4 +38,8 @@ export const getUserReminders = async (userId: string) => {
     id: doc.id,
     ...doc.data(),
   }));
+};
+
+export const deleteReminder = async (id: string) => {
+  await deleteDoc(doc(db, "reminders", id));
 };

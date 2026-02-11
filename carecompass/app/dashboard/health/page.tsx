@@ -2,7 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
-import { addHealthLog, getHealthLogs } from "@/services/healthService";
+import {
+  addHealthLog,
+  getHealthLogs,
+  deleteHealthLog,
+} from "@/services/healthService";
 import {
   LineChart,
   Line,
@@ -23,12 +27,10 @@ export default function HealthPage() {
   const [insight, setInsight] = useState("");
   const [loadingInsight, setLoadingInsight] = useState(false);
 
-  // Load logs from Firestore
   const loadLogs = async () => {
     if (!user) return;
 
     const data = await getHealthLogs(user.uid, type);
-
     setRawLogs(data);
 
     setLogs(
@@ -43,7 +45,6 @@ export default function HealthPage() {
     loadLogs();
   }, [user, type]);
 
-  // Add new log
   const handleAdd = async () => {
     if (!user || !value) return;
 
@@ -52,7 +53,11 @@ export default function HealthPage() {
     loadLogs();
   };
 
-  // Generate AI Insight
+  const handleDelete = async (id: string) => {
+    await deleteHealthLog(id);
+    loadLogs();
+  };
+
   const generateInsight = async () => {
     if (rawLogs.length === 0) return;
 
@@ -136,6 +141,32 @@ export default function HealthPage() {
         )}
       </div>
 
+      {/* Recent Logs with Delete */}
+      <div className="bg-white p-6 rounded-lg shadow-sm border mb-8">
+        <h2 className="text-xl font-semibold mb-4">
+          Recent Logs
+        </h2>
+
+        {rawLogs.length === 0 && (
+          <p className="text-gray-500">No logs yet.</p>
+        )}
+
+        {rawLogs.map((log: any) => (
+          <div
+            key={log.id}
+            className="flex justify-between items-center border p-2 rounded mb-2"
+          >
+            <span>{log.value}</span>
+            <button
+              onClick={() => handleDelete(log.id)}
+              className="text-red-500 text-sm hover:underline"
+            >
+              Delete
+            </button>
+          </div>
+        ))}
+      </div>
+
       {/* AI Insight Section */}
       <div className="bg-white p-6 rounded-lg shadow-sm border">
         <h2 className="text-xl font-semibold mb-4">
@@ -147,9 +178,7 @@ export default function HealthPage() {
           disabled={loadingInsight || rawLogs.length === 0}
           className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:opacity-50"
         >
-          {loadingInsight
-            ? "Analyzing..."
-            : "Generate AI Insight"}
+          {loadingInsight ? "Analyzing..." : "Generate AI Insight"}
         </button>
 
         {insight && (
