@@ -10,6 +10,7 @@ import {
   YAxis,
   Tooltip,
   CartesianGrid,
+  ResponsiveContainer,
 } from "recharts";
 
 export default function HealthPage() {
@@ -18,71 +19,145 @@ export default function HealthPage() {
   const [type, setType] = useState("weight");
   const [value, setValue] = useState("");
   const [logs, setLogs] = useState<any[]>([]);
+  const [rawLogs, setRawLogs] = useState<any[]>([]);
+  const [insight, setInsight] = useState("");
+  const [loadingInsight, setLoadingInsight] = useState(false);
 
+  // Load logs from Firestore
   const loadLogs = async () => {
-    if (user) {
-      const data = await getHealthLogs(user.uid, type);
-      setLogs(
-        data.map((log: any, index: number) => ({
-          name: index + 1,
-          value: parseFloat(log.value),
-        }))
-      );
-    }
+    if (!user) return;
+
+    const data = await getHealthLogs(user.uid, type);
+
+    setRawLogs(data);
+
+    setLogs(
+      data.map((log: any, index: number) => ({
+        name: `#${index + 1}`,
+        value: Number(log.value),
+      }))
+    );
   };
 
   useEffect(() => {
     loadLogs();
   }, [user, type]);
 
+  // Add new log
   const handleAdd = async () => {
-    if (!user) return;
+    if (!user || !value) return;
 
     await addHealthLog(user.uid, type, value);
     setValue("");
     loadLogs();
   };
 
+  // Generate AI Insight
+  const generateInsight = async () => {
+    if (rawLogs.length === 0) return;
+
+    setLoadingInsight(true);
+    setInsight("");
+
+    const res = await fetch("/api/ai/health-insight", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        logs: rawLogs,
+        type,
+      }),
+    });
+
+    const data = await res.json();
+    setInsight(data.insight || "No insight generated.");
+    setLoadingInsight(false);
+  };
+
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-6">
+    <div className="max-w-4xl mx-auto">
+      <h1 className="text-3xl font-bold mb-8">
         Health Tracking
       </h1>
 
       {/* Input Section */}
-      <div className="mb-6 space-y-3">
-        <select
-          className="border p-2 rounded"
-          value={type}
-          onChange={(e) => setType(e.target.value)}
-        >
-          <option value="weight">Weight (kg)</option>
-          <option value="blood_sugar">Blood Sugar</option>
-        </select>
+      <div className="bg-white p-6 rounded-lg shadow-sm border mb-8">
+        <div className="flex flex-wrap gap-4 items-center">
+          <select
+            className="border p-2 rounded"
+            value={type}
+            onChange={(e) => setType(e.target.value)}
+          >
+            <option value="weight">Weight (kg)</option>
+            <option value="blood_sugar">Blood Sugar</option>
+          </select>
 
-        <input
-          className="border p-2 rounded ml-2"
-          placeholder="Enter value"
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-        />
+          <input
+            type="number"
+            className="border p-2 rounded"
+            placeholder="Enter value"
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+          />
 
-        <button
-          onClick={handleAdd}
-          className="bg-blue-600 text-white px-4 py-2 rounded ml-2"
-        >
-          Add Log
-        </button>
+          <button
+            onClick={handleAdd}
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+            Add Log
+          </button>
+        </div>
       </div>
 
-      {/* Chart */}
-      <LineChart width={600} height={300} data={logs}>
-        <CartesianGrid stroke="#ccc" />
-        <XAxis dataKey="name" />
-        <YAxis />
-        <Tooltip />
-        <Line type="monotone" dataKey="value" stroke="#2563eb" />
-      </LineChart>
+      {/* Chart Section */}
+      <div className="bg-white p-6 rounded-lg shadow-sm border mb-8">
+        <h2 className="text-xl font-semibold mb-4">
+          Trend Chart
+        </h2>
+
+        {logs.length === 0 ? (
+          <p className="text-gray-500">
+            No data available yet.
+          </p>
+        ) : (
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={logs}>
+              <CartesianGrid stroke="#e5e7eb" />
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Line
+                type="monotone"
+                dataKey="value"
+                stroke="#2563eb"
+                strokeWidth={3}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        )}
+      </div>
+
+      {/* AI Insight Section */}
+      <div className="bg-white p-6 rounded-lg shadow-sm border">
+        <h2 className="text-xl font-semibold mb-4">
+          AI Health Insight
+        </h2>
+
+        <button
+          onClick={generateInsight}
+          disabled={loadingInsight || rawLogs.length === 0}
+          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:opacity-50"
+        >
+          {loadingInsight
+            ? "Analyzing..."
+            : "Generate AI Insight"}
+        </button>
+
+        {insight && (
+          <div className="mt-6 p-4 bg-gray-100 rounded whitespace-pre-wrap">
+            {insight}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
