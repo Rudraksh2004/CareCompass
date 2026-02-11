@@ -61,7 +61,7 @@ export default function ReportPage() {
       )}
 
       {result && (
-        <div className="mt-6 p-4 bg-gray-100 rounded whitespace-pre-wrap">
+        <div className="mt-6 p-4 bg-black-100 rounded whitespace-pre-wrap">
           {result}
         </div>
       )}
