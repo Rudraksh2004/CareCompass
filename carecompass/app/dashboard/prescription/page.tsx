@@ -1,11 +1,31 @@
 "use client";
 
 import { useState } from "react";
+import Tesseract from "tesseract.js";
 
 export default function PrescriptionPage() {
   const [prescriptionText, setPrescriptionText] = useState("");
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
+  const [ocrLoading, setOcrLoading] = useState(false);
+
+  // Handle image upload + OCR
+  const handleFileUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setOcrLoading(true);
+
+    const { data } = await Tesseract.recognize(
+      file,
+      "eng"
+    );
+
+    setPrescriptionText(data.text);
+    setOcrLoading(false);
+  };
 
   const simplifyPrescription = async () => {
     if (!prescriptionText.trim()) return;
@@ -33,10 +53,28 @@ export default function PrescriptionPage() {
         Simplify Prescription
       </h1>
 
+      {/* Upload Section */}
+      <div className="mb-4">
+        <label className="block mb-2 font-medium">
+          Upload Image (Photo or Handwritten)
+        </label>
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleFileUpload}
+        />
+        {ocrLoading && (
+          <p className="text-gray-500 mt-2">
+            Extracting text from image...
+          </p>
+        )}
+      </div>
+
+      {/* Text Area */}
       <textarea
         rows={8}
         className="w-full border p-3 rounded mb-4"
-        placeholder="Paste prescription here..."
+        placeholder="Or paste prescription here..."
         value={prescriptionText}
         onChange={(e) =>
           setPrescriptionText(e.target.value)
