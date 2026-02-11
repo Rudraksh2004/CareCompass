@@ -44,6 +44,10 @@ export default function DashboardLayout({
           <Link href="/dashboard/health" className="hover:text-blue-600">
             Health Tracking
           </Link>
+
+          <Link href="/dashboard/prescription" className="hover:text-blue-600">
+            Simplify Prescription
+          </Link>
         </nav>
 
         <div className="mt-auto">
