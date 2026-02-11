@@ -1,4 +1,3 @@
-import { db } from "@/lib/firebase";
 import {
   collection,
   addDoc,
@@ -6,7 +5,9 @@ import {
   where,
   getDocs,
   serverTimestamp,
+  orderBy,
 } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 export const addReminder = async (
   userId: string,
@@ -26,7 +27,8 @@ export const addReminder = async (
 export const getUserReminders = async (userId: string) => {
   const q = query(
     collection(db, "reminders"),
-    where("userId", "==", userId)
+    where("userId", "==", userId),
+    orderBy("time")
   );
 
   const snapshot = await getDocs(q);
