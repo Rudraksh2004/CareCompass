@@ -2,29 +2,35 @@
 
 import { useState } from "react";
 import Tesseract from "tesseract.js";
+import { extractTextFromPDF } from "@/utils/pdfExtractor";
 
 export default function ReportPage() {
   const [reportText, setReportText] = useState("");
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
-  const [ocrLoading, setOcrLoading] = useState(false);
+  const [fileLoading, setFileLoading] = useState(false);
 
-  // Handle Image Upload
   const handleFileUpload = async (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setOcrLoading(true);
+    setFileLoading(true);
 
-    const { data } = await Tesseract.recognize(
-      file,
-      "eng"
-    );
+    try {
+      if (file.type === "application/pdf") {
+        const text = await extractTextFromPDF(file);
+        setReportText(text);
+      } else {
+        const { data } = await Tesseract.recognize(file, "eng");
+        setReportText(data.text);
+      }
+    } catch (error) {
+      console.error("File processing failed:", error);
+    }
 
-    setReportText(data.text);
-    setOcrLoading(false);
+    setFileLoading(false);
   };
 
   const explainReport = async () => {
@@ -33,14 +39,20 @@ export default function ReportPage() {
     setLoading(true);
     setResult("");
 
-    const res = await fetch("/api/ai/explain", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ reportText }),
-    });
+    try {
+      const res = await fetch("/api/ai/explain", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reportText }),
+      });
 
-    const data = await res.json();
-    setResult(data.explanation || "No response");
+      const data = await res.json();
+      setResult(data.explanation || "No response generated.");
+    } catch (error) {
+      console.error(error);
+      setResult("Failed to analyze report.");
+    }
+
     setLoading(false);
   };
 
@@ -51,18 +63,19 @@ export default function ReportPage() {
       </h1>
 
       {/* Upload Section */}
-      <div className="mb-4">
+      <div className="mb-4 bg-white p-4 rounded shadow-sm border">
         <label className="block mb-2 font-medium">
-          Upload Report Image
+          Upload Image or PDF
         </label>
         <input
           type="file"
-          accept="image/*"
+          accept="image/*,application/pdf"
           onChange={handleFileUpload}
         />
-        {ocrLoading && (
+
+        {fileLoading && (
           <p className="text-gray-500 mt-2">
-            Extracting text from image...
+            Extracting text from file...
           </p>
         )}
       </div>
@@ -73,14 +86,12 @@ export default function ReportPage() {
         className="w-full border p-3 rounded mb-4"
         placeholder="Or paste medical report here..."
         value={reportText}
-        onChange={(e) =>
-          setReportText(e.target.value)
-        }
+        onChange={(e) => setReportText(e.target.value)}
       />
 
       <button
         onClick={explainReport}
-        className="bg-green-600 text-white px-4 py-2 rounded"
+        className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
       >
         {loading ? "Analyzing..." : "Explain Report"}
       </button>

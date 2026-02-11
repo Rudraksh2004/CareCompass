@@ -2,29 +2,35 @@
 
 import { useState } from "react";
 import Tesseract from "tesseract.js";
+import { extractTextFromPDF } from "@/utils/pdfExtractor";
 
 export default function PrescriptionPage() {
   const [prescriptionText, setPrescriptionText] = useState("");
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
-  const [ocrLoading, setOcrLoading] = useState(false);
+  const [fileLoading, setFileLoading] = useState(false);
 
-  // Handle image upload + OCR
   const handleFileUpload = async (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setOcrLoading(true);
+    setFileLoading(true);
 
-    const { data } = await Tesseract.recognize(
-      file,
-      "eng"
-    );
+    try {
+      if (file.type === "application/pdf") {
+        const text = await extractTextFromPDF(file);
+        setPrescriptionText(text);
+      } else {
+        const { data } = await Tesseract.recognize(file, "eng");
+        setPrescriptionText(data.text);
+      }
+    } catch (error) {
+      console.error("File processing failed:", error);
+    }
 
-    setPrescriptionText(data.text);
-    setOcrLoading(false);
+    setFileLoading(false);
   };
 
   const simplifyPrescription = async () => {
@@ -33,17 +39,23 @@ export default function PrescriptionPage() {
     setLoading(true);
     setResult("");
 
-    const res = await fetch(
-      "/api/ai/simplify-prescription",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prescriptionText }),
-      }
-    );
+    try {
+      const res = await fetch(
+        "/api/ai/simplify-prescription",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prescriptionText }),
+        }
+      );
 
-    const data = await res.json();
-    setResult(data.simplified || "No response");
+      const data = await res.json();
+      setResult(data.simplified || "No response generated.");
+    } catch (error) {
+      console.error(error);
+      setResult("Failed to simplify prescription.");
+    }
+
     setLoading(false);
   };
 
@@ -54,18 +66,19 @@ export default function PrescriptionPage() {
       </h1>
 
       {/* Upload Section */}
-      <div className="mb-4">
+      <div className="mb-4 bg-white p-4 rounded shadow-sm border">
         <label className="block mb-2 font-medium">
-          Upload Image (Photo or Handwritten)
+          Upload Image or PDF
         </label>
         <input
           type="file"
-          accept="image/*"
+          accept="image/*,application/pdf"
           onChange={handleFileUpload}
         />
-        {ocrLoading && (
+
+        {fileLoading && (
           <p className="text-gray-500 mt-2">
-            Extracting text from image...
+            Extracting text from file...
           </p>
         )}
       </div>
@@ -83,7 +96,7 @@ export default function PrescriptionPage() {
 
       <button
         onClick={simplifyPrescription}
-        className="bg-blue-600 text-white px-4 py-2 rounded"
+        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
       >
         {loading ? "Simplifying..." : "Simplify"}
       </button>
