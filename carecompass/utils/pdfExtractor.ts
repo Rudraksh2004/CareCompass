@@ -1,11 +1,16 @@
-import * as pdfjsLib from "pdfjs-dist";
+// @ts-ignore
+import * as pdfjsLib from "pdfjs-dist/build/pdf";
 
-pdfjsLib.GlobalWorkerOptions.workerSrc =
-  `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
 
 export const extractTextFromPDF = async (file: File) => {
   const arrayBuffer = await file.arrayBuffer();
-  const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+
+  const loadingTask = pdfjsLib.getDocument({
+    data: arrayBuffer,
+  });
+
+  const pdf = await loadingTask.promise;
 
   let fullText = "";
 
@@ -14,7 +19,7 @@ export const extractTextFromPDF = async (file: File) => {
     const content = await page.getTextContent();
 
     const pageText = content.items
-      .map((item: any) => item.str)
+      .map((item: any) => ("str" in item ? item.str : ""))
       .join(" ");
 
     fullText += pageText + "\n";
