@@ -22,9 +22,7 @@ export default function DashboardLayout({
     <div className="min-h-screen flex bg-gray-50">
       {/* Sidebar */}
       <div className="w-64 bg-white shadow-md p-6 flex flex-col">
-        <h1 className="text-xl font-bold mb-8">
-          CareCompass
-        </h1>
+        <h1 className="text-xl font-bold mb-8">CareCompass</h1>
 
         <nav className="flex flex-col gap-4">
           <Link href="/dashboard" className="hover:text-blue-600">
@@ -42,25 +40,22 @@ export default function DashboardLayout({
           <Link href="/dashboard/chat" className="hover:text-blue-600">
             AI Health Chat
           </Link>
+
+          <Link href="/dashboard/health" className="hover:text-blue-600">
+            Health Tracking
+          </Link>
         </nav>
 
         <div className="mt-auto">
-          <p className="text-sm text-gray-500 mb-2">
-            {user?.email}
-          </p>
-          <button
-            onClick={handleLogout}
-            className="text-red-500 text-sm"
-          >
+          <p className="text-sm text-gray-500 mb-2">{user?.email}</p>
+          <button onClick={handleLogout} className="text-red-500 text-sm">
             Logout
           </button>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 p-10">
-        {children}
-      </div>
+      <div className="flex-1 p-10">{children}</div>
     </div>
   );
 }
