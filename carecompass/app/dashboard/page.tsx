@@ -33,6 +33,13 @@ export default function DashboardPage() {
       >
         Explain Medical Report →
       </Link>
+
+      <Link
+        href="/dashboard/reminders"
+        className="block mt-3 text-blue-600 underline"
+      >
+        Manage Medicine Reminders →
+      </Link>
     </div>
   );
 }
