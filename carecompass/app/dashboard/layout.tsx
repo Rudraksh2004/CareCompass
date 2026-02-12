@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { logout } from "@/services/authService";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 export default function DashboardLayout({
   children,
@@ -12,82 +12,94 @@ export default function DashboardLayout({
 }) {
   const { user } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
 
   const handleLogout = async () => {
     await logout();
     router.push("/auth/login");
   };
 
-  return (
-    <div className="min-h-screen flex bg-slate-50">
-      {/* Sidebar */}
-      <aside className="w-64 bg-white border-r border-slate-200 p-6 flex flex-col">
-        <h1 className="text-xl font-bold mb-10 text-blue-600">CareCompass</h1>
+  const linkClasses = (path: string) =>
+    `transition px-3 py-2 rounded-lg ${
+      pathname === path
+        ? "bg-blue-100 text-blue-600 font-medium"
+        : "hover:bg-gray-100 text-gray-700"
+    }`;
 
-        <nav className="flex flex-col gap-4 text-sm font-medium text-slate-600">
-          <Link href="/dashboard" className="hover:text-blue-600 transition">
+  return (
+    <div className="min-h-screen flex bg-gray-50">
+      {/* Sidebar */}
+      <div className="w-64 bg-white shadow-md p-6 flex flex-col">
+        <h1 className="text-xl font-bold mb-8 text-blue-600">
+          CareCompass
+        </h1>
+
+        {/* Main Nav */}
+        <nav className="flex flex-col gap-2">
+          <Link href="/dashboard" className={linkClasses("/dashboard")}>
             Dashboard
           </Link>
 
           <Link
             href="/dashboard/report"
-            className="hover:text-blue-600 transition"
+            className={linkClasses("/dashboard/report")}
           >
             Report Explainer
           </Link>
 
           <Link
             href="/dashboard/prescription"
-            className="hover:text-blue-600 transition"
+            className={linkClasses("/dashboard/prescription")}
           >
             Simplify Prescription
           </Link>
 
           <Link
             href="/dashboard/health"
-            className="hover:text-blue-600 transition"
+            className={linkClasses("/dashboard/health")}
           >
             Health Tracking
           </Link>
 
           <Link
             href="/dashboard/reminders"
-            className="hover:text-blue-600 transition"
+            className={linkClasses("/dashboard/reminders")}
           >
             Medicine Reminders
           </Link>
 
           <Link
             href="/dashboard/chat"
-            className="hover:text-blue-600 transition"
+            className={linkClasses("/dashboard/chat")}
           >
             AI Health Chat
           </Link>
-
-          <Link
-            href="/dashboard/profile"
-            className="hover:text-blue-600 transition"
-          >
-            Profile
-          </Link>
         </nav>
 
-        <div className="mt-auto pt-8 border-t border-slate-200">
-          <p className="text-xs text-slate-500 mb-3 break-words">
+        {/* Bottom Section */}
+        <div className="mt-auto pt-6 border-t border-gray-200">
+          <p className="text-sm text-gray-500 mb-4 truncate">
             {user?.email}
           </p>
 
+          <Link
+            href="/dashboard/profile"
+            className={`${linkClasses("/dashboard/profile")} block mb-2`}
+          >
+            Profile
+          </Link>
+
           <button
             onClick={handleLogout}
-            className="text-sm text-red-500 hover:underline"
+            className="text-red-500 text-sm hover:text-red-600 transition"
           >
             Logout
           </button>
         </div>
-      </aside>
+      </div>
 
       {/* Main Content */}
-      <main className="flex-1 p-10">{children}</main>
+      <div className="flex-1 p-10">{children}</div>
     </div>
   );
 }
