@@ -10,9 +10,7 @@ export default function PrescriptionPage() {
   const [loading, setLoading] = useState(false);
   const [fileLoading, setFileLoading] = useState(false);
 
-  const handleFileUpload = async (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -20,14 +18,25 @@ export default function PrescriptionPage() {
 
     try {
       if (file.type === "application/pdf") {
-        const text = await extractTextFromPDF(file);
-        setPrescriptionText(text);
+        const result = await extractTextFromPDF(file);
+
+        // If extracted text is too small → likely scanned PDF
+        if (result.text.trim().length < 30) {
+          console.log("Scanned PDF detected → running OCR");
+
+          const { data } = await Tesseract.recognize(file, "eng");
+
+          setPrescriptionText(data.text);
+        } else {
+          setPrescriptionText(result.text);
+        }
       } else {
         const { data } = await Tesseract.recognize(file, "eng");
+
         setPrescriptionText(data.text);
       }
     } catch (error) {
-      console.error("File processing failed:", error);
+      console.error(error);
     }
 
     setFileLoading(false);
@@ -40,14 +49,11 @@ export default function PrescriptionPage() {
     setResult("");
 
     try {
-      const res = await fetch(
-        "/api/ai/simplify-prescription",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ prescriptionText }),
-        }
-      );
+      const res = await fetch("/api/ai/simplify-prescription", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prescriptionText }),
+      });
 
       const data = await res.json();
       setResult(data.simplified || "No response generated.");
@@ -61,15 +67,11 @@ export default function PrescriptionPage() {
 
   return (
     <div className="max-w-3xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">
-        Simplify Prescription
-      </h1>
+      <h1 className="text-2xl font-bold mb-6">Simplify Prescription</h1>
 
       {/* Upload Section */}
       <div className="mb-4 bg-white p-4 rounded shadow-sm border">
-        <label className="block mb-2 font-medium">
-          Upload Image or PDF
-        </label>
+        <label className="block mb-2 font-medium">Upload Image or PDF</label>
         <input
           type="file"
           accept="image/*,application/pdf"
@@ -77,9 +79,7 @@ export default function PrescriptionPage() {
         />
 
         {fileLoading && (
-          <p className="text-gray-500 mt-2">
-            Extracting text from file...
-          </p>
+          <p className="text-gray-500 mt-2">Extracting text from file...</p>
         )}
       </div>
 
@@ -89,9 +89,7 @@ export default function PrescriptionPage() {
         className="w-full border p-3 rounded mb-4"
         placeholder="Or paste prescription here..."
         value={prescriptionText}
-        onChange={(e) =>
-          setPrescriptionText(e.target.value)
-        }
+        onChange={(e) => setPrescriptionText(e.target.value)}
       />
 
       <button

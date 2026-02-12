@@ -25,5 +25,8 @@ export const extractTextFromPDF = async (file: File) => {
     fullText += pageText + "\n";
   }
 
-  return fullText;
+  return {
+    text: fullText,
+    pageCount: pdf.numPages,
+  };
 };

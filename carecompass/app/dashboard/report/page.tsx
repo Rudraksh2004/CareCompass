@@ -10,9 +10,7 @@ export default function ReportPage() {
   const [loading, setLoading] = useState(false);
   const [fileLoading, setFileLoading] = useState(false);
 
-  const handleFileUpload = async (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -20,14 +18,25 @@ export default function ReportPage() {
 
     try {
       if (file.type === "application/pdf") {
-        const text = await extractTextFromPDF(file);
-        setReportText(text);
+        const result = await extractTextFromPDF(file);
+
+        // If extracted text is too small → likely scanned PDF
+        if (result.text.trim().length < 30) {
+          console.log("Scanned PDF detected → running OCR");
+
+          const { data } = await Tesseract.recognize(file, "eng");
+
+          setReportText(data.text);
+        } else {
+          setReportText(result.text);
+        }
       } else {
         const { data } = await Tesseract.recognize(file, "eng");
+
         setReportText(data.text);
       }
     } catch (error) {
-      console.error("File processing failed:", error);
+      console.error(error);
     }
 
     setFileLoading(false);
@@ -58,15 +67,11 @@ export default function ReportPage() {
 
   return (
     <div className="max-w-3xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">
-        Explain Medical Report
-      </h1>
+      <h1 className="text-2xl font-bold mb-6">Explain Medical Report</h1>
 
       {/* Upload Section */}
       <div className="mb-4 bg-white p-4 rounded shadow-sm border">
-        <label className="block mb-2 font-medium">
-          Upload Image or PDF
-        </label>
+        <label className="block mb-2 font-medium">Upload Image or PDF</label>
         <input
           type="file"
           accept="image/*,application/pdf"
@@ -74,9 +79,7 @@ export default function ReportPage() {
         />
 
         {fileLoading && (
-          <p className="text-gray-500 mt-2">
-            Extracting text from file...
-          </p>
+          <p className="text-gray-500 mt-2">Extracting text from file...</p>
         )}
       </div>
 
