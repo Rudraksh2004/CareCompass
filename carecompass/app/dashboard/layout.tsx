@@ -30,9 +30,7 @@ export default function DashboardLayout({
     <div className="min-h-screen flex bg-gray-50">
       {/* Sidebar */}
       <div className="w-64 bg-white shadow-md p-6 flex flex-col">
-        <h1 className="text-xl font-bold mb-8 text-blue-600">
-          CareCompass
-        </h1>
+        <h1 className="text-xl font-bold mb-8 text-blue-600">CareCompass</h1>
 
         {/* Main Nav */}
         <nav className="flex flex-col gap-2">
@@ -78,13 +76,9 @@ export default function DashboardLayout({
 
         {/* Bottom Section */}
         <div className="mt-auto pt-6 border-t border-gray-200">
-          <p className="text-sm text-gray-500 mb-4 truncate">
-            {user?.email}
-          </p>
-
           <Link
             href="/dashboard/profile"
-            className={`${linkClasses("/dashboard/profile")} block mb-2`}
+            className={`${linkClasses("/dashboard/profile")} block mb-3`}
           >
             Profile
           </Link>
