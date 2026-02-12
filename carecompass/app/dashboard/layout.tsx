@@ -19,47 +19,57 @@ export default function DashboardLayout({
   };
 
   return (
-    <div className="min-h-screen flex bg-gray-50">
+    <div className="min-h-screen flex bg-slate-50">
       {/* Sidebar */}
-      <div className="w-64 bg-white shadow-md p-6 flex flex-col">
-        <h1 className="text-xl font-bold mb-8">CareCompass</h1>
+      <aside className="w-64 bg-white border-r border-slate-200 p-6 flex flex-col">
+        <h1 className="text-xl font-bold mb-10 text-blue-600">
+          CareCompass
+        </h1>
 
-        <nav className="flex flex-col gap-4">
-          <Link href="/dashboard" className="hover:text-blue-600">
+        <nav className="flex flex-col gap-4 text-sm font-medium text-slate-600">
+          <Link href="/dashboard" className="hover:text-blue-600 transition">
             Dashboard
           </Link>
 
-          <Link href="/dashboard/report" className="hover:text-blue-600">
+          <Link href="/dashboard/report" className="hover:text-blue-600 transition">
             Report Explainer
           </Link>
 
-          <Link href="/dashboard/reminders" className="hover:text-blue-600">
-            Medicine Reminders
+          <Link href="/dashboard/prescription" className="hover:text-blue-600 transition">
+            Simplify Prescription
           </Link>
 
-          <Link href="/dashboard/chat" className="hover:text-blue-600">
-            AI Health Chat
-          </Link>
-
-          <Link href="/dashboard/health" className="hover:text-blue-600">
+          <Link href="/dashboard/health" className="hover:text-blue-600 transition">
             Health Tracking
           </Link>
 
-          <Link href="/dashboard/prescription" className="hover:text-blue-600">
-            Simplify Prescription
+          <Link href="/dashboard/reminders" className="hover:text-blue-600 transition">
+            Medicine Reminders
+          </Link>
+
+          <Link href="/dashboard/chat" className="hover:text-blue-600 transition">
+            AI Health Chat
           </Link>
         </nav>
 
-        <div className="mt-auto">
-          <p className="text-sm text-gray-500 mb-2">{user?.email}</p>
-          <button onClick={handleLogout} className="text-red-500 text-sm">
+        <div className="mt-auto pt-8 border-t border-slate-200">
+          <p className="text-xs text-slate-500 mb-3 break-words">
+            {user?.email}
+          </p>
+
+          <button
+            onClick={handleLogout}
+            className="text-sm text-red-500 hover:underline"
+          >
             Logout
           </button>
         </div>
-      </div>
+      </aside>
 
       {/* Main Content */}
-      <div className="flex-1 p-10">{children}</div>
+      <main className="flex-1 p-10">
+        {children}
+      </main>
     </div>
   );
 }
