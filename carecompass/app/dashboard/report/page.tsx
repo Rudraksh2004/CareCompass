@@ -7,6 +7,7 @@ import { useAuth } from "@/context/AuthContext";
 import { saveHistory, getHistory } from "@/services/historyService";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { exportMedicalPDF } from "@/utils/pdfExporter";
 
 export default function ReportPage() {
   const { user } = useAuth();
@@ -118,10 +119,19 @@ export default function ReportPage() {
 
       {/* AI Result */}
       {result && (
-        <div className="bg-white p-6 rounded-2xl border shadow-sm">
-          <div className="prose max-w-none text-sm">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>{result}</ReactMarkdown>
+        <div className="space-y-4">
+          <div className="bg-white p-6 rounded-2xl border shadow-sm">
+            <div className="prose max-w-none text-sm">{result}</div>
           </div>
+
+          <button
+            onClick={() =>
+              exportMedicalPDF("Medical Report Explanation", reportText, result)
+            }
+            className="bg-purple-600 hover:bg-purple-700 transition text-white px-5 py-2 rounded-xl"
+          >
+            Download PDF
+          </button>
         </div>
       )}
 
