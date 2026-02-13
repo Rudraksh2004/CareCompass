@@ -7,6 +7,8 @@ import {
   getHistory,
   clearHistory,
 } from "@/services/historyService";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 export default function ChatPage() {
   const { user } = useAuth();
@@ -31,18 +33,16 @@ export default function ChatPage() {
         content: string;
       }[] = [];
 
-      data
-        .reverse()
-        .forEach((item: any) => {
-          formatted.push({
-            role: "user",
-            content: item.userMessage,
-          });
-          formatted.push({
-            role: "assistant",
-            content: item.aiResponse,
-          });
+      data.reverse().forEach((item: any) => {
+        formatted.push({
+          role: "user",
+          content: item.userMessage,
         });
+        formatted.push({
+          role: "assistant",
+          content: item.aiResponse,
+        });
+      });
 
       setMessages(formatted);
     };
@@ -60,10 +60,7 @@ export default function ChatPage() {
 
     const userMessage = input;
 
-    setMessages((prev) => [
-      ...prev,
-      { role: "user", content: userMessage },
-    ]);
+    setMessages((prev) => [...prev, { role: "user", content: userMessage }]);
 
     setInput("");
     setLoading(true);
@@ -78,10 +75,7 @@ export default function ChatPage() {
       const data = await res.json();
       const aiReply = data.reply || "No response.";
 
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: aiReply },
-      ]);
+      setMessages((prev) => [...prev, { role: "assistant", content: aiReply }]);
 
       if (user) {
         await saveHistory(user.uid, "chats", {
@@ -105,9 +99,7 @@ export default function ChatPage() {
     setClearing(false);
   };
 
-  const handleKeyPress = (
-    e: React.KeyboardEvent<HTMLInputElement>
-  ) => {
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       sendMessage();
     }
@@ -117,9 +109,7 @@ export default function ChatPage() {
     <div className="max-w-3xl mx-auto flex flex-col h-[85vh]">
       {/* Header */}
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">
-          AI Health Assistant
-        </h1>
+        <h1 className="text-2xl font-bold">AI Health Assistant</h1>
 
         <button
           onClick={handleClearChat}
@@ -147,7 +137,11 @@ export default function ChatPage() {
                 : "bg-gray-100 text-gray-800"
             }`}
           >
-            {msg.content}
+            <div className="prose prose-sm max-w-none">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {msg.content}
+              </ReactMarkdown>
+            </div>
           </div>
         ))}
 

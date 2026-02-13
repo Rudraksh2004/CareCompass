@@ -31,3 +31,16 @@ body {
 .btn-primary {
   @apply bg-blue-600 text-white py-2 w-full rounded hover:bg-blue-700;
 }
+
+.prose {
+  line-height: 1.7;
+}
+
+.prose ul {
+  list-style-type: disc;
+  padding-left: 1.25rem;
+}
+
+.prose li {
+  margin-bottom: 0.25rem;
+}

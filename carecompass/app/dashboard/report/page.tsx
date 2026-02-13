@@ -5,6 +5,8 @@ import Tesseract from "tesseract.js";
 import { extractTextFromPDF } from "@/utils/pdfExtractor";
 import { useAuth } from "@/context/AuthContext";
 import { saveHistory, getHistory } from "@/services/historyService";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 export default function ReportPage() {
   const { user } = useAuth();
@@ -21,9 +23,7 @@ export default function ReportPage() {
     }
   }, [user]);
 
-  const handleFileUpload = async (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -64,8 +64,7 @@ export default function ReportPage() {
       });
 
       const data = await res.json();
-      const explanation =
-        data.explanation || "No response generated.";
+      const explanation = data.explanation || "No response generated.";
 
       setResult(explanation);
 
@@ -87,9 +86,7 @@ export default function ReportPage() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
-      <h1 className="text-2xl font-bold">
-        Explain Medical Report
-      </h1>
+      <h1 className="text-2xl font-bold">Explain Medical Report</h1>
 
       {/* Upload */}
       <div className="bg-white p-6 rounded-2xl border shadow-sm">
@@ -99,9 +96,7 @@ export default function ReportPage() {
           onChange={handleFileUpload}
         />
         {fileLoading && (
-          <p className="text-sm text-gray-500 mt-2">
-            Extracting text...
-          </p>
+          <p className="text-sm text-gray-500 mt-2">Extracting text...</p>
         )}
       </div>
 
@@ -123,17 +118,17 @@ export default function ReportPage() {
 
       {/* AI Result */}
       {result && (
-        <div className="bg-white p-6 rounded-2xl border shadow-sm whitespace-pre-wrap">
-          {result}
+        <div className="bg-white p-6 rounded-2xl border shadow-sm">
+          <div className="prose max-w-none text-sm">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{result}</ReactMarkdown>
+          </div>
         </div>
       )}
 
       {/* History */}
       {history.length > 0 && (
         <div>
-          <h2 className="text-lg font-semibold mb-4">
-            Previous Reports
-          </h2>
+          <h2 className="text-lg font-semibold mb-4">Previous Reports</h2>
 
           <div className="space-y-4">
             {history.map((item) => (
@@ -145,16 +140,12 @@ export default function ReportPage() {
                   {item.createdAt?.toDate?.().toLocaleString?.() || ""}
                 </p>
 
-                <p className="text-sm font-medium mb-1">
-                  Report:
-                </p>
+                <p className="text-sm font-medium mb-1">Report:</p>
                 <p className="text-sm text-gray-600 mb-3 line-clamp-3">
                   {item.originalText}
                 </p>
 
-                <p className="text-sm font-medium mb-1">
-                  AI Response:
-                </p>
+                <p className="text-sm font-medium mb-1">AI Response:</p>
                 <p className="text-sm text-gray-600 line-clamp-3">
                   {item.aiResponse}
                 </p>

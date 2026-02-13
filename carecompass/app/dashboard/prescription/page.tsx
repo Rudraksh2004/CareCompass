@@ -5,6 +5,8 @@ import Tesseract from "tesseract.js";
 import { extractTextFromPDF } from "@/utils/pdfExtractor";
 import { useAuth } from "@/context/AuthContext";
 import { saveHistory, getHistory } from "@/services/historyService";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 export default function PrescriptionPage() {
   const { user } = useAuth();
@@ -21,9 +23,7 @@ export default function PrescriptionPage() {
     }
   }, [user]);
 
-  const handleFileUpload = async (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -57,18 +57,14 @@ export default function PrescriptionPage() {
     setResult("");
 
     try {
-      const res = await fetch(
-        "/api/ai/simplify-prescription",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ prescriptionText }),
-        }
-      );
+      const res = await fetch("/api/ai/simplify-prescription", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prescriptionText }),
+      });
 
       const data = await res.json();
-      const simplified =
-        data.simplified || "No response generated.";
+      const simplified = data.simplified || "No response generated.";
 
       setResult(simplified);
 
@@ -78,10 +74,7 @@ export default function PrescriptionPage() {
           aiResponse: simplified,
         });
 
-        const updated = await getHistory(
-          user.uid,
-          "prescriptions"
-        );
+        const updated = await getHistory(user.uid, "prescriptions");
         setHistory(updated);
       }
     } catch (error) {
@@ -93,9 +86,7 @@ export default function PrescriptionPage() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
-      <h1 className="text-2xl font-bold">
-        Simplify Prescription
-      </h1>
+      <h1 className="text-2xl font-bold">Simplify Prescription</h1>
 
       {/* Upload */}
       <div className="bg-white p-6 rounded-2xl border shadow-sm">
@@ -105,9 +96,7 @@ export default function PrescriptionPage() {
           onChange={handleFileUpload}
         />
         {fileLoading && (
-          <p className="text-sm text-gray-500 mt-2">
-            Extracting text...
-          </p>
+          <p className="text-sm text-gray-500 mt-2">Extracting text...</p>
         )}
       </div>
 
@@ -116,9 +105,7 @@ export default function PrescriptionPage() {
         className="w-full border border-gray-300 p-3 rounded-xl"
         placeholder="Or paste prescription here..."
         value={prescriptionText}
-        onChange={(e) =>
-          setPrescriptionText(e.target.value)
-        }
+        onChange={(e) => setPrescriptionText(e.target.value)}
       />
 
       <button
@@ -129,17 +116,17 @@ export default function PrescriptionPage() {
       </button>
 
       {result && (
-        <div className="bg-white p-6 rounded-2xl border shadow-sm whitespace-pre-wrap">
-          {result}
+        <div className="bg-white p-6 rounded-2xl border shadow-sm">
+          <div className="prose max-w-none text-sm">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{result}</ReactMarkdown>
+          </div>
         </div>
       )}
 
       {/* History */}
       {history.length > 0 && (
         <div>
-          <h2 className="text-lg font-semibold mb-4">
-            Previous Prescriptions
-          </h2>
+          <h2 className="text-lg font-semibold mb-4">Previous Prescriptions</h2>
 
           <div className="space-y-4">
             {history.map((item) => (
@@ -151,16 +138,12 @@ export default function PrescriptionPage() {
                   {item.createdAt?.toDate?.().toLocaleString?.() || ""}
                 </p>
 
-                <p className="text-sm font-medium mb-1">
-                  Prescription:
-                </p>
+                <p className="text-sm font-medium mb-1">Prescription:</p>
                 <p className="text-sm text-gray-600 mb-3 line-clamp-3">
                   {item.originalText}
                 </p>
 
-                <p className="text-sm font-medium mb-1">
-                  AI Response:
-                </p>
+                <p className="text-sm font-medium mb-1">AI Response:</p>
                 <p className="text-sm text-gray-600 line-clamp-3">
                   {item.aiResponse}
                 </p>
