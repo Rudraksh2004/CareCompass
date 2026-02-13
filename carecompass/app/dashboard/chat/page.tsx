@@ -21,7 +21,7 @@ export default function ChatPage() {
   const [loading, setLoading] = useState(false);
   const [clearing, setClearing] = useState(false);
 
-  // Load chat history
+  // Load previous chat history
   useEffect(() => {
     const loadChatHistory = async () => {
       if (!user) return;
@@ -33,16 +33,18 @@ export default function ChatPage() {
         content: string;
       }[] = [];
 
-      data.reverse().forEach((item: any) => {
-        formatted.push({
-          role: "user",
-          content: item.userMessage,
+      data
+        .reverse()
+        .forEach((item: any) => {
+          formatted.push({
+            role: "user",
+            content: item.userMessage,
+          });
+          formatted.push({
+            role: "assistant",
+            content: item.aiResponse,
+          });
         });
-        formatted.push({
-          role: "assistant",
-          content: item.aiResponse,
-        });
-      });
 
       setMessages(formatted);
     };
@@ -53,14 +55,38 @@ export default function ChatPage() {
   // Auto scroll to latest message
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, loading]);
+  }, [messages]);
+
+  // Typing effect function
+  const typeMessage = async (fullText: string) => {
+    let currentText = "";
+
+    for (let i = 0; i < fullText.length; i++) {
+      currentText += fullText[i];
+
+      setMessages((prev) => {
+        const updated = [...prev];
+        updated[updated.length - 1] = {
+          role: "assistant",
+          content: currentText,
+        };
+        return updated;
+      });
+
+      await new Promise((resolve) => setTimeout(resolve, 8)); // speed control
+    }
+  };
 
   const sendMessage = async () => {
     if (!input.trim() || loading) return;
 
     const userMessage = input;
 
-    setMessages((prev) => [...prev, { role: "user", content: userMessage }]);
+    setMessages((prev) => [
+      ...prev,
+      { role: "user", content: userMessage },
+      { role: "assistant", content: "" }, // placeholder for typing
+    ]);
 
     setInput("");
     setLoading(true);
@@ -75,8 +101,10 @@ export default function ChatPage() {
       const data = await res.json();
       const aiReply = data.reply || "No response.";
 
-      setMessages((prev) => [...prev, { role: "assistant", content: aiReply }]);
+      // Typing animation instead of instant response
+      await typeMessage(aiReply);
 
+      // Save to Firestore after full message is typed
       if (user) {
         await saveHistory(user.uid, "chats", {
           userMessage,
@@ -99,7 +127,9 @@ export default function ChatPage() {
     setClearing(false);
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyPress = (
+    e: React.KeyboardEvent<HTMLInputElement>
+  ) => {
     if (e.key === "Enter") {
       sendMessage();
     }
@@ -109,7 +139,9 @@ export default function ChatPage() {
     <div className="max-w-3xl mx-auto flex flex-col h-[85vh]">
       {/* Header */}
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">AI Health Assistant</h1>
+        <h1 className="text-2xl font-bold">
+          AI Health Assistant
+        </h1>
 
         <button
           onClick={handleClearChat}
@@ -120,11 +152,11 @@ export default function ChatPage() {
         </button>
       </div>
 
-      {/* Chat Box */}
+      {/* Chat Window */}
       <div className="flex-1 overflow-y-auto bg-white p-6 rounded-2xl border shadow-sm space-y-4">
         {messages.length === 0 && !loading && (
           <p className="text-gray-500 text-sm">
-            Ask anything about your health, reports, or medicines.
+            Ask anything about your health, reports, medicines, or lifestyle.
           </p>
         )}
 
@@ -147,7 +179,7 @@ export default function ChatPage() {
 
         {loading && (
           <div className="bg-gray-100 text-gray-700 p-3 rounded-xl w-fit text-sm">
-            AI is thinking...
+            AI is typing...
           </div>
         )}
 
