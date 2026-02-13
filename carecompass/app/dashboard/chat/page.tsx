@@ -33,18 +33,16 @@ export default function ChatPage() {
         content: string;
       }[] = [];
 
-      data
-        .reverse()
-        .forEach((item: any) => {
-          formatted.push({
-            role: "user",
-            content: item.userMessage,
-          });
-          formatted.push({
-            role: "assistant",
-            content: item.aiResponse,
-          });
+      data.reverse().forEach((item: any) => {
+        formatted.push({
+          role: "user",
+          content: item.userMessage,
         });
+        formatted.push({
+          role: "assistant",
+          content: item.aiResponse,
+        });
+      });
 
       setMessages(formatted);
     };
@@ -53,9 +51,22 @@ export default function ChatPage() {
   }, [user]);
 
   // Auto scroll to latest message
+  // Auto scroll to latest message (stable for streaming)
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    if (!bottomRef.current) return;
+
+    const scroll = () => {
+      bottomRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "end",
+      });
+    };
+
+    // Small delay prevents strict mode double render issues
+    const timeout = setTimeout(scroll, 50);
+
+    return () => clearTimeout(timeout);
+  }, [messages.length]);
 
   // Typing effect function
   const typeMessage = async (fullText: string) => {
@@ -127,9 +138,7 @@ export default function ChatPage() {
     setClearing(false);
   };
 
-  const handleKeyPress = (
-    e: React.KeyboardEvent<HTMLInputElement>
-  ) => {
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       sendMessage();
     }
@@ -139,9 +148,7 @@ export default function ChatPage() {
     <div className="max-w-3xl mx-auto flex flex-col h-[85vh]">
       {/* Header */}
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">
-          AI Health Assistant
-        </h1>
+        <h1 className="text-2xl font-bold">AI Health Assistant</h1>
 
         <button
           onClick={handleClearChat}
