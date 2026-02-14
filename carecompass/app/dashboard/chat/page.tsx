@@ -21,7 +21,6 @@ export default function ChatPage() {
   const [loading, setLoading] = useState(false);
   const [clearing, setClearing] = useState(false);
 
-  // Load previous chat history
   useEffect(() => {
     const loadChatHistory = async () => {
       if (!user) return;
@@ -50,25 +49,20 @@ export default function ChatPage() {
     loadChatHistory();
   }, [user]);
 
-  // Auto scroll to latest message
-  // Auto scroll to latest message (stable for streaming)
+  // Stable auto-scroll (fixed earlier)
   useEffect(() => {
     if (!bottomRef.current) return;
 
-    const scroll = () => {
+    const timeout = setTimeout(() => {
       bottomRef.current?.scrollIntoView({
         behavior: "smooth",
         block: "end",
       });
-    };
-
-    // Small delay prevents strict mode double render issues
-    const timeout = setTimeout(scroll, 50);
+    }, 50);
 
     return () => clearTimeout(timeout);
   }, [messages.length]);
 
-  // Typing effect function
   const typeMessage = async (fullText: string) => {
     let currentText = "";
 
@@ -84,7 +78,7 @@ export default function ChatPage() {
         return updated;
       });
 
-      await new Promise((resolve) => setTimeout(resolve, 8)); // speed control
+      await new Promise((resolve) => setTimeout(resolve, 12));
     }
   };
 
@@ -96,7 +90,7 @@ export default function ChatPage() {
     setMessages((prev) => [
       ...prev,
       { role: "user", content: userMessage },
-      { role: "assistant", content: "" }, // placeholder for typing
+      { role: "assistant", content: "" },
     ]);
 
     setInput("");
@@ -112,10 +106,8 @@ export default function ChatPage() {
       const data = await res.json();
       const aiReply = data.reply || "No response.";
 
-      // Typing animation instead of instant response
       await typeMessage(aiReply);
 
-      // Save to Firestore after full message is typed
       if (user) {
         await saveHistory(user.uid, "chats", {
           userMessage,
@@ -138,31 +130,33 @@ export default function ChatPage() {
     setClearing(false);
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      sendMessage();
-    }
+  const handleKeyPress = (
+    e: React.KeyboardEvent<HTMLInputElement>
+  ) => {
+    if (e.key === "Enter") sendMessage();
   };
 
   return (
-    <div className="max-w-3xl mx-auto flex flex-col h-[85vh]">
+    <div className="max-w-3xl mx-auto flex flex-col h-[85vh] text-gray-900 dark:text-gray-100">
       {/* Header */}
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">AI Health Assistant</h1>
+        <h1 className="text-2xl font-bold">
+          AI Health Assistant
+        </h1>
 
         <button
           onClick={handleClearChat}
           disabled={clearing || messages.length === 0}
-          className="text-sm text-red-500 hover:text-red-600 transition disabled:opacity-50"
+          className="text-sm text-red-500 hover:text-red-600 dark:text-red-400 transition disabled:opacity-50"
         >
           {clearing ? "Clearing..." : "Clear Chat"}
         </button>
       </div>
 
       {/* Chat Window */}
-      <div className="flex-1 overflow-y-auto bg-white p-6 rounded-2xl border shadow-sm space-y-4">
+      <div className="flex-1 overflow-y-auto bg-white dark:bg-gray-800 p-6 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm space-y-4 transition-colors">
         {messages.length === 0 && !loading && (
-          <p className="text-gray-500 text-sm">
+          <p className="text-gray-500 dark:text-gray-400 text-sm">
             Ask anything about your health, reports, medicines, or lifestyle.
           </p>
         )}
@@ -173,10 +167,10 @@ export default function ChatPage() {
             className={`p-3 rounded-xl max-w-[80%] text-sm leading-relaxed ${
               msg.role === "user"
                 ? "bg-blue-600 text-white ml-auto"
-                : "bg-gray-100 text-gray-800"
+                : "bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-100"
             }`}
           >
-            <div className="prose prose-sm max-w-none">
+            <div className="prose prose-sm dark:prose-invert max-w-none">
               <ReactMarkdown remarkPlugins={[remarkGfm]}>
                 {msg.content}
               </ReactMarkdown>
@@ -185,7 +179,7 @@ export default function ChatPage() {
         ))}
 
         {loading && (
-          <div className="bg-gray-100 text-gray-700 p-3 rounded-xl w-fit text-sm">
+          <div className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 p-3 rounded-xl w-fit text-sm">
             AI is typing...
           </div>
         )}
@@ -193,14 +187,14 @@ export default function ChatPage() {
         <div ref={bottomRef} />
       </div>
 
-      {/* Input Section */}
+      {/* Input */}
       <div className="mt-4 flex gap-3">
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyPress}
           placeholder="Ask a health question..."
-          className="flex-1 border border-gray-300 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="flex-1 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
         />
 
         <button
