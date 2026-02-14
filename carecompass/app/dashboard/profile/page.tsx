@@ -2,19 +2,66 @@
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
-import { getUserProfile } from "@/services/userService";
+import {
+  getUserProfile,
+  updateUserProfile,
+} from "@/services/userService";
 
 export default function ProfilePage() {
   const { user } = useAuth();
-  const [profile, setProfile] = useState<any>(null);
+
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  const [name, setName] = useState("");
+  const [age, setAge] = useState("");
+  const [bloodGroup, setBloodGroup] = useState("");
 
   useEffect(() => {
-    if (user) {
-      getUserProfile(user.uid).then(setProfile);
-    }
+    const loadProfile = async () => {
+      if (!user) return;
+
+      const data = await getUserProfile(user.uid);
+
+      if (data) {
+        setName(data.name || "");
+        setAge(data.age || "");
+        setBloodGroup(data.bloodGroup || "");
+      }
+
+      setLoading(false);
+    };
+
+    loadProfile();
   }, [user]);
 
-  if (!profile) {
+  const handleSave = async () => {
+    if (!user) return;
+
+    if (!name || !age || !bloodGroup) {
+      alert("Please fill all required fields.");
+      return;
+    }
+
+    try {
+      setSaving(true);
+
+      await updateUserProfile(user.uid, {
+        name,
+        age,
+        bloodGroup,
+      });
+
+      alert("Profile updated successfully!");
+    } catch (error) {
+      console.error(error);
+      alert("Failed to update profile.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) {
     return (
       <div className="text-gray-500 dark:text-gray-400">
         Loading profile...
@@ -30,76 +77,110 @@ export default function ProfilePage() {
           Your Profile
         </h1>
         <p className="text-indigo-100 text-sm mt-1">
-          Manage your personal health information.
+          Update your personal health information.
         </p>
       </div>
 
-      {/* Profile Info Card */}
+      {/* Editable Profile Card */}
       <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-6 rounded-2xl shadow-sm transition-colors">
         <h2 className="text-xl font-semibold mb-6">
           Personal Information
         </h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          {/* Name */}
-          <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-xl">
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
-              Full Name
-            </p>
-            <p className="text-lg font-semibold">
-              {profile.name || "Not provided"}
-            </p>
+          {/* Full Name */}
+          <div>
+            <label className="block text-sm text-gray-500 dark:text-gray-400 mb-2">
+              Full Name *
+            </label>
+            <input
+              type="text"
+              className="w-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 p-3 rounded-xl text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Enter your full name"
+            />
           </div>
 
-          {/* Email */}
-          <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-xl">
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
-              Email
-            </p>
-            <p className="text-lg font-semibold">
-              {user?.email || "Not available"}
-            </p>
+          {/* Email (Read Only) */}
+          <div>
+            <label className="block text-sm text-gray-500 dark:text-gray-400 mb-2">
+              Email (Read Only)
+            </label>
+            <input
+              type="text"
+              disabled
+              value={user?.email || ""}
+              className="w-full border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 p-3 rounded-xl text-gray-500 dark:text-gray-400 cursor-not-allowed"
+            />
           </div>
 
           {/* Age */}
-          <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-xl">
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
-              Age
-            </p>
-            <p className="text-lg font-semibold">
-              {profile.age || "Not set"}
-            </p>
+          <div>
+            <label className="block text-sm text-gray-500 dark:text-gray-400 mb-2">
+              Age *
+            </label>
+            <input
+              type="number"
+              className="w-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 p-3 rounded-xl text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={age}
+              onChange={(e) => setAge(e.target.value)}
+              placeholder="Enter your age"
+            />
           </div>
 
           {/* Blood Group */}
-          <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-xl">
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
-              Blood Group
-            </p>
-            <p className="text-lg font-semibold">
-              {profile.bloodGroup || "Not set"}
-            </p>
+          <div>
+            <label className="block text-sm text-gray-500 dark:text-gray-400 mb-2">
+              Blood Group *
+            </label>
+            <select
+              className="w-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 p-3 rounded-xl text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={bloodGroup}
+              onChange={(e) => setBloodGroup(e.target.value)}
+            >
+              <option value="">Select Blood Group</option>
+              <option value="A+">A+</option>
+              <option value="A-">A-</option>
+              <option value="B+">B+</option>
+              <option value="B-">B-</option>
+              <option value="AB+">AB+</option>
+              <option value="AB-">AB-</option>
+              <option value="O+">O+</option>
+              <option value="O-">O-</option>
+            </select>
           </div>
+        </div>
+
+        {/* Save Button */}
+        <div className="mt-8 flex justify-end">
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="bg-blue-600 hover:bg-blue-700 transition text-white px-6 py-3 rounded-xl font-medium shadow-sm disabled:opacity-50"
+          >
+            {saving ? "Saving..." : "Save Changes"}
+          </button>
         </div>
       </div>
 
-      {/* Health Summary Card (UI only, no logic change) */}
+      {/* Info Card */}
       <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-6 rounded-2xl shadow-sm transition-colors">
         <h2 className="text-xl font-semibold mb-4">
           Profile Summary
         </h2>
 
         <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
-          This profile is used by CareCompass to personalize AI health
-          explanations, insights, and recommendations. Keeping your
-          information updated helps the AI provide more relevant and
-          accurate health guidance (non-diagnostic).
+          This information is used by CareCompass to personalize AI health
+          explanations, insights, and recommendations. Keeping your profile
+          updated helps the AI provide more relevant (non-diagnostic)
+          guidance.
         </p>
 
-        <div className="mt-4 text-xs text-gray-400 dark:text-gray-500">
-          Note: CareCompass provides informational AI assistance only and
-          does not replace professional medical advice.
-        </div>
+        <p className="text-xs text-gray-400 dark:text-gray-500 mt-4">
+          Note: CareCompass is an AI health companion and does not replace
+          professional medical advice.
+        </p>
       </div>
     </div>
   );
