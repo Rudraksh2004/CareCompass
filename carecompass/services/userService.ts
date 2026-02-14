@@ -1,5 +1,10 @@
 import { db } from "@/lib/firebase";
-import { doc, getDoc, setDoc, serverTimestamp, updateDoc } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  setDoc,
+  serverTimestamp,
+} from "firebase/firestore";
 
 export const createUserProfile = async (
   uid: string,
@@ -26,10 +31,19 @@ export const getUserProfile = async (uid: string) => {
   return null;
 };
 
+// 🔥 UPDATED (safer than updateDoc)
 export const updateUserProfile = async (
   uid: string,
   data: any
 ) => {
   const docRef = doc(db, "users", uid);
-  await updateDoc(docRef, data);
+
+  await setDoc(
+    docRef,
+    {
+      ...data,
+      updatedAt: serverTimestamp(),
+    },
+    { merge: true } // ← CRITICAL (prevents crashes)
+  );
 };
