@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { addHealthLog, getHealthLogs } from "@/services/healthService";
 import { getUserProfile } from "@/services/userService";
@@ -14,6 +14,8 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import AIReportCard from "@/components/AIReportCard";
+import * as htmlToImage from "html-to-image";
+import { exportMedicalPDF } from "@/utils/pdfExporter";
 
 export default function HealthPage() {
   const { user } = useAuth();
@@ -28,6 +30,10 @@ export default function HealthPage() {
   const [trendAnalysis, setTrendAnalysis] = useState("");
   const [loadingInsight, setLoadingInsight] = useState(false);
   const [loadingTrend, setLoadingTrend] = useState(false);
+  const [exportingPDF, setExportingPDF] = useState(false);
+
+  // 🔥 Chart ref for PDF export (IMPORTANT)
+  const chartRef = useRef<HTMLDivElement>(null);
 
   const loadLogs = async () => {
     if (!user) return;
@@ -39,7 +45,7 @@ export default function HealthPage() {
       data.map((log: any, index: number) => ({
         name: `#${index + 1}`,
         value: Number(log.value),
-      }))
+      })),
     );
   };
 
@@ -64,16 +70,22 @@ export default function HealthPage() {
     setLoadingInsight(true);
     setInsight("");
 
-    const res = await fetch("/api/ai/health-insight", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ logs: rawLogs, type }),
-    });
+    try {
+      const res = await fetch("/api/ai/health-insight", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ logs: rawLogs, type }),
+      });
 
-    const data = await res.json();
-    setInsight(data.insight || "No insight generated.");
+      const data = await res.json();
+      setInsight(data.insight || "No insight generated.");
+    } catch (error) {
+      console.error(error);
+      setInsight("Failed to generate insight.");
+    }
+
     setLoadingInsight(false);
   };
 
@@ -100,13 +112,65 @@ export default function HealthPage() {
       });
 
       const data = await res.json();
-      setTrendAnalysis(data.analysis);
+      setTrendAnalysis(data.analysis || "No trend analysis generated.");
     } catch (error) {
       console.error(error);
       setTrendAnalysis("Trend detection failed.");
     }
 
     setLoadingTrend(false);
+  };
+
+  // 🔥 FULL AI HEALTH REPORT PDF (Chart + Insight + Trend)
+  const formatHealthLogsForReport = () => {
+    if (!rawLogs || rawLogs.length === 0) return "No health logs available.";
+
+    const unit = type === "weight" ? "kg" : "mg/dL";
+
+    return rawLogs
+      .map((log: any, index: number) => {
+        const date = log.createdAt?.seconds
+          ? new Date(log.createdAt.seconds * 1000).toLocaleDateString()
+          : `Entry ${index + 1}`;
+
+        return `Entry ${index + 1} (${date}): ${log.value} ${unit}`;
+      })
+      .join("\n");
+  };
+
+  const downloadFullAIReport = async () => {
+    if (!chartRef.current || rawLogs.length === 0) return;
+
+    setExportingPDF(true);
+
+    try {
+      const chartImage = await htmlToImage.toPng(chartRef.current, {
+        cacheBust: true,
+        backgroundColor: "#ffffff",
+      });
+
+      const formattedLogs = formatHealthLogsForReport();
+
+      const combinedAIReport = `
+AI Health Insight:
+${insight || "No insight generated."}
+
+AI Trend Detection:
+${trendAnalysis || "No trend analysis generated."}
+    `;
+
+      await exportMedicalPDF(
+        `AI Health Trend Report (${type.toUpperCase()})`,
+        formattedLogs, // ✅ FIXED (no more JSON)
+        combinedAIReport,
+        chartImage,
+      );
+    } catch (error) {
+      console.error("PDF Export Error:", error);
+      alert("Failed to export PDF.");
+    }
+
+    setExportingPDF(false);
   };
 
   // 🧠 Smart Abnormal Detection (AI-style logic)
@@ -126,13 +190,10 @@ export default function HealthPage() {
 
       let status = "normal";
 
-      // 🔴 Major spike/drop
       if (percentChange >= 8) {
-        status = "abnormal";
-      }
-      // 🟡 Moderate fluctuation
-      else if (percentChange >= 4) {
-        status = "warning";
+        status = "abnormal"; // 🔴
+      } else if (percentChange >= 4) {
+        status = "warning"; // 🟡
       }
 
       return {
@@ -146,19 +207,15 @@ export default function HealthPage() {
     <div className="max-w-5xl mx-auto space-y-8 text-gray-900 dark:text-gray-100">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold">
-          Health Tracking & Trend Analysis
-        </h1>
+        <h1 className="text-3xl font-bold">Health Tracking & Trend Analysis</h1>
         <p className="text-gray-500 dark:text-gray-400 mt-1">
-          Track your metrics and detect AI-powered health trends.
+          Track your metrics and generate AI-powered clinical health reports.
         </p>
       </div>
 
       {/* Add Log Card */}
       <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-6 rounded-2xl shadow-sm">
-        <h2 className="text-lg font-semibold mb-4">
-          Add Health Log
-        </h2>
+        <h2 className="text-lg font-semibold mb-4">Add Health Log</h2>
 
         <div className="flex flex-wrap gap-4">
           <select
@@ -187,35 +244,22 @@ export default function HealthPage() {
         </div>
       </div>
 
-      {/* Chart with Abnormal Highlighting */}
+      {/* Chart with Ref (CRITICAL FOR PDF) */}
       <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-6 rounded-2xl shadow-sm">
-        <h2 className="text-xl font-semibold mb-4">
-          AI-Aware Trend Chart
-        </h2>
+        <h2 className="text-xl font-semibold mb-4">AI-Aware Trend Chart</h2>
 
         {logs.length === 0 ? (
-          <p className="text-gray-500">
-            No data available yet.
-          </p>
+          <p className="text-gray-500">No data available yet.</p>
         ) : (
           <>
-            <div className="w-full h-[320px]">
+            {/* 🔥 REF ATTACHED HERE */}
+            <div ref={chartRef} className="w-full h-[320px]">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={processedChartData}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis
-                    dataKey="name"
-                    stroke="#94a3b8"
-                  />
+                  <XAxis dataKey="name" stroke="#94a3b8" />
                   <YAxis stroke="#94a3b8" />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "#0f172a",
-                      border: "1px solid #334155",
-                      borderRadius: "12px",
-                      color: "#fff",
-                    }}
-                  />
+                  <Tooltip />
 
                   <Line
                     type="monotone"
@@ -269,9 +313,7 @@ export default function HealthPage() {
             <div className="flex flex-wrap gap-6 mt-4 text-sm">
               <div className="flex items-center gap-2">
                 <span className="w-3 h-3 rounded-full bg-blue-500"></span>
-                <span className="text-gray-500 dark:text-gray-400">
-                  Normal
-                </span>
+                <span className="text-gray-500 dark:text-gray-400">Normal</span>
               </div>
 
               <div className="flex items-center gap-2">
@@ -308,6 +350,17 @@ export default function HealthPage() {
           className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg disabled:opacity-50"
         >
           {loadingTrend ? "Detecting Trend..." : "Detect AI Trend"}
+        </button>
+
+        {/* 🔥 NEW: FULL AI REPORT PDF */}
+        <button
+          onClick={downloadFullAIReport}
+          disabled={exportingPDF || rawLogs.length === 0}
+          className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg disabled:opacity-50"
+        >
+          {exportingPDF
+            ? "Generating Clinical Report..."
+            : "Download Full AI Health Report (PDF)"}
         </button>
       </div>
 

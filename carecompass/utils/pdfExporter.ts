@@ -1,12 +1,12 @@
 import jsPDF from "jspdf";
 
-// Clean markdown artifacts from AI response
 function cleanText(text: string) {
+  if (!text) return "";
   return text
     .replace(/#+\s?/g, "")
     .replace(/\*\*/g, "")
     .replace(/\*/g, "")
-    .replace(/&[a-z]+;/g, "")
+    .replace(/`/g, "")
     .trim();
 }
 
@@ -17,41 +17,51 @@ function detectRiskLevel(text: string) {
     lower.includes("critical") ||
     lower.includes("severe") ||
     lower.includes("abnormal") ||
-    lower.includes("low haemoglobin") ||
+    lower.includes("consult a doctor") ||
     lower.includes("high risk") ||
-    lower.includes("consult a doctor")
+    lower.includes("low haemoglobin")
   ) {
     return {
       label: "HIGH RISK",
-      color: [220, 38, 38], // Red
+      color: [220, 38, 38],
       bg: [254, 226, 226],
     };
   }
 
   if (
     lower.includes("fluctuating") ||
-    lower.includes("moderate") ||
     lower.includes("variance") ||
+    lower.includes("moderate") ||
     lower.includes("elevated")
   ) {
     return {
       label: "MODERATE RISK",
-      color: [217, 119, 6], // Amber
+      color: [217, 119, 6],
       bg: [255, 237, 213],
     };
   }
 
   return {
     label: "STABLE / NORMAL",
-    color: [22, 163, 74], // Green
+    color: [22, 163, 74],
     bg: [220, 252, 231],
   };
 }
 
-export const exportMedicalPDF = (
+// 🧠 Dynamic Section Title (IMPORTANT FIX)
+function getSectionTitle(reportTitle: string) {
+  const title = reportTitle.toLowerCase();
+
+  if (title.includes("health")) return "Health Log Summary";
+  if (title.includes("prescription")) return "Extracted Prescription Text";
+  return "Extracted Medical Text (OCR)";
+}
+
+export const exportMedicalPDF = async (
   title: string,
   originalText: string,
-  aiResponse: string
+  aiResponse: string,
+  chartImage?: string
 ) => {
   const doc = new jsPDF("p", "mm", "a4");
   const margin = 15;
@@ -60,8 +70,9 @@ export const exportMedicalPDF = (
   const cleanedAI = cleanText(aiResponse);
   const cleanedOriginal = cleanText(originalText);
   const risk = detectRiskLevel(cleanedAI);
+  const sectionTitle = getSectionTitle(title);
 
-  // 🧠 Header Branding
+  // 🧠 HEADER (Branding)
   doc.setFont("helvetica", "bold");
   doc.setFontSize(22);
   doc.setTextColor(37, 99, 235);
@@ -70,7 +81,7 @@ export const exportMedicalPDF = (
   y += 8;
   doc.setFontSize(14);
   doc.setTextColor(0, 0, 0);
-  doc.text("Clinical AI Medical Report", margin, y);
+  doc.text("Clinical AI Health Report", margin, y);
 
   // Divider
   y += 5;
@@ -86,52 +97,61 @@ export const exportMedicalPDF = (
   doc.setFont("helvetica", "normal");
   doc.text(title, margin + 35, y);
 
-  // 🚨 RISK BADGE (FIXED + BEAUTIFUL)
+  // 🚨 RISK BADGE (FIXED)
   y += 12;
   doc.setFont("helvetica", "bold");
   doc.text("AI Risk Assessment:", margin, y);
 
-  // Badge Background
   doc.setFillColor(risk.bg[0], risk.bg[1], risk.bg[2]);
   doc.roundedRect(margin + 55, y - 6, 60, 10, 3, 3, "F");
 
-  // Badge Text (FIXED — no emoji corruption)
   doc.setTextColor(risk.color[0], risk.color[1], risk.color[2]);
   doc.setFontSize(11);
   doc.text(risk.label, margin + 60, y);
-
   doc.setTextColor(0, 0, 0);
 
-  // 🧾 Extracted Text Section (Styled Card)
-  y += 16;
+  // 📊 CHART SECTION (ONLY if provided)
+  if (chartImage) {
+    y += 18;
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(14);
+    doc.text("AI Trend Chart Analysis", margin, y);
+
+    y += 6;
+    doc.addImage(chartImage, "PNG", margin, y, 180, 80);
+    y += 90;
+  }
+
+  // 🧾 DYNAMIC ORIGINAL TEXT SECTION (FIXED)
+  y += 5;
   doc.setFillColor(245, 247, 250);
   doc.roundedRect(margin, y - 6, 180, 8, 3, 3, "F");
 
   doc.setFont("helvetica", "bold");
   doc.setFontSize(14);
-  doc.text("Extracted Medical Text (OCR)", margin + 2, y);
+  doc.text(sectionTitle, margin + 2, y);
 
-  y += 8;
+  y += 10;
   doc.setFont("helvetica", "normal");
-  doc.setFontSize(10);
+  doc.setFontSize(11);
 
   const originalSplit = doc.splitTextToSize(
-    cleanedOriginal || "No extracted text available.",
+    cleanedOriginal || "No data available.",
     180
   );
 
   doc.text(originalSplit, margin, y);
-  y += originalSplit.length * 5 + 8;
+  y += originalSplit.length * 6 + 10;
 
-  // 🤖 AI Explanation Section (Premium Look)
+  // 🤖 AI EXPLANATION SECTION (PREMIUM)
   doc.setFillColor(240, 249, 255);
   doc.roundedRect(margin, y - 6, 180, 8, 3, 3, "F");
 
   doc.setFont("helvetica", "bold");
   doc.setFontSize(14);
-  doc.text("AI Simplified Explanation", margin + 2, y);
+  doc.text("AI Clinical Explanation & Insights", margin + 2, y);
 
-  y += 8;
+  y += 10;
   doc.setFont("helvetica", "normal");
   doc.setFontSize(11);
 
@@ -141,10 +161,10 @@ export const exportMedicalPDF = (
   );
 
   doc.text(aiSplit, margin, y);
-  y += aiSplit.length * 6 + 10;
+  y += aiSplit.length * 6 + 12;
 
-  // 🛡️ Professional Disclaimer Box
-  doc.setDrawColor(200, 200, 200);
+  // 🛡️ MEDICAL DISCLAIMER (PROFESSIONAL)
+  doc.setDrawColor(220, 220, 220);
   doc.setFillColor(250, 250, 250);
   doc.roundedRect(margin, y, 180, 22, 4, 4, "FD");
 
@@ -155,7 +175,7 @@ export const exportMedicalPDF = (
   doc.setFont("helvetica", "normal");
   doc.setFontSize(9);
   doc.text(
-    "This report is generated by CareCompass AI for educational and informational purposes only. It does NOT provide medical diagnosis or treatment advice. Please consult a qualified healthcare professional for clinical decisions.",
+    "This report is generated by CareCompass AI for educational and informational purposes only. It is NOT a medical diagnosis or treatment recommendation. Always consult a qualified healthcare professional for clinical decisions.",
     margin + 3,
     y + 14,
     { maxWidth: 174 }
@@ -170,5 +190,5 @@ export const exportMedicalPDF = (
     285
   );
 
-  doc.save("CareCompass-AI-Medical-Report.pdf");
+  doc.save("CareCompass-AI-Clinical-Report.pdf");
 };
