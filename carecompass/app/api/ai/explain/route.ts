@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { GEMINI_CONFIG } from "@/lib/aiConfig";
 
 export async function POST(req: Request) {
   try {
@@ -21,7 +20,7 @@ export async function POST(req: Request) {
     }
 
     const response = await fetch(
-      `${GEMINI_CONFIG.baseUrl}/models/${GEMINI_CONFIG.model}:generateContent?key=${process.env.GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`,
       {
         method: "POST",
         headers: {
