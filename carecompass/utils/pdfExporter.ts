@@ -106,6 +106,29 @@ function formatDataPointsWithUnits(text: string, title: string) {
   });
 }
 
+function formatClinicalText(text: string) {
+  if (!text) return text;
+
+  return (
+    text
+      // Add proper line break before numbered sections (1. 2. 3.)
+      .replace(/\s(\d+\.\s)/g, "\n\n$1")
+
+      // Add spacing before major headings
+      .replace(
+        /(Trend Analysis|Pattern Analysis|Lifestyle Insights|Gentle Suggestions|Disclaimer|Status:|Direction:)/gi,
+        "\n\n$1",
+      )
+
+      // Fix merged sentences like ".Your" -> ". Your"
+      .replace(/\.([A-Z])/g, ". $1")
+
+      // Ensure clean paragraph spacing
+      .replace(/\n{3,}/g, "\n\n")
+      .trim()
+  );
+}
+
 export const exportMedicalPDF = async (
   title: string,
   originalText: string,
@@ -119,6 +142,7 @@ export const exportMedicalPDF = async (
   // 🔧 CLEAN + FIX TEXT (NO DESIGN CHANGE)
   let cleanedAI = cleanText(aiResponse);
   cleanedAI = formatDataPointsWithUnits(cleanedAI, title);
+  cleanedAI = formatClinicalText(cleanedAI); // ⭐ NEW LINE (format like medical report)
 
   const cleanedOriginal = cleanText(originalText);
   const risk = detectRiskLevel(cleanedAI);
