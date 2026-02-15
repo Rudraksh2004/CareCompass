@@ -4,10 +4,34 @@ export async function POST(req: Request) {
   try {
     const { logs, type } = await req.json();
 
-    const apiKey = process.env.GEMINI_API_KEY;
+    if (!logs || logs.length === 0) {
+      return NextResponse.json({
+        insight: "No health data available to analyze.",
+      });
+    }
+
+    const formattedLogs = logs
+      .map((log: any, i: number) => `Entry ${i + 1}: ${log.value}`)
+      .join("\n");
+
+    const prompt = `
+You are CareCompass AI, a non-diagnostic health assistant.
+
+Health Metric: ${type}
+
+User Health Logs (chronological):
+${formattedLogs}
+
+Explain:
+1. What the trend suggests (simple language)
+2. Whether values are stable, increasing, or fluctuating
+3. Lifestyle insights (non-medical)
+4. Gentle wellness suggestions
+5. Add a short disclaimer: Not medical advice
+`;
 
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${process.env.GEMINI_API_KEY}`,
       {
         method: "POST",
         headers: {
@@ -16,25 +40,7 @@ export async function POST(req: Request) {
         body: JSON.stringify({
           contents: [
             {
-              role: "user",
-              parts: [
-                {
-                  text: `
-You are CareCompass AI.
-
-Analyze the following ${type} data points and give insights.
-
-Rules:
-- Do NOT diagnose diseases
-- Provide general trend observations
-- Mention if increasing, decreasing or stable
-- Suggest healthy habits (general advice only)
-
-Data:
-${JSON.stringify(logs)}
-                  `,
-                },
-              ],
+              parts: [{ text: prompt }],
             },
           ],
         }),
@@ -43,14 +49,17 @@ ${JSON.stringify(logs)}
 
     const data = await response.json();
 
-    const insight =
-      data.candidates?.[0]?.content?.parts?.[0]?.text;
+    console.log("Health Insight API Response:", data);
 
-    return NextResponse.json({ insight });
+    const text =
+      data?.candidates?.[0]?.content?.parts?.[0]?.text ||
+      "AI insight could not be generated.";
+
+    return NextResponse.json({ insight: text });
   } catch (error) {
-    console.error(error);
+    console.error("Health Insight Error:", error);
     return NextResponse.json(
-      { error: "Insight generation failed" },
+      { insight: "Health insight failed due to server error." },
       { status: 500 }
     );
   }
