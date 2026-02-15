@@ -1,5 +1,8 @@
 import jsPDF from "jspdf";
 
+const PAGE_HEIGHT = 280; // Safe printable height
+const LINE_HEIGHT = 6;
+
 function cleanText(text: string) {
   if (!text) return "";
   return text
@@ -17,9 +20,8 @@ function detectRiskLevel(text: string) {
     lower.includes("critical") ||
     lower.includes("severe") ||
     lower.includes("abnormal") ||
-    lower.includes("consult a doctor") ||
     lower.includes("high risk") ||
-    lower.includes("low haemoglobin")
+    lower.includes("consult a doctor")
   ) {
     return {
       label: "HIGH RISK",
@@ -30,9 +32,8 @@ function detectRiskLevel(text: string) {
 
   if (
     lower.includes("fluctuating") ||
-    lower.includes("variance") ||
     lower.includes("moderate") ||
-    lower.includes("elevated")
+    lower.includes("variance")
   ) {
     return {
       label: "MODERATE RISK",
@@ -48,12 +49,10 @@ function detectRiskLevel(text: string) {
   };
 }
 
-// 🧠 Dynamic Section Title (IMPORTANT FIX)
-function getSectionTitle(reportTitle: string) {
-  const title = reportTitle.toLowerCase();
-
-  if (title.includes("health")) return "Health Log Summary";
-  if (title.includes("prescription")) return "Extracted Prescription Text";
+function getSectionTitle(title: string) {
+  const t = title.toLowerCase();
+  if (t.includes("health")) return "Health Log Summary";
+  if (t.includes("prescription")) return "Extracted Prescription Text";
   return "Extracted Medical Text (OCR)";
 }
 
@@ -72,7 +71,15 @@ export const exportMedicalPDF = async (
   const risk = detectRiskLevel(cleanedAI);
   const sectionTitle = getSectionTitle(title);
 
-  // 🧠 HEADER (Branding)
+  // 🧠 Helper: Add new page automatically
+  const checkPageBreak = (requiredSpace = 20) => {
+    if (y + requiredSpace > PAGE_HEIGHT) {
+      doc.addPage();
+      y = 20;
+    }
+  };
+
+  // 🏥 HEADER
   doc.setFont("helvetica", "bold");
   doc.setFontSize(22);
   doc.setTextColor(37, 99, 235);
@@ -83,36 +90,36 @@ export const exportMedicalPDF = async (
   doc.setTextColor(0, 0, 0);
   doc.text("Clinical AI Health Report", margin, y);
 
-  // Divider
-  y += 5;
+  y += 6;
   doc.setDrawColor(200, 200, 200);
   doc.line(margin, y, 195, y);
 
-  // 📄 Report Type
+  // 📄 REPORT TYPE
   y += 12;
   doc.setFontSize(12);
   doc.setFont("helvetica", "bold");
   doc.text("Report Type:", margin, y);
-
   doc.setFont("helvetica", "normal");
   doc.text(title, margin + 35, y);
 
-  // 🚨 RISK BADGE (FIXED)
+  // 🚨 RISK BADGE
   y += 12;
   doc.setFont("helvetica", "bold");
   doc.text("AI Risk Assessment:", margin, y);
 
   doc.setFillColor(risk.bg[0], risk.bg[1], risk.bg[2]);
-  doc.roundedRect(margin + 55, y - 6, 60, 10, 3, 3, "F");
+  doc.roundedRect(margin + 55, y - 6, 65, 10, 3, 3, "F");
 
   doc.setTextColor(risk.color[0], risk.color[1], risk.color[2]);
   doc.setFontSize(11);
   doc.text(risk.label, margin + 60, y);
   doc.setTextColor(0, 0, 0);
 
-  // 📊 CHART SECTION (ONLY if provided)
+  // 📊 CHART (Auto page break safe)
   if (chartImage) {
-    y += 18;
+    checkPageBreak(100);
+
+    y += 15;
     doc.setFont("helvetica", "bold");
     doc.setFontSize(14);
     doc.text("AI Trend Chart Analysis", margin, y);
@@ -122,8 +129,10 @@ export const exportMedicalPDF = async (
     y += 90;
   }
 
-  // 🧾 DYNAMIC ORIGINAL TEXT SECTION (FIXED)
+  // 🧾 ORIGINAL TEXT SECTION
+  checkPageBreak(30);
   y += 5;
+
   doc.setFillColor(245, 247, 250);
   doc.roundedRect(margin, y - 6, 180, 8, 3, 3, "F");
 
@@ -135,15 +144,21 @@ export const exportMedicalPDF = async (
   doc.setFont("helvetica", "normal");
   doc.setFontSize(11);
 
-  const originalSplit = doc.splitTextToSize(
+  const originalLines = doc.splitTextToSize(
     cleanedOriginal || "No data available.",
     180
   );
 
-  doc.text(originalSplit, margin, y);
-  y += originalSplit.length * 6 + 10;
+  originalLines.forEach((line: string) => {
+    checkPageBreak(LINE_HEIGHT);
+    doc.text(line, margin, y);
+    y += LINE_HEIGHT;
+  });
 
-  // 🤖 AI EXPLANATION SECTION (PREMIUM)
+  // 🤖 AI EXPLANATION SECTION (MULTI-PAGE FIX)
+  checkPageBreak(25);
+  y += 10;
+
   doc.setFillColor(240, 249, 255);
   doc.roundedRect(margin, y - 6, 180, 8, 3, 3, "F");
 
@@ -155,15 +170,21 @@ export const exportMedicalPDF = async (
   doc.setFont("helvetica", "normal");
   doc.setFontSize(11);
 
-  const aiSplit = doc.splitTextToSize(
+  const aiLines = doc.splitTextToSize(
     cleanedAI || "No AI explanation generated.",
     180
   );
 
-  doc.text(aiSplit, margin, y);
-  y += aiSplit.length * 6 + 12;
+  aiLines.forEach((line: string) => {
+    checkPageBreak(LINE_HEIGHT);
+    doc.text(line, margin, y);
+    y += LINE_HEIGHT;
+  });
 
-  // 🛡️ MEDICAL DISCLAIMER (PROFESSIONAL)
+  // 🛡️ DISCLAIMER (always visible on last page)
+  checkPageBreak(35);
+  y += 12;
+
   doc.setDrawColor(220, 220, 220);
   doc.setFillColor(250, 250, 250);
   doc.roundedRect(margin, y, 180, 22, 4, 4, "FD");
@@ -175,7 +196,7 @@ export const exportMedicalPDF = async (
   doc.setFont("helvetica", "normal");
   doc.setFontSize(9);
   doc.text(
-    "This report is generated by CareCompass AI for educational and informational purposes only. It is NOT a medical diagnosis or treatment recommendation. Always consult a qualified healthcare professional for clinical decisions.",
+    "This report is generated by CareCompass AI for informational purposes only and is not a medical diagnosis. Always consult a qualified healthcare professional.",
     margin + 3,
     y + 14,
     { maxWidth: 174 }
@@ -187,7 +208,7 @@ export const exportMedicalPDF = async (
   doc.text(
     `Generated by CareCompass AI • ${new Date().toLocaleString()}`,
     margin,
-    285
+    290
   );
 
   doc.save("CareCompass-AI-Clinical-Report.pdf");
