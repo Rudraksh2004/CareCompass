@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { GEMINI_CONFIG } from "@/lib/aiConfig";
 
 export async function POST(req: Request) {
   try {
@@ -31,7 +32,7 @@ Explain:
 `;
 
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${process.env.GEMINI_API_KEY}`,
+      `${GEMINI_CONFIG.baseUrl}/models/${GEMINI_CONFIG.model}:generateContent?key=${process.env.GEMINI_API_KEY}`,
       {
         method: "POST",
         headers: {
@@ -44,7 +45,7 @@ Explain:
             },
           ],
         }),
-      }
+      },
     );
 
     const data = await response.json();
@@ -60,7 +61,7 @@ Explain:
     console.error("Health Insight Error:", error);
     return NextResponse.json(
       { insight: "Health insight failed due to server error." },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

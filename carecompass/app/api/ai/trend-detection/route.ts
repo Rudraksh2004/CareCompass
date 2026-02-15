@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { GEMINI_CONFIG } from "@/lib/aiConfig";
 
 export async function POST(req: Request) {
   try {
@@ -36,7 +37,7 @@ Provide:
 `;
 
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${process.env.GEMINI_API_KEY}`,
+      `${GEMINI_CONFIG.baseUrl}/models/${GEMINI_CONFIG.model}:generateContent?key=${process.env.GEMINI_API_KEY}`,
       {
         method: "POST",
         headers: {
@@ -49,7 +50,7 @@ Provide:
             },
           ],
         }),
-      }
+      },
     );
 
     const data = await response.json();
@@ -65,7 +66,7 @@ Provide:
     console.error("Trend Detection Error:", error);
     return NextResponse.json(
       { analysis: "Trend detection failed." },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

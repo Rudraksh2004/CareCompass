@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
+import { GEMINI_CONFIG } from "@/lib/aiConfig";
 
 export async function POST(req: Request) {
   try {
-    const { profile, healthLogs, reports, prescriptions } =
-      await req.json();
+    const { profile, healthLogs, reports, prescriptions } = await req.json();
 
     const prompt = `
 You are CareCompass, a non-diagnostic AI health companion.
@@ -38,7 +38,7 @@ IMPORTANT:
 `;
 
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1/models/gemini-3-flash-preview:generateContent?key=${process.env.GEMINI_API_KEY}`,
+      `${GEMINI_CONFIG.baseUrl}/models/${GEMINI_CONFIG.model}:generateContent?key=${process.env.GEMINI_API_KEY}`,
       {
         method: "POST",
         headers: {
@@ -51,7 +51,7 @@ IMPORTANT:
             },
           ],
         }),
-      }
+      },
     );
 
     const data = await response.json();
@@ -65,7 +65,7 @@ IMPORTANT:
     console.error("Health Summary API Error:", error);
     return NextResponse.json(
       { error: "Failed to generate health summary" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
