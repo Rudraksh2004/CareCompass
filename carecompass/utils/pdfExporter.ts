@@ -5,13 +5,30 @@ const LINE_HEIGHT = 6;
 
 function cleanText(text: string) {
   if (!text) return "";
+
   return text
+    // Remove markdown formatting (safe)
     .replace(/#+\s?/g, "")
     .replace(/\*\*/g, "")
     .replace(/\*/g, "")
     .replace(/`/g, "")
+
+    // ✅ FIX 1: ONLY repair OCR spaced letters like "D a t a" -> "Data"
+    .replace(/\b(?:[A-Za-z]\s){2,}[A-Za-z]\b/g, (match) =>
+      match.replace(/\s+/g, "")
+    )
+
+    // ✅ FIX 2: Fix "& b  Safety Disclaimer" artifact ONLY
+    .replace(/&\s*b\s+/gi, "& ")
+
+    // Normalize excessive spaces (NOT removing normal spaces)
+    .replace(/\s{2,}/g, " ")
+    .replace(/\s*:\s*/g, ": ")
+    .replace(/\s*,\s*/g, ", ")
+
     .trim();
 }
+
 
 function detectRiskLevel(text: string) {
   const lower = text.toLowerCase();
@@ -56,6 +73,31 @@ function getSectionTitle(title: string) {
   return "Extracted Medical Text (OCR)";
 }
 
+// 🔧 FIX 3: Add units to Data Points automatically (WITHOUT changing layout)
+function formatDataPointsWithUnits(text: string, title: string) {
+  if (!text) return text;
+
+  const lowerTitle = title.toLowerCase();
+
+  let unit = "";
+  if (lowerTitle.includes("weight")) unit = " kg";
+  else if (lowerTitle.includes("blood sugar")) unit = " mg/dL";
+  else if (lowerTitle.includes("health")) unit = "";
+
+  return text.replace(
+    /(Data Points?:\s*)([0-9.,\s]+)/i,
+    (_, label, numbers) => {
+      const formatted = numbers
+        .split(",")
+        .map((n: string) => n.trim())
+        .filter(Boolean)
+        .map((n: string) => `${n}${unit}`)
+        .join(", ");
+      return `${label}${formatted}`;
+    }
+  );
+}
+
 export const exportMedicalPDF = async (
   title: string,
   originalText: string,
@@ -66,7 +108,10 @@ export const exportMedicalPDF = async (
   const margin = 15;
   let y = 20;
 
-  const cleanedAI = cleanText(aiResponse);
+  // 🔧 CLEAN + FIX TEXT (NO DESIGN CHANGE)
+  let cleanedAI = cleanText(aiResponse);
+  cleanedAI = formatDataPointsWithUnits(cleanedAI, title);
+
   const cleanedOriginal = cleanText(originalText);
   const risk = detectRiskLevel(cleanedAI);
   const sectionTitle = getSectionTitle(title);
@@ -102,7 +147,7 @@ export const exportMedicalPDF = async (
   doc.setFont("helvetica", "normal");
   doc.text(title, margin + 35, y);
 
-  // 🚨 RISK BADGE
+  // 🚨 RISK BADGE (UNCHANGED DESIGN)
   y += 12;
   doc.setFont("helvetica", "bold");
   doc.text("AI Risk Assessment:", margin, y);
@@ -129,7 +174,7 @@ export const exportMedicalPDF = async (
     y += 90;
   }
 
-  // 🧾 ORIGINAL TEXT SECTION
+  // 🧾 ORIGINAL TEXT SECTION (UNCHANGED)
   checkPageBreak(30);
   y += 5;
 
@@ -155,7 +200,7 @@ export const exportMedicalPDF = async (
     y += LINE_HEIGHT;
   });
 
-  // 🤖 AI EXPLANATION SECTION (MULTI-PAGE FIX)
+  // 🤖 AI EXPLANATION SECTION (MULTI-PAGE SAFE — UNCHANGED)
   checkPageBreak(25);
   y += 10;
 
@@ -181,7 +226,7 @@ export const exportMedicalPDF = async (
     y += LINE_HEIGHT;
   });
 
-  // 🛡️ DISCLAIMER (always visible on last page)
+  // 🛡️ DISCLAIMER (UNCHANGED DESIGN — but artifact fixed via cleanText)
   checkPageBreak(35);
   y += 12;
 
@@ -202,7 +247,7 @@ export const exportMedicalPDF = async (
     { maxWidth: 174 }
   );
 
-  // Footer
+  // Footer (UNCHANGED)
   doc.setFontSize(8);
   doc.setTextColor(120, 120, 120);
   doc.text(
