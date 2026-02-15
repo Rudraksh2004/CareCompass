@@ -35,12 +35,12 @@ body {
 .prose {
   line-height: 1.7;
 }
-
+.prose h3 {
+  font-size: 1.25rem;
+  margin-top: 1.5rem;
+}
 .prose ul {
+  margin-left: 1rem;
   list-style-type: disc;
-  padding-left: 1.25rem;
 }
 
-.prose li {
-  margin-bottom: 0.25rem;
-}

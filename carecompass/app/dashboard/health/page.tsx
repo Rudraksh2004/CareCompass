@@ -13,6 +13,7 @@ import {
   CartesianGrid,
   ResponsiveContainer,
 } from "recharts";
+import AIReportCard from "@/components/AIReportCard";
 
 export default function HealthPage() {
   const { user } = useAuth();
@@ -38,7 +39,7 @@ export default function HealthPage() {
       data.map((log: any, index: number) => ({
         name: `#${index + 1}`,
         value: Number(log.value),
-      }))
+      })),
     );
   };
 
@@ -111,9 +112,7 @@ export default function HealthPage() {
   return (
     <div className="max-w-5xl mx-auto space-y-8 text-gray-900 dark:text-gray-100">
       <div>
-        <h1 className="text-3xl font-bold">
-          Health Tracking & Trend Analysis
-        </h1>
+        <h1 className="text-3xl font-bold">Health Tracking & Trend Analysis</h1>
         <p className="text-gray-500 dark:text-gray-400 mt-1">
           Track your metrics and detect AI-powered health trends.
         </p>
@@ -121,9 +120,7 @@ export default function HealthPage() {
 
       {/* Add Log Card */}
       <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-6 rounded-2xl shadow-sm">
-        <h2 className="text-lg font-semibold mb-4">
-          Add Health Log
-        </h2>
+        <h2 className="text-lg font-semibold mb-4">Add Health Log</h2>
 
         <div className="flex flex-wrap gap-4">
           <select
@@ -154,14 +151,10 @@ export default function HealthPage() {
 
       {/* Chart */}
       <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-6 rounded-2xl shadow-sm">
-        <h2 className="text-xl font-semibold mb-4">
-          Trend Chart
-        </h2>
+        <h2 className="text-xl font-semibold mb-4">Trend Chart</h2>
 
         {logs.length === 0 ? (
-          <p className="text-gray-500">
-            No data available yet.
-          </p>
+          <p className="text-gray-500">No data available yet.</p>
         ) : (
           <div className="w-full h-[320px]">
             <ResponsiveContainer width="100%" height="100%">
@@ -202,24 +195,14 @@ export default function HealthPage() {
       </div>
 
       {/* AI Insight */}
-      {insight && (
-        <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-xl whitespace-pre-wrap text-sm">
-          <h3 className="font-semibold mb-2">
-            AI Insight
-          </h3>
-          {insight}
-        </div>
-      )}
+      <AIReportCard title="AI Health Insight" content={insight} />
 
       {/* Trend Analysis */}
-      {trendAnalysis && (
-        <div className="bg-purple-100 dark:bg-purple-900/30 border border-purple-300 dark:border-purple-700 p-4 rounded-xl whitespace-pre-wrap text-sm">
-          <h3 className="font-semibold mb-2">
-            🧠 AI Trend Detection
-          </h3>
-          {trendAnalysis}
-        </div>
-      )}
+      <AIReportCard
+        title="AI Trend Detection"
+        content={trendAnalysis}
+        variant="trend"
+      />
     </div>
   );
 }
