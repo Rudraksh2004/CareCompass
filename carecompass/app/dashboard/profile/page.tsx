@@ -21,15 +21,19 @@ export default function ProfilePage() {
     const loadProfile = async () => {
       if (!user) return;
 
-      const data = await getUserProfile(user.uid);
+      try {
+        const data = await getUserProfile(user.uid);
 
-      if (data) {
-        setName(data.name || "");
-        setAge(data.age || "");
-        setBloodGroup(data.bloodGroup || "");
+        if (data) {
+          setName(data.name || "");
+          setAge(data.age ? String(data.age) : "");
+          setBloodGroup(data.bloodGroup || "");
+        }
+      } catch (error) {
+        console.error("Error loading profile:", error);
+      } finally {
+        setLoading(false);
       }
-
-      setLoading(false);
     };
 
     loadProfile();
@@ -38,7 +42,7 @@ export default function ProfilePage() {
   const handleSave = async () => {
     if (!user) return;
 
-    if (!name || !age || !bloodGroup) {
+    if (!name.trim() || !age || !bloodGroup) {
       alert("Please fill all required fields.");
       return;
     }
@@ -47,15 +51,15 @@ export default function ProfilePage() {
       setSaving(true);
 
       await updateUserProfile(user.uid, {
-        name,
-        age,
+        name: name.trim(),
+        age: Number(age),
         bloodGroup,
       });
 
       alert("Profile updated successfully!");
     } catch (error) {
-      console.error(error);
-      alert("Failed to update profile.");
+      console.error("Profile update error:", error);
+      alert("Failed to update profile. Please try again.");
     } finally {
       setSaving(false);
     }
@@ -77,7 +81,7 @@ export default function ProfilePage() {
           Your Profile
         </h1>
         <p className="text-indigo-100 text-sm mt-1">
-          Update your personal health information.
+          Update your personal health information for better AI insights.
         </p>
       </div>
 
@@ -122,6 +126,7 @@ export default function ProfilePage() {
             </label>
             <input
               type="number"
+              min="1"
               className="w-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 p-3 rounded-xl text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
               value={age}
               onChange={(e) => setAge(e.target.value)}
@@ -159,27 +164,33 @@ export default function ProfilePage() {
             disabled={saving}
             className="bg-blue-600 hover:bg-blue-700 transition text-white px-6 py-3 rounded-xl font-medium shadow-sm disabled:opacity-50"
           >
-            {saving ? "Saving..." : "Save Changes"}
+            {saving ? "Saving Changes..." : "Save Changes"}
           </button>
         </div>
       </div>
 
-      {/* Info Card */}
+      {/* AI Health Summary Info Card */}
       <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-6 rounded-2xl shadow-sm transition-colors">
         <h2 className="text-xl font-semibold mb-4">
-          Profile Summary
+          AI Health Summary
         </h2>
 
         <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
-          This information is used by CareCompass to personalize AI health
-          explanations, insights, and recommendations. Keeping your profile
-          updated helps the AI provide more relevant (non-diagnostic)
-          guidance.
+          CareCompass generates a personalized AI health summary using
+          your profile details, health logs, medical reports, and
+          prescription history. This helps the AI provide more relevant
+          and contextual (non-diagnostic) health insights tailored to you.
         </p>
 
+        <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-xl text-sm text-gray-700 dark:text-gray-200">
+          💡 Tip: Go to the Dashboard and click "Generate Summary" to
+          analyze your complete health data with AI.
+        </div>
+
         <p className="text-xs text-gray-400 dark:text-gray-500 mt-4">
-          Note: CareCompass is an AI health companion and does not replace
-          professional medical advice.
+          Disclaimer: CareCompass is an AI health companion designed for
+          informational purposes only and does not provide medical
+          diagnosis or treatment advice.
         </p>
       </div>
     </div>
