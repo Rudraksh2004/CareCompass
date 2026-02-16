@@ -28,54 +28,50 @@ export default function ChatPage() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [creatingChat, setCreatingChat] = useState(false);
 
-  // Load all chat sessions
+  // 🔥 Load sessions on mount (FIXED)
   useEffect(() => {
     if (!user) return;
-    loadSessions();
+    fetchSessions();
   }, [user]);
 
-  const loadSessions = async () => {
+  const fetchSessions = async () => {
     if (!user) return;
 
     const data = await getChatSessions(user.uid);
     setSessions(data);
 
-    // Auto-load latest chat if none selected
+    // Auto open latest chat if none selected
     if (data.length > 0 && !activeSession) {
-      setActiveSession(data[0].id);
-      loadMessages(data[0].id);
+      const latest = data[0].id;
+      setActiveSession(latest);
+      loadMessages(latest);
     }
   };
 
   const loadMessages = async (sessionId: string) => {
     if (!user) return;
-
     const msgs = await getMessages(user.uid, sessionId);
     setMessages(msgs as Message[]);
     setActiveSession(sessionId);
   };
 
-  // Auto-scroll
+  // Auto scroll
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
 
-  // Create new chat session
+  // ➕ New Chat (FIXED sidebar refresh)
   const handleNewChat = async () => {
     if (!user) return;
 
-    setCreatingChat(true);
     const sessionId = await createChatSession(user.uid);
-
     setActiveSession(sessionId);
     setMessages([]);
-    await loadSessions();
-    setCreatingChat(false);
+    await fetchSessions(); // IMPORTANT: refresh sidebar
   };
 
-  // Delete chat session
+  // 🗑 Delete Chat
   const handleDeleteChat = async (sessionId: string) => {
     if (!user) return;
 
@@ -86,10 +82,10 @@ export default function ChatPage() {
       setMessages([]);
     }
 
-    await loadSessions();
+    await fetchSessions();
   };
 
-  // 🔥 AI Smart Title Generator (Option C)
+  // 🧠 Smart Title Generator (FIXED)
   const generateSmartTitle = async (
     firstMessage: string,
     sessionId: string
@@ -109,13 +105,13 @@ export default function ChatPage() {
       const title = data.title || "Medical Discussion";
 
       await updateChatTitle(user.uid, sessionId, title);
-      await loadSessions();
-    } catch (error) {
-      console.error("Title generation failed:", error);
+      await fetchSessions(); // 🔥 refresh sidebar instantly
+    } catch (err) {
+      console.error("Title generation error:", err);
     }
   };
 
-  // Typing animation (kept from your original logic)
+  // Typing animation (kept from your original)
   const typeMessage = async (fullText: string) => {
     let currentText = "";
 
@@ -136,7 +132,7 @@ export default function ChatPage() {
   };
 
   const sendMessage = async () => {
-    if (!input.trim() || loading || !user || !activeSession) return;
+    if (!input.trim() || !user || !activeSession || loading) return;
 
     const userMessage = input;
     const isFirstMessage = messages.length === 0;
@@ -154,7 +150,7 @@ export default function ChatPage() {
       // Save user message
       await saveMessage(user.uid, activeSession, "user", userMessage);
 
-      // 🔥 Generate smart AI title only on first message
+      // Generate smart title ONLY on first message
       if (isFirstMessage) {
         generateSmartTitle(userMessage, activeSession);
       }
@@ -183,15 +179,14 @@ export default function ChatPage() {
 
   return (
     <div className="flex h-[88vh] max-w-7xl mx-auto rounded-3xl overflow-hidden border border-gray-200 dark:border-gray-800 bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl shadow-2xl">
-      {/* 🧠 SIDEBAR (ChatGPT Style) */}
+      {/* Sidebar */}
       {sidebarOpen && (
         <div className="w-72 border-r border-gray-200 dark:border-gray-800 p-4 flex flex-col bg-white/80 dark:bg-gray-900/80">
           <button
             onClick={handleNewChat}
-            disabled={creatingChat}
-            className="mb-4 w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-2.5 rounded-xl font-semibold shadow-md hover:opacity-90 transition disabled:opacity-50"
+            className="mb-4 w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-2.5 rounded-xl font-semibold shadow-md hover:opacity-90 transition"
           >
-            {creatingChat ? "Creating..." : "+ New Chat"}
+            + New Chat
           </button>
 
           <div className="flex-1 overflow-y-auto space-y-2">
@@ -224,22 +219,20 @@ export default function ChatPage() {
         </div>
       )}
 
-      {/* 💬 CHAT AREA */}
+      {/* Chat Area */}
       <div className="flex-1 flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-800">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="px-3 py-1 rounded-lg bg-gray-100 dark:bg-gray-800 text-sm"
-            >
-              ☰
-            </button>
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="px-3 py-1 rounded-lg bg-gray-100 dark:bg-gray-800 text-sm"
+          >
+            ☰
+          </button>
 
-            <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              AI Health Assistant
-            </h1>
-          </div>
+          <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            AI Health Assistant
+          </h1>
 
           <span className="text-xs text-gray-500">
             Non-diagnostic AI
@@ -285,7 +278,7 @@ export default function ChatPage() {
 
           {loading && (
             <div className="text-sm text-gray-500 animate-pulse">
-              CareCompass AI is analyzing your query...
+              CareCompass AI is analyzing...
             </div>
           )}
 
