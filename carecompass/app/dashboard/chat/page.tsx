@@ -49,7 +49,7 @@ export default function ChatPage() {
     loadChatHistory();
   }, [user]);
 
-  // Stable auto-scroll (fixed earlier)
+  // Stable auto-scroll (UNCHANGED logic)
   useEffect(() => {
     if (!bottomRef.current) return;
 
@@ -137,73 +137,108 @@ export default function ChatPage() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto flex flex-col h-[85vh] text-gray-900 dark:text-gray-100">
-      {/* Header */}
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">
-          AI Health Assistant
-        </h1>
+    <div className="max-w-4xl mx-auto flex flex-col h-[88vh] text-gray-900 dark:text-gray-100">
+      {/* Premium Header */}
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            AI Health Assistant
+          </h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            Non-diagnostic medical AI for reports, symptoms & health insights
+          </p>
+        </div>
 
         <button
           onClick={handleClearChat}
           disabled={clearing || messages.length === 0}
-          className="text-sm text-red-500 hover:text-red-600 dark:text-red-400 transition disabled:opacity-50"
+          className="px-4 py-2 rounded-xl border border-red-300 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 dark:border-red-800 transition text-sm font-medium disabled:opacity-50"
         >
           {clearing ? "Clearing..." : "Clear Chat"}
         </button>
       </div>
 
-      {/* Chat Window */}
-      <div className="flex-1 overflow-y-auto bg-white dark:bg-gray-800 p-6 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm space-y-4 transition-colors">
-        {messages.length === 0 && !loading && (
-          <p className="text-gray-500 dark:text-gray-400 text-sm">
-            Ask anything about your health, reports, medicines, or lifestyle.
-          </p>
-        )}
-
-        {messages.map((msg, index) => (
-          <div
-            key={index}
-            className={`p-3 rounded-xl max-w-[80%] text-sm leading-relaxed ${
-              msg.role === "user"
-                ? "bg-blue-600 text-white ml-auto"
-                : "bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-100"
-            }`}
-          >
-            <div className="prose prose-sm dark:prose-invert max-w-none">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                {msg.content}
-              </ReactMarkdown>
+      {/* Chat Container - Premium Glass */}
+      <div className="flex-1 overflow-hidden rounded-3xl border border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl shadow-xl flex flex-col">
+        {/* Messages Area */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+          {messages.length === 0 && !loading && (
+            <div className="h-full flex flex-col items-center justify-center text-center">
+              <div className="text-5xl mb-4">🧠</div>
+              <h2 className="text-lg font-semibold mb-2">
+                Welcome to CareCompass AI
+              </h2>
+              <p className="text-sm text-gray-500 dark:text-gray-400 max-w-md">
+                Ask about medical reports, prescriptions, symptoms,
+                lifestyle, or health trends. Your AI health companion
+                is ready to help.
+              </p>
             </div>
+          )}
+
+          {messages.map((msg, index) => (
+            <div
+              key={index}
+              className={`flex ${
+                msg.role === "user"
+                  ? "justify-end"
+                  : "justify-start"
+              }`}
+            >
+              <div
+                className={`max-w-[78%] rounded-2xl px-5 py-4 text-sm leading-relaxed shadow-sm transition ${
+                  msg.role === "user"
+                    ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-br-md"
+                    : "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100 border border-gray-200 dark:border-gray-700 rounded-bl-md"
+                }`}
+              >
+                <div className="prose prose-sm dark:prose-invert max-w-none">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {msg.content}
+                  </ReactMarkdown>
+                </div>
+              </div>
+            </div>
+          ))}
+
+          {/* Typing Indicator */}
+          {loading && (
+            <div className="flex justify-start">
+              <div className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-4 py-3 rounded-2xl rounded-bl-md text-sm animate-pulse">
+                CareCompass AI is analyzing your query...
+              </div>
+            </div>
+          )}
+
+          <div ref={bottomRef} />
+        </div>
+
+        {/* Input Area - Sticky Premium */}
+        <div className="border-t border-gray-200 dark:border-gray-800 p-4 bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl">
+          <div className="flex gap-3">
+            <input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyPress}
+              placeholder="Ask about reports, symptoms, medicines, or health trends..."
+              className="flex-1 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition shadow-sm"
+            />
+
+            <button
+              onClick={sendMessage}
+              disabled={loading || !input.trim()}
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:opacity-90 transition text-white px-6 py-3 rounded-xl font-semibold shadow-md disabled:opacity-50"
+            >
+              {loading ? "Sending..." : "Send"}
+            </button>
           </div>
-        ))}
 
-        {loading && (
-          <div className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 p-3 rounded-xl w-fit text-sm">
-            AI is typing...
-          </div>
-        )}
-
-        <div ref={bottomRef} />
-      </div>
-
-      {/* Input */}
-      <div className="mt-4 flex gap-3">
-        <input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={handleKeyPress}
-          placeholder="Ask a health question..."
-          className="flex-1 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
-        />
-
-        <button
-          onClick={sendMessage}
-          disabled={loading}
-          className="bg-blue-600 hover:bg-blue-700 transition text-white px-6 py-3 rounded-xl disabled:opacity-50"
-        >
-          Send
-        </button>
+          {/* Medical Disclaimer */}
+          <p className="text-xs text-gray-400 text-center mt-3">
+            CareCompass AI provides informational, non-diagnostic health assistance only. 
+            Always consult a medical professional for clinical decisions.
+          </p>
+        </div>
       </div>
     </div>
   );
