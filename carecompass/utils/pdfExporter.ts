@@ -14,20 +14,26 @@ function cleanText(text: string) {
       .replace(/\*/g, "")
       .replace(/`/g, "")
 
-      // 🔥 FIX 1: Remove markdown separators like ---
+      // FIX 1: Remove markdown separators like ---
       .replace(/-{3,}/g, "")
 
-      // 🔥 FIX 2: Fix spaced OCR words (D a t a, c o n s i s t e n t)
+      // FIX 2: Fix spaced OCR words (D a t a -> Data)
       .replace(/\b(?:[A-Za-z]\s){2,}[A-Za-z]\b/g, (match) =>
-        match.replace(/\s+/g, ""),
+        match.replace(/\s+/g, "")
       )
 
-      // 🔥 FIX 3: Fix broken units like "k g" -> "kg"
+      // FIX 3: Fix broken units like "k g" -> "kg"
       .replace(/\b(k\s?g)\b/gi, "kg")
       .replace(/\b(m\s?g\s?\/\s?d\s?L)\b/gi, "mg/dL")
 
-      // 🔥 FIX 4: Remove weird punctuation after numbers (68 kg! 62 !)
+      // FIX 4: Remove weird punctuation after numbers (68 kg! 62 !)
       .replace(/(\d)\s*[!'`]+/g, "$1")
+
+      // FIX 5: Fix merged words like "AIHealthInsight"
+      .replace(/([a-z])([A-Z])/g, "$1 $2")
+
+      // FIX 6: Fix merged sentences ".Your" -> ". Your"
+      .replace(/\.([A-Z])/g, ". $1")
 
       // Fix OCR artifact "& b Safety"
       .replace(/&\s*b\s+/gi, "& ")
@@ -84,7 +90,7 @@ function getSectionTitle(title: string) {
   return "Extracted Medical Text (OCR)";
 }
 
-// 🔧 FIX 3: Add units to Data Points automatically (WITHOUT changing layout)
+// 🔥 CRITICAL FIX: Proper Data Points extraction + units (ONLY numbers, nothing else)
 function formatDataPointsWithUnits(text: string, title: string) {
   if (!text) return text;
 
@@ -94,15 +100,15 @@ function formatDataPointsWithUnits(text: string, title: string) {
   if (lowerTitle.includes("weight")) unit = " kg";
   else if (lowerTitle.includes("blood sugar")) unit = " mg/dL";
 
-  // 🔥 Extract clean numeric values even if corrupted (68 kg! 62 ! 64)
-  return text.replace(/(Data Points?:\s*)([^\n]+)/i, (_, label, rawValues) => {
-    const numbers = rawValues
-      .match(/[\d.]+/g) // extract only numbers
-      ?.map((n: string) => `${n}${unit}`)
-      .join(", ");
+  return text.replace(/Data Points?:\s*([^\n]+)/i, (match, valuesPart) => {
+    // Extract ONLY numeric values
+    const numbers = valuesPart.match(/\d+(\.\d+)?/g);
 
-    if (!numbers) return `${label}${rawValues}`;
-    return `${label}${numbers}`;
+    if (!numbers || numbers.length === 0) return match;
+
+    const formatted = numbers.map((num: string) => `${num}${unit}`).join(", ");
+
+    return `Data Points: ${formatted}`;
   });
 }
 
@@ -111,19 +117,16 @@ function formatClinicalText(text: string) {
 
   return (
     text
-      // Add proper line break before numbered sections (1. 2. 3.)
+      // Proper spacing before numbered sections
       .replace(/\s(\d+\.\s)/g, "\n\n$1")
 
-      // Add spacing before major headings
+      // Add spacing before key headings only (no layout change)
       .replace(
         /(Trend Analysis|Pattern Analysis|Lifestyle Insights|Gentle Suggestions|Disclaimer|Status:|Direction:)/gi,
-        "\n\n$1",
+        "\n\n$1"
       )
 
-      // Fix merged sentences like ".Your" -> ". Your"
-      .replace(/\.([A-Z])/g, ". $1")
-
-      // Ensure clean paragraph spacing
+      // Prevent giant merged paragraphs
       .replace(/\n{3,}/g, "\n\n")
       .trim()
   );
@@ -133,22 +136,22 @@ export const exportMedicalPDF = async (
   title: string,
   originalText: string,
   aiResponse: string,
-  chartImage?: string,
+  chartImage?: string
 ) => {
   const doc = new jsPDF("p", "mm", "a4");
   const margin = 15;
   let y = 20;
 
-  // 🔧 CLEAN + FIX TEXT (NO DESIGN CHANGE)
+  // CLEAN + STRICT FIX (NO DESIGN CHANGE)
   let cleanedAI = cleanText(aiResponse);
   cleanedAI = formatDataPointsWithUnits(cleanedAI, title);
-  cleanedAI = formatClinicalText(cleanedAI); // ⭐ NEW LINE (format like medical report)
+  cleanedAI = formatClinicalText(cleanedAI);
 
   const cleanedOriginal = cleanText(originalText);
   const risk = detectRiskLevel(cleanedAI);
   const sectionTitle = getSectionTitle(title);
 
-  // 🧠 Helper: Add new page automatically
+  // Helper: Add new page automatically
   const checkPageBreak = (requiredSpace = 20) => {
     if (y + requiredSpace > PAGE_HEIGHT) {
       doc.addPage();
@@ -156,7 +159,7 @@ export const exportMedicalPDF = async (
     }
   };
 
-  // 🏥 HEADER
+  // HEADER (UNCHANGED)
   doc.setFont("helvetica", "bold");
   doc.setFontSize(22);
   doc.setTextColor(37, 99, 235);
@@ -171,7 +174,7 @@ export const exportMedicalPDF = async (
   doc.setDrawColor(200, 200, 200);
   doc.line(margin, y, 195, y);
 
-  // 📄 REPORT TYPE
+  // REPORT TYPE (UNCHANGED)
   y += 12;
   doc.setFontSize(12);
   doc.setFont("helvetica", "bold");
@@ -179,7 +182,7 @@ export const exportMedicalPDF = async (
   doc.setFont("helvetica", "normal");
   doc.text(title, margin + 35, y);
 
-  // 🚨 RISK BADGE (UNCHANGED DESIGN)
+  // RISK BADGE (UNCHANGED)
   y += 12;
   doc.setFont("helvetica", "bold");
   doc.text("AI Risk Assessment:", margin, y);
@@ -192,7 +195,7 @@ export const exportMedicalPDF = async (
   doc.text(risk.label, margin + 60, y);
   doc.setTextColor(0, 0, 0);
 
-  // 📊 CHART (Auto page break safe)
+  // CHART (UNCHANGED)
   if (chartImage) {
     checkPageBreak(100);
 
@@ -206,7 +209,7 @@ export const exportMedicalPDF = async (
     y += 90;
   }
 
-  // 🧾 ORIGINAL TEXT SECTION (UNCHANGED)
+  // ORIGINAL TEXT SECTION (UNCHANGED)
   checkPageBreak(30);
   y += 5;
 
@@ -223,7 +226,7 @@ export const exportMedicalPDF = async (
 
   const originalLines = doc.splitTextToSize(
     cleanedOriginal || "No data available.",
-    180,
+    180
   );
 
   originalLines.forEach((line: string) => {
@@ -232,7 +235,7 @@ export const exportMedicalPDF = async (
     y += LINE_HEIGHT;
   });
 
-  // 🤖 AI EXPLANATION SECTION (MULTI-PAGE SAFE — UNCHANGED)
+  // AI EXPLANATION SECTION (UNCHANGED LAYOUT)
   checkPageBreak(25);
   y += 10;
 
@@ -249,7 +252,7 @@ export const exportMedicalPDF = async (
 
   const aiLines = doc.splitTextToSize(
     cleanedAI || "No AI explanation generated.",
-    180,
+    180
   );
 
   aiLines.forEach((line: string) => {
@@ -258,7 +261,7 @@ export const exportMedicalPDF = async (
     y += LINE_HEIGHT;
   });
 
-  // 🛡️ DISCLAIMER (UNCHANGED DESIGN — but artifact fixed via cleanText)
+  // DISCLAIMER (UNCHANGED)
   checkPageBreak(35);
   y += 12;
 
@@ -276,7 +279,7 @@ export const exportMedicalPDF = async (
     "This report is generated by CareCompass AI for informational purposes only and is not a medical diagnosis. Always consult a qualified healthcare professional.",
     margin + 3,
     y + 14,
-    { maxWidth: 174 },
+    { maxWidth: 174 }
   );
 
   // Footer (UNCHANGED)
@@ -285,7 +288,7 @@ export const exportMedicalPDF = async (
   doc.text(
     `Generated by CareCompass AI • ${new Date().toLocaleString()}`,
     margin,
-    290,
+    290
   );
 
   doc.save("CareCompass-AI-Clinical-Report.pdf");
