@@ -2,202 +2,229 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-emerald-50 text-gray-900">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-blue-50 text-gray-900">
       {/* NAVBAR */}
-      <header className="w-full flex items-center justify-between px-8 py-6 max-w-7xl mx-auto">
-        <h1 className="text-2xl font-bold text-blue-600">
-          CareCompass
-        </h1>
+      <header className="w-full border-b border-gray-200/60 backdrop-blur-md bg-white/70 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-8 py-5 flex items-center justify-between">
+          <h1 className="text-2xl font-bold tracking-tight text-blue-600">
+            CareCompass
+          </h1>
 
-        <div className="flex gap-4">
-          <Link
-            href="/auth/login"
-            className="text-gray-600 hover:text-blue-600 transition font-medium"
-          >
-            Login
-          </Link>
-          <Link
-            href="/auth/signup"
-            className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg transition shadow-sm"
-          >
-            Get Started
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link
+              href="/auth/login"
+              className="text-gray-600 hover:text-blue-600 font-medium transition"
+            >
+              Login
+            </Link>
+
+            <Link
+              href="/auth/signup"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-medium shadow-md transition"
+            >
+              Get Started
+            </Link>
+          </div>
         </div>
       </header>
 
       {/* HERO SECTION */}
-      <section className="text-center px-6 py-20 max-w-5xl mx-auto">
-        <h2 className="text-5xl font-bold leading-tight mb-6">
-          Your AI-Powered{" "}
-          <span className="text-blue-600">
-            Health Companion
+      <section className="relative px-6 pt-24 pb-20 text-center">
+        {/* Glow Background */}
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.15),_transparent_60%)]" />
+
+        <div className="max-w-5xl mx-auto">
+          <span className="inline-block mb-6 px-4 py-1.5 rounded-full bg-blue-100 text-blue-700 text-sm font-medium">
+            AI-Powered Non-Diagnostic Health Companion
           </span>
-        </h2>
 
-        <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-10">
-          CareCompass is a non-diagnostic AI health assistant that helps you
-          understand medical reports, simplify prescriptions, track health
-          trends, and generate clinical AI insights — all in one secure platform.
-        </p>
+          <h2 className="text-5xl md:text-6xl font-bold leading-tight tracking-tight mb-6">
+            Understand Your Health
+            <br />
+            <span className="text-blue-600">
+              With Clinical-Grade AI Insights
+            </span>
+          </h2>
 
-        <div className="flex flex-wrap justify-center gap-4">
-          <Link
-            href="/auth/signup"
-            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl text-lg font-medium shadow-md transition"
-          >
-            Get Started Free
-          </Link>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-10">
+            CareCompass helps you simplify medical reports, decode prescriptions,
+            track health trends, and generate professional AI health insights —
+            all in one secure and intelligent platform.
+          </p>
 
-          <Link
-            href="/auth/login"
-            className="border border-gray-300 hover:border-blue-500 hover:text-blue-600 px-8 py-3 rounded-xl text-lg font-medium transition"
-          >
-            Login
-          </Link>
+          <div className="flex flex-wrap justify-center gap-4">
+            <Link
+              href="/auth/signup"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-2xl text-lg font-semibold shadow-lg transition"
+            >
+              Get Started Free
+            </Link>
+
+            <Link
+              href="/auth/login"
+              className="px-8 py-4 rounded-2xl border border-gray-300 text-lg font-semibold hover:border-blue-500 hover:text-blue-600 transition"
+            >
+              Login
+            </Link>
+          </div>
+
+          {/* Trust Badges */}
+          <div className="flex flex-wrap justify-center gap-6 mt-12 text-sm text-gray-500">
+            <span>🔒 Secure & Private</span>
+            <span>🧠 AI-Powered Analysis</span>
+            <span>⚕️ Non-Diagnostic Guidance</span>
+          </div>
         </div>
       </section>
 
-      {/* FEATURES SECTION */}
-      <section className="px-6 py-20 max-w-7xl mx-auto">
-        <h3 className="text-3xl font-bold text-center mb-14">
-          Powerful AI Health Features
-        </h3>
+      {/* PREMIUM FEATURE CARDS */}
+      <section className="px-6 py-24 max-w-7xl mx-auto">
+        <div className="text-center mb-16">
+          <h3 className="text-3xl md:text-4xl font-bold mb-4">
+            Everything You Need For Smart Health Tracking
+          </h3>
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            A complete AI health ecosystem designed to help you understand,
+            monitor, and manage your medical data intelligently.
+          </p>
+        </div>
 
         <div className="grid md:grid-cols-3 gap-8">
-          {/* Feature 1 */}
-          <div className="bg-white p-8 rounded-2xl shadow-sm border hover:shadow-md transition">
-            <h4 className="text-xl font-semibold mb-3">
-              🧾 Medical Report Explainer
-            </h4>
-            <p className="text-gray-600">
-              Upload handwritten, scanned, or PDF medical reports and get
-              easy-to-understand AI explanations instantly.
-            </p>
-          </div>
-
-          {/* Feature 2 */}
-          <div className="bg-white p-8 rounded-2xl shadow-sm border hover:shadow-md transition">
-            <h4 className="text-xl font-semibold mb-3">
-              💊 Prescription Simplifier
-            </h4>
-            <p className="text-gray-600">
-              Decode complex prescriptions, medicines, and dosages using
-              AI-powered medical interpretation.
-            </p>
-          </div>
-
-          {/* Feature 3 */}
-          <div className="bg-white p-8 rounded-2xl shadow-sm border hover:shadow-md transition">
-            <h4 className="text-xl font-semibold mb-3">
-              📊 AI Health Trend Analysis
-            </h4>
-            <p className="text-gray-600">
-              Track weight, blood sugar, and health metrics with AI-powered
-              trend detection and abnormal pattern alerts.
-            </p>
-          </div>
-
-          {/* Feature 4 */}
-          <div className="bg-white p-8 rounded-2xl shadow-sm border hover:shadow-md transition">
-            <h4 className="text-xl font-semibold mb-3">
-              🤖 AI Health Chat Assistant
-            </h4>
-            <p className="text-gray-600">
-              Ask health-related questions and receive intelligent,
-              non-diagnostic AI guidance anytime.
-            </p>
-          </div>
-
-          {/* Feature 5 */}
-          <div className="bg-white p-8 rounded-2xl shadow-sm border hover:shadow-md transition">
-            <h4 className="text-xl font-semibold mb-3">
-              ⏰ Smart Medicine Reminders
-            </h4>
-            <p className="text-gray-600">
-              Never miss your medication with personalized reminder scheduling
-              and tracking.
-            </p>
-          </div>
-
-          {/* Feature 6 */}
-          <div className="bg-white p-8 rounded-2xl shadow-sm border hover:shadow-md transition">
-            <h4 className="text-xl font-semibold mb-3">
-              📄 Clinical AI PDF Reports
-            </h4>
-            <p className="text-gray-600">
-              Generate professional multi-page AI health reports with risk
-              assessment and clinical summaries.
-            </p>
-          </div>
+          {features.map((feature, index) => (
+            <div
+              key={index}
+              className="group bg-white/70 backdrop-blur-lg border border-gray-200 rounded-3xl p-8 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+            >
+              <div className="text-3xl mb-4">
+                {feature.icon}
+              </div>
+              <h4 className="text-xl font-semibold mb-3">
+                {feature.title}
+              </h4>
+              <p className="text-gray-600 leading-relaxed">
+                {feature.description}
+              </p>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* HOW IT WORKS */}
-      <section className="bg-white py-20 px-6">
+      {/* HOW IT WORKS (PREMIUM TIMELINE STYLE) */}
+      <section className="bg-white border-y border-gray-100 py-24 px-6">
         <div className="max-w-6xl mx-auto text-center">
-          <h3 className="text-3xl font-bold mb-12">
+          <h3 className="text-3xl md:text-4xl font-bold mb-16">
             How CareCompass Works
           </h3>
 
-          <div className="grid md:grid-cols-3 gap-10">
-            <div>
-              <div className="text-4xl mb-4">📤</div>
-              <h4 className="text-xl font-semibold mb-2">
-                Upload Reports or Data
-              </h4>
-              <p className="text-gray-600">
-                Upload medical reports, prescriptions, or health logs securely.
-              </p>
-            </div>
-
-            <div>
-              <div className="text-4xl mb-4">🧠</div>
-              <h4 className="text-xl font-semibold mb-2">
-                AI Analysis
-              </h4>
-              <p className="text-gray-600">
-                Advanced AI analyzes your data and detects patterns and insights.
-              </p>
-            </div>
-
-            <div>
-              <div className="text-4xl mb-4">📊</div>
-              <h4 className="text-xl font-semibold mb-2">
-                Smart Health Insights
-              </h4>
-              <p className="text-gray-600">
-                Receive clear explanations, trends, and non-diagnostic guidance.
-              </p>
-            </div>
+          <div className="grid md:grid-cols-3 gap-12">
+            {steps.map((step, index) => (
+              <div key={index} className="relative">
+                <div className="w-16 h-16 mx-auto mb-6 flex items-center justify-center rounded-2xl bg-blue-100 text-2xl">
+                  {step.icon}
+                </div>
+                <h4 className="text-xl font-semibold mb-3">
+                  {step.title}
+                </h4>
+                <p className="text-gray-600">
+                  {step.description}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* DISCLAIMER + CTA */}
-      <section className="px-6 py-20 text-center max-w-4xl mx-auto">
-        <h3 className="text-3xl font-bold mb-6">
-          Built for Smarter Health Understanding
-        </h3>
+      {/* PREMIUM CTA */}
+      <section className="px-6 py-24 text-center">
+        <div className="max-w-4xl mx-auto bg-gradient-to-r from-blue-600 to-emerald-500 rounded-3xl p-12 text-white shadow-2xl">
+          <h3 className="text-3xl md:text-4xl font-bold mb-6">
+            Start Your AI Health Journey Today
+          </h3>
 
-        <p className="text-gray-600 mb-8">
-          CareCompass is a non-diagnostic AI health companion designed to help
-          users better understand their medical data. It does not replace
-          professional medical advice. Always consult a qualified healthcare
-          professional for medical decisions.
+          <p className="text-blue-100 text-lg mb-10">
+            Generate clinical AI reports, detect health trends, and understand
+            your medical data with intelligent, non-diagnostic insights.
+          </p>
+
+          <Link
+            href="/auth/signup"
+            className="bg-white text-blue-600 px-10 py-4 rounded-2xl text-lg font-semibold hover:scale-105 transition shadow-lg"
+          >
+            Create Free Account →
+          </Link>
+        </div>
+
+        <p className="text-sm text-gray-500 mt-8 max-w-2xl mx-auto">
+          CareCompass provides AI-generated health insights for informational
+          purposes only and does not replace professional medical advice.
         </p>
-
-        <Link
-          href="/auth/signup"
-          className="bg-emerald-600 hover:bg-emerald-700 text-white px-10 py-4 rounded-2xl text-lg font-semibold shadow-lg transition"
-        >
-          Start Using CareCompass →
-        </Link>
       </section>
 
       {/* FOOTER */}
-      <footer className="border-t py-6 text-center text-sm text-gray-500">
-        © {new Date().getFullYear()} CareCompass AI • Non-Diagnostic Health Companion
+      <footer className="border-t border-gray-200 py-8 text-center text-sm text-gray-500">
+        © {new Date().getFullYear()} CareCompass AI • Built with Next.js,
+        Firebase & AI
       </footer>
     </div>
   );
 }
+
+const features = [
+  {
+    icon: "🧾",
+    title: "AI Report Explainer",
+    description:
+      "Upload medical reports (PDF, images, handwritten) and receive simplified AI explanations instantly.",
+  },
+  {
+    icon: "💊",
+    title: "Prescription Simplifier",
+    description:
+      "Decode complex prescriptions and medicine instructions into clear, easy-to-understand insights.",
+  },
+  {
+    icon: "📊",
+    title: "AI Trend Detection",
+    description:
+      "Track weight, blood sugar, and health metrics with intelligent abnormal trend analysis.",
+  },
+  {
+    icon: "🤖",
+    title: "AI Health Assistant",
+    description:
+      "Chat with an AI health companion for non-diagnostic guidance and health awareness.",
+  },
+  {
+    icon: "⏰",
+    title: "Smart Reminders",
+    description:
+      "Manage medicine schedules and never miss a dose with personalized reminders.",
+  },
+  {
+    icon: "📄",
+    title: "Clinical PDF Reports",
+    description:
+      "Generate professional multi-page AI health reports with risk assessment and insights.",
+  },
+];
+
+const steps = [
+  {
+    icon: "📤",
+    title: "Upload Medical Data",
+    description:
+      "Upload reports, prescriptions, or health logs securely to the platform.",
+  },
+  {
+    icon: "🧠",
+    title: "AI Analysis",
+    description:
+      "Advanced AI models analyze your data and extract meaningful health insights.",
+  },
+  {
+    icon: "📈",
+    title: "Smart Insights",
+    description:
+      "Receive simplified explanations, trends, and non-diagnostic recommendations.",
+  },
+];
