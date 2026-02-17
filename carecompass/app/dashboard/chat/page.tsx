@@ -28,25 +28,41 @@ export default function ChatPage() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [initializing, setInitializing] = useState(true);
 
-  // 🔥 Load sessions on mount (FIXED)
+  // 🔥 Load sessions on mount
   useEffect(() => {
     if (!user) return;
-    fetchSessions();
+    initializeChat();
   }, [user]);
 
-  const fetchSessions = async () => {
+  const initializeChat = async () => {
     if (!user) return;
 
+    setInitializing(true);
     const data = await getChatSessions(user.uid);
     setSessions(data);
 
-    // Auto open latest chat if none selected
-    if (data.length > 0 && !activeSession) {
+    // Auto open latest chat OR create new one
+    if (data.length > 0) {
       const latest = data[0].id;
       setActiveSession(latest);
-      loadMessages(latest);
+      await loadMessages(latest);
+    } else {
+      const newSessionId = await createChatSession(user.uid);
+      setActiveSession(newSessionId);
+      setMessages([]);
+      const updated = await getChatSessions(user.uid);
+      setSessions(updated);
     }
+
+    setInitializing(false);
+  };
+
+  const fetchSessions = async () => {
+    if (!user) return;
+    const data = await getChatSessions(user.uid);
+    setSessions(data);
   };
 
   const loadMessages = async (sessionId: string) => {
@@ -56,19 +72,26 @@ export default function ChatPage() {
     setActiveSession(sessionId);
   };
 
-  // Auto scroll
+  // Auto scroll (stable)
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, loading]);
+    const timeout = setTimeout(() => {
+      bottomRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "end",
+      });
+    }, 50);
 
-  // ➕ New Chat (FIXED sidebar refresh)
+    return () => clearTimeout(timeout);
+  }, [messages.length, loading]);
+
+  // ➕ New Chat
   const handleNewChat = async () => {
     if (!user) return;
 
     const sessionId = await createChatSession(user.uid);
     setActiveSession(sessionId);
     setMessages([]);
-    await fetchSessions(); // IMPORTANT: refresh sidebar
+    await fetchSessions();
   };
 
   // 🗑 Delete Chat
@@ -85,7 +108,7 @@ export default function ChatPage() {
     await fetchSessions();
   };
 
-  // 🧠 Smart Title Generator (FIXED)
+  // 🧠 Smart Title Generator (first message only)
   const generateSmartTitle = async (
     firstMessage: string,
     sessionId: string
@@ -102,16 +125,16 @@ export default function ChatPage() {
       });
 
       const data = await res.json();
-      const title = data.title || "Medical Discussion";
+      const title = data.title || "Health Discussion";
 
       await updateChatTitle(user.uid, sessionId, title);
-      await fetchSessions(); // 🔥 refresh sidebar instantly
+      await fetchSessions();
     } catch (err) {
       console.error("Title generation error:", err);
     }
   };
 
-  // Typing animation (kept from your original)
+  // Typing animation (premium feel)
   const typeMessage = async (fullText: string) => {
     let currentText = "";
 
@@ -127,16 +150,17 @@ export default function ChatPage() {
         return updated;
       });
 
-      await new Promise((resolve) => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 8));
     }
   };
 
   const sendMessage = async () => {
     if (!input.trim() || !user || !activeSession || loading) return;
 
-    const userMessage = input;
+    const userMessage = input.trim();
     const isFirstMessage = messages.length === 0;
 
+    // Optimistic UI
     setMessages((prev) => [
       ...prev,
       { role: "user", content: userMessage },
@@ -147,34 +171,60 @@ export default function ChatPage() {
     setLoading(true);
 
     try {
-      // Save user message
+      // Save user message to Firebase
       await saveMessage(user.uid, activeSession, "user", userMessage);
 
-      // Generate smart title ONLY on first message
+      // Generate smart title for first message
       if (isFirstMessage) {
         generateSmartTitle(userMessage, activeSession);
       }
 
+      // 🔥 CRITICAL FIX: Send uid + sessionId for AI memory
       const res = await fetch("/api/ai/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ message: userMessage }),
+        body: JSON.stringify({
+          message: userMessage,
+          uid: user.uid,
+          sessionId: activeSession,
+        }),
       });
 
       const data = await res.json();
-      const aiReply = data.reply || "No response generated.";
+      const aiReply =
+        data.reply || "I'm here to help with your health questions.";
 
+      // Typing effect
       await typeMessage(aiReply);
 
       // Save AI reply
       await saveMessage(user.uid, activeSession, "assistant", aiReply);
     } catch (error) {
-      console.error(error);
+      console.error("Chat error:", error);
+
+      setMessages((prev) => [
+        ...prev.slice(0, -1),
+        {
+          role: "assistant",
+          content:
+            "Something went wrong. Please try again.",
+        },
+      ]);
     }
 
     setLoading(false);
+  };
+
+  // ⌨️ Enter to send (Shift+Enter = new line)
+  const handleKeyDown = (
+    e: React.KeyboardEvent<HTMLInputElement>
+  ) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
   };
 
   return (
@@ -231,54 +281,58 @@ export default function ChatPage() {
           </button>
 
           <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            AI Health Assistant
+            CareCompass AI Assistant
           </h1>
 
           <span className="text-xs text-gray-500">
-            Non-diagnostic AI
+            Memory Enabled • Non-diagnostic
           </span>
         </div>
 
         {/* Messages */}
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
-          {messages.length === 0 && (
+          {initializing ? (
+            <div className="text-center mt-20 text-gray-500">
+              Initializing AI chat...
+            </div>
+          ) : messages.length === 0 ? (
             <div className="text-center mt-20 text-gray-500">
               <div className="text-5xl mb-4">🧠</div>
               <p className="font-semibold text-lg">
-                Start a new medical conversation
+                Start a new health conversation
               </p>
               <p className="text-sm mt-2">
                 Ask about reports, prescriptions, symptoms, or health trends.
               </p>
             </div>
-          )}
-
-          {messages.map((msg, index) => (
-            <div
-              key={index}
-              className={`flex ${
-                msg.role === "user"
-                  ? "justify-end"
-                  : "justify-start"
-              }`}
-            >
+          ) : (
+            messages.map((msg, index) => (
               <div
-                className={`max-w-[75%] px-5 py-4 rounded-2xl text-sm shadow ${
+                key={index}
+                className={`flex ${
                   msg.role === "user"
-                    ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white"
-                    : "bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-100"
+                    ? "justify-end"
+                    : "justify-start"
                 }`}
               >
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                  {msg.content}
-                </ReactMarkdown>
+                <div
+                  className={`max-w-[75%] px-5 py-4 rounded-2xl text-sm shadow ${
+                    msg.role === "user"
+                      ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white"
+                      : "bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-100"
+                  }`}
+                >
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {msg.content}
+                  </ReactMarkdown>
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
 
           {loading && (
             <div className="text-sm text-gray-500 animate-pulse">
-              CareCompass AI is analyzing...
+              CareCompass AI is analyzing your health query...
             </div>
           )}
 
@@ -290,14 +344,15 @@ export default function ChatPage() {
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask a health question..."
+            onKeyDown={handleKeyDown}
+            placeholder="Ask about reports, symptoms, health trends..."
             className="flex-1 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
 
           <button
             onClick={sendMessage}
             disabled={loading || !activeSession}
-            className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-xl font-semibold disabled:opacity-50"
+            className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-xl font-semibold disabled:opacity-50 hover:opacity-90 transition"
           >
             Send
           </button>
