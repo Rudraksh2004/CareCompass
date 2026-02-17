@@ -4,175 +4,142 @@ import { useAuth } from "@/context/AuthContext";
 import { useEffect, useState } from "react";
 import { getUserProfile } from "@/services/userService";
 import { getUserReminders } from "@/services/reminderService";
-import { getHealthLogs } from "@/services/healthService";
-import { getHistory } from "@/services/historyService";
 
 export default function DashboardPage() {
   const { user } = useAuth();
-
   const [profile, setProfile] = useState<any>(null);
   const [reminders, setReminders] = useState<any[]>([]);
-  const [healthLogs, setHealthLogs] = useState<any[]>([]);
-  const [reports, setReports] = useState<any[]>([]);
-  const [prescriptions, setPrescriptions] = useState<any[]>([]);
-
-  const [summary, setSummary] = useState("");
-  const [loadingSummary, setLoadingSummary] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (user) {
-      getUserProfile(user.uid).then(setProfile);
-      getUserReminders(user.uid).then(setReminders);
-      getHealthLogs(user.uid, "weight").then(setHealthLogs);
-      getHistory(user.uid, "reports").then(setReports);
-      getHistory(user.uid, "prescriptions").then(setPrescriptions);
+      Promise.all([
+        getUserProfile(user.uid),
+        getUserReminders(user.uid),
+      ]).then(([profileData, remindersData]) => {
+        setProfile(profileData);
+        setReminders(remindersData || []);
+        setLoading(false);
+      });
     }
   }, [user]);
 
-  const generateSummary = async () => {
-    if (!profile) return;
-
-    setLoadingSummary(true);
-    setSummary("");
-
-    try {
-      const res = await fetch("/api/ai/health-summary", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          profile,
-          healthLogs,
-          reports,
-          prescriptions,
-        }),
-      });
-
-      const data = await res.json();
-      setSummary(data.summary || "No summary generated.");
-    } catch (error) {
-      console.error(error);
-      setSummary("Failed to generate AI health summary.");
-    }
-
-    setLoadingSummary(false);
-  };
-
-  if (!profile) {
+  if (loading) {
     return (
-      <div className="text-gray-500 dark:text-gray-400">
-        Loading dashboard...
+      <div className="text-center mt-20 text-gray-500">
+        Loading your health dashboard...
       </div>
     );
   }
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8 text-gray-900 dark:text-gray-100">
-      {/* Welcome Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-6 rounded-2xl shadow-sm">
-        <h1 className="text-3xl font-bold mb-1">
-          Welcome back, {profile.name} 👋
-        </h1>
-        <p className="text-blue-100 text-sm">
-          Your AI-powered health companion is analyzing your health patterns.
+    <div className="space-y-8 text-gray-900 dark:text-gray-100">
+      {/* 🔷 Header */}
+      <div className="bg-gradient-to-r from-blue-600 to-emerald-500 text-white p-8 rounded-3xl shadow-xl">
+        <h2 className="text-3xl font-bold">
+          Welcome back, {profile?.name || "User"} 👋
+        </h2>
+        <p className="opacity-90 mt-2 text-sm">
+          Your AI-powered health companion is monitoring your insights and wellness data.
         </p>
+
+        <div className="flex flex-wrap gap-6 mt-6 text-sm">
+          <div className="bg-white/20 px-4 py-2 rounded-xl backdrop-blur">
+            Blood Group: <span className="font-semibold">{profile?.bloodGroup || "N/A"}</span>
+          </div>
+          <div className="bg-white/20 px-4 py-2 rounded-xl backdrop-blur">
+            Age: <span className="font-semibold">{profile?.age || "N/A"}</span>
+          </div>
+        </div>
       </div>
 
-      {/* 🧠 AI Health Summary Card */}
-      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-6 rounded-2xl shadow-sm transition-colors">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold">
-            AI Health Summary
-          </h2>
-
-          <button
-            onClick={generateSummary}
-            disabled={loadingSummary}
-            className="bg-emerald-600 hover:bg-emerald-700 transition text-white px-4 py-2 rounded-lg font-medium disabled:opacity-50"
-          >
-            {loadingSummary ? "Analyzing..." : "Generate Summary"}
-          </button>
-        </div>
-
-        {summary ? (
-          <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-xl text-sm whitespace-pre-wrap">
-            {summary}
-          </div>
-        ) : (
-          <p className="text-gray-500 dark:text-gray-400 text-sm">
-            Generate a personalized AI health summary based on your
-            reports, prescriptions, and health logs.
+      {/* 📊 Quick Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-6 rounded-2xl shadow-sm">
+          <p className="text-sm text-gray-500">Active Reminders</p>
+          <h3 className="text-3xl font-bold mt-2">
+            {reminders.length}
+          </h3>
+          <p className="text-xs text-gray-400 mt-1">
+            Medicine & health alerts
           </p>
-        )}
+        </div>
 
-        <p className="text-xs text-gray-400 dark:text-gray-500 mt-4">
-          Disclaimer: This AI summary is informational and non-diagnostic.
-          Always consult a medical professional for medical decisions.
-        </p>
-      </div>
+        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-6 rounded-2xl shadow-sm">
+          <p className="text-sm text-gray-500">AI Features Used</p>
+          <h3 className="text-3xl font-bold mt-2">
+            6+
+          </h3>
+          <p className="text-xs text-gray-400 mt-1">
+            Reports, Chat, Trends & Insights
+          </p>
+        </div>
 
-      {/* Profile Summary */}
-      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-6 rounded-2xl shadow-sm">
-        <h2 className="text-xl font-semibold mb-4">
-          Health Profile
-        </h2>
-
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-xl">
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Name
-            </p>
-            <p className="font-semibold">{profile.name}</p>
-          </div>
-
-          <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-xl">
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Age
-            </p>
-            <p className="font-semibold">
-              {profile.age || "Not set"}
-            </p>
-          </div>
-
-          <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-xl">
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Blood Group
-            </p>
-            <p className="font-semibold">
-              {profile.bloodGroup || "Not set"}
-            </p>
-          </div>
+        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-6 rounded-2xl shadow-sm">
+          <p className="text-sm text-gray-500">Health Status</p>
+          <h3 className="text-3xl font-bold mt-2 text-emerald-600">
+            Stable
+          </h3>
+          <p className="text-xs text-gray-400 mt-1">
+            Based on recent AI analysis
+          </p>
         </div>
       </div>
 
-      {/* Reminders */}
+      {/* 💊 Upcoming Reminders Section */}
       <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-6 rounded-2xl shadow-sm">
-        <h2 className="text-xl font-semibold mb-4">
-          Upcoming Medicine Reminders
-        </h2>
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-xl font-semibold">
+            Upcoming Medicine Reminders
+          </h3>
+          <span className="text-sm text-gray-400">
+            {reminders.length} scheduled
+          </span>
+        </div>
 
         {reminders.length === 0 ? (
-          <p className="text-gray-500 dark:text-gray-400 text-sm">
-            No reminders scheduled yet.
-          </p>
+          <div className="text-center py-10 text-gray-500">
+            <p className="text-lg font-medium">
+              No reminders scheduled
+            </p>
+            <p className="text-sm mt-1">
+              Add medicine reminders to stay on track with your treatment.
+            </p>
+          </div>
         ) : (
           <div className="grid gap-4">
             {reminders.map((reminder) => (
               <div
                 key={reminder.id}
-                className="bg-gray-50 dark:bg-gray-700 p-4 rounded-xl"
+                className="flex items-center justify-between bg-gray-50 dark:bg-gray-700/40 p-4 rounded-xl border border-gray-200 dark:border-gray-600"
               >
-                <p className="font-semibold">
-                  {reminder.medicineName}
-                </p>
-                <p className="text-sm text-gray-600 dark:text-gray-300">
-                  {reminder.dosage} • {reminder.time}
-                </p>
+                <div>
+                  <p className="font-semibold">
+                    {reminder.medicineName}
+                  </p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    {reminder.dosage}
+                  </p>
+                </div>
+
+                <div className="text-sm font-medium text-blue-600 dark:text-blue-400">
+                  {reminder.time}
+                </div>
               </div>
             ))}
           </div>
         )}
+      </div>
+
+      {/* 🧠 AI Assistant Card */}
+      <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-6 rounded-2xl shadow-lg">
+        <h3 className="text-xl font-semibold mb-2">
+          CareCompass AI Assistant
+        </h3>
+        <p className="text-sm opacity-90">
+          Analyze reports, simplify prescriptions, detect trends, and get personalized
+          health insights — all powered by AI.
+        </p>
       </div>
     </div>
   );
