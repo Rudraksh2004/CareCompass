@@ -7,6 +7,7 @@ import {
   getUserReminders,
   deleteReminder,
   markDoseTaken,
+  updateReminder,
 } from "@/services/reminderService";
 
 interface Reminder {
@@ -55,9 +56,7 @@ export default function ReminderPage() {
 
           const diff = nextDose.getTime() - now.getTime();
           const hours = Math.floor(diff / (1000 * 60 * 60));
-          const minutes = Math.floor(
-            (diff % (1000 * 60 * 60)) / (1000 * 60)
-          );
+          const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
 
           updated[`${reminder.id}-${t}`] = `${hours}h ${minutes}m`;
         });
@@ -85,15 +84,8 @@ export default function ReminderPage() {
     loadReminders();
   };
 
-  const handleMarkTaken = async (
-    reminder: Reminder,
-    reminderTime: string
-  ) => {
-    await markDoseTaken(
-      reminder.id,
-      reminderTime,
-      reminder.takenTimes || []
-    );
+  const handleMarkTaken = async (reminder: Reminder, reminderTime: string) => {
+    await markDoseTaken(reminder.id, reminderTime, reminder.takenTimes || []);
     loadReminders();
   };
 
@@ -117,9 +109,7 @@ export default function ReminderPage() {
       <div className="bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-2xl transition-all">
         <div className="flex items-center gap-3 mb-6">
           <div className="text-2xl">💊</div>
-          <h2 className="text-xl font-semibold">
-            Add New Reminder
-          </h2>
+          <h2 className="text-xl font-semibold">Add New Reminder</h2>
         </div>
 
         <div className="grid gap-5">
@@ -171,9 +161,7 @@ export default function ReminderPage() {
       {/* 📋 Reminders List (PREMIUM + ADVANCED FEATURES) */}
       <div className="bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-2xl transition-all">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-semibold">
-            Your Active Reminders
-          </h2>
+          <h2 className="text-2xl font-semibold">Your Active Reminders</h2>
 
           <div className="text-xs px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-300 font-medium">
             {reminders.length} Active
@@ -187,7 +175,8 @@ export default function ReminderPage() {
               No Reminders Yet
             </p>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-              Add your first medicine reminder to stay consistent with your treatment.
+              Add your first medicine reminder to stay consistent with your
+              treatment.
             </p>
           </div>
         ) : (
@@ -214,19 +203,27 @@ export default function ReminderPage() {
                     </div>
                   </div>
 
-                  <button
-                    onClick={() => handleDelete(reminder.id)}
-                    className="text-xs px-4 py-1.5 rounded-full font-semibold bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-300 hover:scale-105 transition"
-                  >
-                    Delete
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => user && updateReminder(user.uid, reminder)}
+                      className="text-xs px-4 py-1.5 rounded-full font-semibold bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-300 hover:scale-105 transition"
+                    >
+                      Edit
+                    </button>
+
+                    <button
+                      onClick={() => handleDelete(reminder.id)}
+                      className="text-xs px-4 py-1.5 rounded-full font-semibold bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-300 hover:scale-105 transition"
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
 
                 {/* Times + Countdown + Taken */}
                 <div className="mt-4 space-y-3">
                   {reminder.times?.map((t) => {
-                    const isTaken =
-                      reminder.takenTimes?.includes(t);
+                    const isTaken = reminder.takenTimes?.includes(t);
 
                     return (
                       <div
@@ -234,21 +231,16 @@ export default function ReminderPage() {
                         className="flex items-center justify-between bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 rounded-xl"
                       >
                         <div>
-                          <p className="font-medium">
-                            ⏰ {t}
-                          </p>
+                          <p className="font-medium">⏰ {t}</p>
                           <p className="text-xs text-gray-500">
                             Next dose in{" "}
-                            {countdowns[
-                              `${reminder.id}-${t}`
-                            ] || "Calculating..."}
+                            {countdowns[`${reminder.id}-${t}`] ||
+                              "Calculating..."}
                           </p>
                         </div>
 
                         <button
-                          onClick={() =>
-                            handleMarkTaken(reminder, t)
-                          }
+                          onClick={() => handleMarkTaken(reminder, t)}
                           disabled={isTaken}
                           className={`text-xs px-4 py-1.5 rounded-full font-semibold transition ${
                             isTaken
