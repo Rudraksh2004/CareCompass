@@ -39,84 +39,126 @@ export default function ReminderPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 text-gray-900 dark:text-gray-100">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold">
-          Medicine Reminders
-        </h1>
-        <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm">
-          Schedule and manage your daily medication reminders.
-        </p>
+    <div className="max-w-5xl mx-auto space-y-8 text-gray-900 dark:text-gray-100">
+      {/* 🌟 Premium Header */}
+      <div className="relative overflow-hidden rounded-3xl border border-gray-200 dark:border-gray-800 bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-emerald-600/10 backdrop-blur-xl p-8 shadow-xl">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.15),_transparent_60%)]" />
+        <div className="relative">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            Smart Medicine Reminders
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-2 text-sm max-w-xl">
+            Schedule, manage, and stay consistent with your daily medications
+            using your personal CareCompass reminder system.
+          </p>
+        </div>
       </div>
 
-      {/* Add Reminder Card */}
-      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-6 rounded-2xl shadow-sm transition-colors">
-        <h2 className="text-lg font-semibold mb-4">
-          Add New Reminder
-        </h2>
+      {/* 💊 Add Reminder Card (Premium Glass) */}
+      <div className="bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-2xl transition-all">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="text-2xl">💊</div>
+          <h2 className="text-xl font-semibold">
+            Add New Reminder
+          </h2>
+        </div>
 
-        <div className="grid gap-4">
-          <input
-            className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 p-3 rounded-xl text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Medicine Name (e.g., Paracetamol)"
-            value={medicineName}
-            onChange={(e) => setMedicineName(e.target.value)}
-          />
+        <div className="grid gap-5">
+          <div>
+            <label className="text-sm font-medium text-gray-600 dark:text-gray-400">
+              Medicine Name
+            </label>
+            <input
+              className="w-full mt-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-3.5 rounded-xl text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+              placeholder="e.g., Paracetamol"
+              value={medicineName}
+              onChange={(e) => setMedicineName(e.target.value)}
+            />
+          </div>
 
-          <input
-            className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 p-3 rounded-xl text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Dosage (e.g., 500mg)"
-            value={dosage}
-            onChange={(e) => setDosage(e.target.value)}
-          />
+          <div>
+            <label className="text-sm font-medium text-gray-600 dark:text-gray-400">
+              Dosage (Optional)
+            </label>
+            <input
+              className="w-full mt-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-3.5 rounded-xl text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
+              placeholder="e.g., 500mg"
+              value={dosage}
+              onChange={(e) => setDosage(e.target.value)}
+            />
+          </div>
 
-          <input
-            type="time"
-            className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 p-3 rounded-xl text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            value={time}
-            onChange={(e) => setTime(e.target.value)}
-          />
+          <div>
+            <label className="text-sm font-medium text-gray-600 dark:text-gray-400">
+              Reminder Time
+            </label>
+            <input
+              type="time"
+              className="w-full mt-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-3.5 rounded-xl text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"
+              value={time}
+              onChange={(e) => setTime(e.target.value)}
+            />
+          </div>
 
           <button
             onClick={handleAddReminder}
-            className="bg-blue-600 hover:bg-blue-700 transition text-white px-6 py-3 rounded-xl font-medium shadow-sm disabled:opacity-50"
+            className="mt-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:opacity-90 transition text-white px-6 py-3.5 rounded-xl font-semibold shadow-lg disabled:opacity-50"
           >
-            Add Reminder
+            + Add Reminder
           </button>
         </div>
       </div>
 
-      {/* Reminders List Card */}
-      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-6 rounded-2xl shadow-sm transition-colors">
-        <h2 className="text-xl font-semibold mb-4">
-          Your Reminders
-        </h2>
+      {/* 📋 Reminders List (Enterprise Card) */}
+      <div className="bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-2xl transition-all">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-semibold">
+            Your Active Reminders
+          </h2>
+
+          <div className="text-xs px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-300 font-medium">
+            {reminders.length} Active
+          </div>
+        </div>
 
         {reminders.length === 0 ? (
-          <p className="text-gray-500 dark:text-gray-400 text-sm">
-            No reminders yet. Add your first medicine reminder above.
-          </p>
+          <div className="text-center py-14">
+            <div className="text-5xl mb-4">⏰</div>
+            <p className="text-lg font-semibold text-gray-700 dark:text-gray-200">
+              No Reminders Yet
+            </p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+              Add your first medicine reminder to stay consistent with your treatment.
+            </p>
+          </div>
         ) : (
-          <div className="space-y-4">
+          <div className="grid gap-4">
             {reminders.map((reminder) => (
               <div
                 key={reminder.id}
-                className="flex items-center justify-between bg-gray-50 dark:bg-gray-700 border border-gray-100 dark:border-gray-600 p-4 rounded-xl transition-colors"
+                className="group flex items-center justify-between bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 border border-gray-200 dark:border-gray-700 p-5 rounded-2xl transition-all hover:shadow-lg hover:scale-[1.01]"
               >
-                <div>
-                  <p className="font-semibold text-lg">
-                    {reminder.medicineName}
-                  </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">
-                    {reminder.dosage
-                      ? `${reminder.dosage} • `
-                      : ""}
-                    {reminder.time}
-                  </p>
+                {/* Left Info */}
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white text-lg shadow-md">
+                    💊
+                  </div>
+
+                  <div>
+                    <p className="font-semibold text-lg">
+                      {reminder.medicineName}
+                    </p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      {reminder.dosage
+                        ? `${reminder.dosage} • `
+                        : ""}
+                      ⏰ {reminder.time}
+                    </p>
+                  </div>
                 </div>
 
-                <div className="text-xs bg-green-100 dark:bg-green-900/40 text-green-600 dark:text-green-300 px-3 py-1 rounded-full font-medium">
+                {/* Status Badge */}
+                <div className="text-xs px-4 py-1.5 rounded-full font-semibold bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-300 shadow-sm">
                   Active
                 </div>
               </div>
