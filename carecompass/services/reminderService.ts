@@ -22,6 +22,10 @@ export interface Reminder {
   createdAt?: any;
 }
 
+const getTodayKey = () => {
+  return new Date().toISOString().split("T")[0]; // YYYY-MM-DD
+};
+
 // ➕ Add Reminder (Supports Multiple Times)
 export const addReminder = async (
   uid: string,
@@ -35,13 +39,13 @@ export const addReminder = async (
     userId: uid,
     medicineName,
     dosage: dosage || "",
-    times: [time], // 🔥 New schema (array support)
-    takenTimes: [],
+    times: [time], // multi-dose ready
+    takenTimes: [], // 🔒 SAME SCHEMA (unchanged)
     createdAt: serverTimestamp(),
   });
 };
 
-// 📥 Get All User Reminders (Schema Safe)
+// 📥 Get All User Reminders (Schema Safe + Backward Compatible)
 export const getUserReminders = async (uid: string): Promise<Reminder[]> => {
   if (!uid) return [];
 
@@ -51,7 +55,6 @@ export const getUserReminders = async (uid: string): Promise<Reminder[]> => {
   return snapshot.docs.map((docSnap) => {
     const data = docSnap.data();
 
-    // 🔥 Backward compatibility (old reminders had "time" not "times")
     const safeTimes =
       Array.isArray(data.times)
         ? data.times
@@ -82,7 +85,7 @@ export const deleteReminder = async (reminderId: string) => {
   }
 };
 
-// ✏️ Update Reminder (Crash-Proof Edit Fix)
+// ✏️ Update Reminder (Crash-Proof Edit Fix — PRESERVES YOUR LOGIC)
 export const updateReminder = async (
   reminderId: string,
   data: {
@@ -100,7 +103,6 @@ export const updateReminder = async (
     const docRef = doc(db, "reminders", reminderId);
     const docSnap = await getDoc(docRef);
 
-    // 🔥 Prevent Firebase Runtime Error (your exact bug)
     if (!docSnap.exists()) {
       console.error("Reminder document does not exist:", reminderId);
       return;
@@ -116,7 +118,6 @@ export const updateReminder = async (
       updatePayload.dosage = data.dosage;
     }
 
-    // 🔥 Always store in new schema format
     if (data.times !== undefined) {
       updatePayload.times = data.times;
     }
@@ -127,7 +128,7 @@ export const updateReminder = async (
   }
 };
 
-// ✅ Mark Dose as Taken (Per Specific Time Slot)
+// ✅ Mark Dose as Taken (DAILY RESET FIX — NO SCHEMA CHANGE)
 export const markDoseTaken = async (
   reminderId: string,
   time: string,
@@ -136,10 +137,12 @@ export const markDoseTaken = async (
   if (!reminderId || !time) return;
 
   try {
+    const today = getTodayKey();
+    const todayKey = `${today}_${time}`; // 🔥 DAILY UNIQUE KEY
+
     const docRef = doc(db, "reminders", reminderId);
     const docSnap = await getDoc(docRef);
 
-    // 🔥 Prevent crash if reminder deleted while UI open
     if (!docSnap.exists()) {
       console.error("Reminder not found for marking taken:", reminderId);
       return;
@@ -147,10 +150,10 @@ export const markDoseTaken = async (
 
     const takenTimes = Array.isArray(currentTaken) ? currentTaken : [];
 
-    // Avoid duplicate entries
-    if (takenTimes.includes(time)) return;
+    // Prevent duplicate marking for SAME DAY
+    if (takenTimes.includes(todayKey)) return;
 
-    const updatedTaken = [...takenTimes, time];
+    const updatedTaken = [...takenTimes, todayKey];
 
     await updateDoc(docRef, {
       takenTimes: updatedTaken,

@@ -18,6 +18,9 @@ interface Reminder {
   takenTimes?: string[];
 }
 
+const getTodayKey = () =>
+  new Date().toISOString().split("T")[0];
+
 export default function ReminderPage() {
   const { user } = useAuth();
 
@@ -33,6 +36,8 @@ export default function ReminderPage() {
   const [editingTimeKey, setEditingTimeKey] = useState<string | null>(null);
   const [editTimeValue, setEditTimeValue] = useState("");
 
+  const today = getTodayKey();
+
   const loadReminders = async () => {
     if (!user) return;
     const data = await getUserReminders(user.uid);
@@ -43,7 +48,7 @@ export default function ReminderPage() {
     loadReminders();
   }, [user]);
 
-  // ⏰ Live Countdown Timer
+  // ⏰ Countdown Timer (UNCHANGED LOGIC)
   useEffect(() => {
     const calculateCountdowns = () => {
       const updated: Record<string, string> = {};
@@ -94,6 +99,15 @@ export default function ReminderPage() {
     loadReminders();
   };
 
+  // 🔥 DAILY RESET FIX (UI side only — no schema change)
+  const isDoseTakenToday = (
+    reminder: Reminder,
+    reminderTime: string
+  ) => {
+    const key = `${today}_${reminderTime}`;
+    return reminder.takenTimes?.includes(key);
+  };
+
   const handleMarkTaken = async (
     reminder: Reminder,
     reminderTime: string
@@ -106,7 +120,7 @@ export default function ReminderPage() {
     loadReminders();
   };
 
-  // ✏️ Start Editing Reminder (name + dosage)
+  // ✏️ Edit Reminder
   const startEditReminder = (reminder: Reminder) => {
     setEditingId(reminder.id);
     setEditMedicine(reminder.medicineName);
@@ -125,7 +139,7 @@ export default function ReminderPage() {
     loadReminders();
   };
 
-  // ⏰ Start Editing Specific Time
+  // ⏰ Edit Time
   const startEditTime = (
     reminderId: string,
     currentTime: string
@@ -275,12 +289,11 @@ export default function ReminderPage() {
                 </div>
               </div>
 
-              {/* Times Section (NOW EDITABLE) */}
+              {/* Times Section */}
               <div className="mt-4 space-y-3">
                 {reminder.times?.map((t) => {
                   const key = `${reminder.id}-${t}`;
-                  const isTaken =
-                    reminder.takenTimes?.includes(t);
+                  const isTaken = isDoseTakenToday(reminder, t);
 
                   return (
                     <div
