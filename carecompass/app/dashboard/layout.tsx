@@ -82,6 +82,13 @@ export default function DashboardLayout({
           </Link>
 
           <Link
+            href="/dashboard/medicine"
+            className={linkClasses("/dashboard/medicine")}
+          >
+            Medicine Describer
+          </Link>
+
+          <Link
             href="/dashboard/chat"
             className={linkClasses("/dashboard/chat")}
           >
@@ -146,9 +153,7 @@ export default function DashboardLayout({
         </header>
 
         {/* Page Content */}
-        <div className="flex-1 p-6 md:p-10 overflow-auto">
-          {children}
-        </div>
+        <div className="flex-1 p-6 md:p-10 overflow-auto">{children}</div>
       </main>
     </div>
   );
