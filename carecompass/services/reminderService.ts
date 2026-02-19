@@ -9,60 +9,153 @@ import {
   doc,
   updateDoc,
   serverTimestamp,
+  getDoc,
 } from "firebase/firestore";
 
+export interface Reminder {
+  id: string;
+  userId: string;
+  medicineName: string;
+  dosage?: string;
+  times: string[];
+  takenTimes: string[];
+  createdAt?: any;
+}
+
+// ➕ Add Reminder (Supports Multiple Times)
 export const addReminder = async (
   uid: string,
   medicineName: string,
   dosage: string,
-  time: string
+  time: string,
 ) => {
+  if (!uid || !medicineName || !time) return;
+
   await addDoc(collection(db, "reminders"), {
     userId: uid,
     medicineName,
-    dosage,
-    times: [time], // 🔥 supports multiple reminders
+    dosage: dosage || "",
+    times: [time], // 🔥 New schema (array support)
     takenTimes: [],
     createdAt: serverTimestamp(),
   });
 };
 
-export const getUserReminders = async (uid: string) => {
-  const q = query(
-    collection(db, "reminders"),
-    where("userId", "==", uid)
-  );
+// 📥 Get All User Reminders (Schema Safe)
+export const getUserReminders = async (uid: string): Promise<Reminder[]> => {
+  if (!uid) return [];
 
+  const q = query(collection(db, "reminders"), where("userId", "==", uid));
   const snapshot = await getDocs(q);
 
-  return snapshot.docs.map((docSnap) => ({
-    id: docSnap.id,
-    ...docSnap.data(),
-  }));
+  return snapshot.docs.map((docSnap) => {
+    const data = docSnap.data();
+
+    // 🔥 Backward compatibility (old reminders had "time" not "times")
+    const safeTimes =
+      Array.isArray(data.times)
+        ? data.times
+        : data.time
+        ? [data.time]
+        : [];
+
+    return {
+      id: docSnap.id,
+      userId: data.userId,
+      medicineName: data.medicineName || "",
+      dosage: data.dosage || "",
+      times: safeTimes,
+      takenTimes: Array.isArray(data.takenTimes) ? data.takenTimes : [],
+      createdAt: data.createdAt || null,
+    };
+  });
 };
 
+// 🗑 Delete Reminder (Safe)
 export const deleteReminder = async (reminderId: string) => {
-  await deleteDoc(doc(db, "reminders", reminderId));
+  if (!reminderId) return;
+
+  try {
+    await deleteDoc(doc(db, "reminders", reminderId));
+  } catch (error) {
+    console.error("Error deleting reminder:", error);
+  }
 };
 
+// ✏️ Update Reminder (Crash-Proof Edit Fix)
 export const updateReminder = async (
   reminderId: string,
-  data: any
+  data: {
+    medicineName?: string;
+    dosage?: string;
+    times?: string[];
+  },
 ) => {
-  await updateDoc(doc(db, "reminders", reminderId), data);
+  if (!reminderId) {
+    console.error("No reminderId provided for update");
+    return;
+  }
+
+  try {
+    const docRef = doc(db, "reminders", reminderId);
+    const docSnap = await getDoc(docRef);
+
+    // 🔥 Prevent Firebase Runtime Error (your exact bug)
+    if (!docSnap.exists()) {
+      console.error("Reminder document does not exist:", reminderId);
+      return;
+    }
+
+    const updatePayload: any = {};
+
+    if (data.medicineName !== undefined) {
+      updatePayload.medicineName = data.medicineName;
+    }
+
+    if (data.dosage !== undefined) {
+      updatePayload.dosage = data.dosage;
+    }
+
+    // 🔥 Always store in new schema format
+    if (data.times !== undefined) {
+      updatePayload.times = data.times;
+    }
+
+    await updateDoc(docRef, updatePayload);
+  } catch (error) {
+    console.error("Error updating reminder:", error);
+  }
 };
 
-// ✅ Mark dose as taken (per time)
+// ✅ Mark Dose as Taken (Per Specific Time Slot)
 export const markDoseTaken = async (
   reminderId: string,
   time: string,
-  currentTaken: string[]
+  currentTaken: string[] = [],
 ) => {
-  const updatedTaken = currentTaken.includes(time)
-    ? currentTaken
-    : [...currentTaken, time];
+  if (!reminderId || !time) return;
 
-  await updateDoc(doc(db, "reminders", reminderId), {
-    takenTimes: updatedTaken,
-  });
+  try {
+    const docRef = doc(db, "reminders", reminderId);
+    const docSnap = await getDoc(docRef);
+
+    // 🔥 Prevent crash if reminder deleted while UI open
+    if (!docSnap.exists()) {
+      console.error("Reminder not found for marking taken:", reminderId);
+      return;
+    }
+
+    const takenTimes = Array.isArray(currentTaken) ? currentTaken : [];
+
+    // Avoid duplicate entries
+    if (takenTimes.includes(time)) return;
+
+    const updatedTaken = [...takenTimes, time];
+
+    await updateDoc(docRef, {
+      takenTimes: updatedTaken,
+    });
+  } catch (error) {
+    console.error("Error marking dose as taken:", error);
+  }
 };
