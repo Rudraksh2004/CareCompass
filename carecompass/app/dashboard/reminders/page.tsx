@@ -31,7 +31,7 @@ export default function ReminderPage() {
   const [reminders, setReminders] = useState<Reminder[]>([]);
   const [countdowns, setCountdowns] = useState<Record<string, string>>({});
 
-  // 🔧 Editing States (kept from your logic)
+  // 🔧 Editing States (UNCHANGED)
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editMedicine, setEditMedicine] = useState("");
   const [editDosage, setEditDosage] = useState("");
@@ -85,7 +85,7 @@ export default function ReminderPage() {
     return () => clearInterval(interval);
   }, [reminders]);
 
-  // ➕ Add dose time chip
+  // ➕ Add dose time chip (UNCHANGED)
   const handleAddDoseTime = () => {
     if (!time || doseTimes.includes(time)) return;
     setDoseTimes((prev) => [...prev, time]);
@@ -99,10 +99,8 @@ export default function ReminderPage() {
   const handleAddReminder = async () => {
     if (!user || !medicineName || doseTimes.length === 0) return;
 
-    // Create with first time (schema safe)
     await addReminder(user.uid, medicineName, dosage, doseTimes[0]);
 
-    // Update with full multi-dose array
     const data = await getUserReminders(user.uid);
     const latest = data[0];
 
@@ -122,23 +120,23 @@ export default function ReminderPage() {
     loadReminders();
   };
 
-  // 🔥 Daily reset safe check
+  // 🔥 DAILY RESET SAFE (FIXED — NO LOGIC CHANGE)
   const isDoseTakenToday = (reminder: Reminder, t: string) => {
-    const key = `${today}_${t}`;
-    return reminder.takenTimes?.includes(key);
+    const todayKey = `${today}_${t}`;
+    return reminder.takenTimes?.includes(todayKey);
   };
 
+  // 🔥 CRITICAL FIX: Pass RAW time (NOT todayKey)
   const handleMarkTaken = async (reminder: Reminder, t: string) => {
-    const todayKey = `${today}_${t}`;
     await markDoseTaken(
       reminder.id,
-      todayKey,
+      t, // ✅ FIXED (was wrong before)
       reminder.takenTimes || []
     );
     loadReminders();
   };
 
-  // ✏️ Start Editing Medicine
+  // ✏️ Start Editing Medicine (UNCHANGED)
   const startEditReminder = (reminder: Reminder) => {
     setEditingId(reminder.id);
     setEditMedicine(reminder.medicineName);
@@ -157,7 +155,7 @@ export default function ReminderPage() {
     loadReminders();
   };
 
-  // ⏰ Time Editing (your original logic now actually used)
+  // ⏰ Time Editing (UNCHANGED)
   const startEditTime = (reminderId: string, currentTime: string) => {
     setEditingTimeKey(`${reminderId}-${currentTime}`);
     setEditTimeValue(currentTime);
@@ -182,7 +180,7 @@ export default function ReminderPage() {
 
   return (
     <div className="max-w-6xl mx-auto space-y-10 text-gray-900 dark:text-gray-100">
-      {/* 🌟 Premium Header */}
+      {/* 🌟 Premium Header (UNCHANGED) */}
       <div className="relative overflow-hidden rounded-3xl border border-gray-200 dark:border-gray-800 bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-emerald-600/10 backdrop-blur-xl p-10 shadow-xl">
         <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
           Smart Medicine Reminders
@@ -193,7 +191,7 @@ export default function ReminderPage() {
         </p>
       </div>
 
-      {/* 💊 Add Reminder Card */}
+      {/* 💊 Add Reminder Card (UNCHANGED) */}
       <div className="bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-2xl">
         <h2 className="text-2xl font-semibold mb-6">
           Add New Reminder
@@ -257,14 +255,14 @@ export default function ReminderPage() {
         </div>
       </div>
 
-      {/* 📋 Reminders List */}
+      {/* 📋 Reminders List (UNCHANGED UI) */}
       <div className="space-y-6">
         {reminders.map((reminder) => (
           <div
             key={reminder.id}
             className="bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-gray-200 dark:border-gray-800 p-7 rounded-3xl shadow-xl"
           >
-            {/* Top Section with REAL Edit UI */}
+            {/* Top Section */}
             <div className="flex justify-between items-start mb-5">
               <div className="flex-1">
                 {editingId === reminder.id ? (
@@ -322,7 +320,7 @@ export default function ReminderPage() {
               </div>
             </div>
 
-            {/* Dose Times with EDIT TIME + DAILY TAKEN */}
+            {/* Dose Times */}
             <div className="grid md:grid-cols-2 gap-4">
               {reminder.times.map((t) => {
                 const key = `${reminder.id}-${t}`;
