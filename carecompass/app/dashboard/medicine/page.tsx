@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import Tesseract from "tesseract.js";
 import { extractTextFromPDF } from "@/utils/pdfExtractor";
@@ -14,6 +14,7 @@ import {
 
 export default function MedicinePage() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const { user } = useAuth();
   const autoMedicine = searchParams.get("name");
 
@@ -22,12 +23,12 @@ export default function MedicinePage() {
   const [loading, setLoading] = useState(false);
   const [fileLoading, setFileLoading] = useState(false);
   const [history, setHistory] = useState<any[]>([]);
+  const [detectedMedicines, setDetectedMedicines] = useState<string[]>([]);
+  const [detecting, setDetecting] = useState(false);
 
-  // 🔥 Load History (NEW)
+  // Load History
   useEffect(() => {
-    if (user) {
-      loadHistory();
-    }
+    if (user) loadHistory();
   }, [user]);
 
   const loadHistory = async () => {
@@ -36,13 +37,35 @@ export default function MedicinePage() {
     setHistory(data);
   };
 
-  // 🔥 Auto-fill from Reminder redirect (UNCHANGED)
+  // Auto-fill from reminder redirect
   useEffect(() => {
     if (autoMedicine) {
       setMedicineText(autoMedicine);
       describeMedicine(autoMedicine);
     }
   }, [autoMedicine]);
+
+  // 🔥 NEW: Detect medicines using AI
+  const detectMedicines = async (text: string) => {
+    if (!text || text.length < 10) return;
+
+    setDetecting(true);
+    try {
+      const res = await fetch("/api/ai/extract-medicines", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ text }),
+      });
+
+      const data = await res.json();
+      setDetectedMedicines(data.medicines || []);
+    } catch (error) {
+      console.error(error);
+    }
+    setDetecting(false);
+  };
 
   const handleFileUpload = async (
     e: React.ChangeEvent<HTMLInputElement>
@@ -51,21 +74,23 @@ export default function MedicinePage() {
     if (!file) return;
 
     setFileLoading(true);
+    setDetectedMedicines([]);
 
     try {
+      let extractedText = "";
+
       if (file.type === "application/pdf") {
         const pdfResult = await extractTextFromPDF(file);
-
-        if (pdfResult.text.trim().length < 20) {
-          const { data } = await Tesseract.recognize(file, "eng");
-          setMedicineText(data.text);
-        } else {
-          setMedicineText(pdfResult.text);
-        }
+        extractedText = pdfResult.text;
       } else {
         const { data } = await Tesseract.recognize(file, "eng");
-        setMedicineText(data.text);
+        extractedText = data.text;
       }
+
+      setMedicineText(extractedText);
+
+      // 🔥 AUTO DETECT MEDICINES
+      await detectMedicines(extractedText);
     } catch (error) {
       console.error(error);
     }
@@ -97,7 +122,6 @@ export default function MedicinePage() {
 
       setResult(description);
 
-      // 🔥 SAVE HISTORY (NEW)
       if (user) {
         await saveMedicineHistory(user.uid, {
           medicineText: finalText,
@@ -115,99 +139,89 @@ export default function MedicinePage() {
 
   return (
     <div className="max-w-5xl mx-auto space-y-8 text-gray-900 dark:text-gray-100">
-      {/* 🌟 Premium Header */}
-      <div className="relative overflow-hidden rounded-3xl border border-gray-200 dark:border-gray-800 bg-gradient-to-r from-purple-600/10 via-blue-600/10 to-emerald-600/10 backdrop-blur-xl p-8 shadow-xl">
+      {/* Header */}
+      <div className="rounded-3xl border border-gray-200 dark:border-gray-800 bg-gradient-to-r from-purple-600/10 via-blue-600/10 to-emerald-600/10 p-8 shadow-xl">
         <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
           Medicine Describer
         </h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-2 text-sm max-w-2xl">
-          Understand medicine composition, uses, side-effects, and precautions
-          with structured clinical explanations.
+        <p className="text-gray-600 dark:text-gray-400 mt-2 text-sm">
+          Upload prescription → Detect medicines → Get clinical explanations
         </p>
       </div>
 
-      {/* 💊 Input Card */}
-      <div className="bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-2xl">
+      {/* Upload Card */}
+      <div className="bg-white/70 dark:bg-gray-900/60 border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-2xl">
         <h2 className="text-xl font-semibold mb-6">
-          Enter Medicine Name or Upload Prescription
+          Upload Prescription or Enter Medicine
         </h2>
 
-        <div className="mb-6">
-          <input
-            type="file"
-            accept="image/*,application/pdf"
-            onChange={handleFileUpload}
-            className="text-sm"
-          />
-          {fileLoading && (
-            <p className="text-sm text-gray-500 mt-2">
-              Extracting medicine text from file...
+        <input
+          type="file"
+          accept="image/*,application/pdf"
+          onChange={handleFileUpload}
+          className="mb-4"
+        />
+
+        {fileLoading && (
+          <p className="text-sm text-gray-500">
+            Extracting text from file...
+          </p>
+        )}
+
+        {/* 🔥 Detected Medicines Chips */}
+        {detecting && (
+          <p className="text-sm text-blue-500 mt-3">
+            Detecting medicines from prescription...
+          </p>
+        )}
+
+        {detectedMedicines.length > 0 && (
+          <div className="mt-4">
+            <p className="text-sm font-semibold mb-2">
+              Detected Medicines:
             </p>
-          )}
-        </div>
+            <div className="flex flex-wrap gap-2">
+              {detectedMedicines.map((med, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => describeMedicine(med)}
+                  className="px-4 py-1.5 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 text-sm font-medium hover:scale-105 transition"
+                >
+                  💊 {med}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         <textarea
           rows={4}
           value={medicineText}
           onChange={(e) => setMedicineText(e.target.value)}
-          placeholder="e.g., Paracetamol 500mg, Metformin, Amoxicillin..."
-          className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
+          placeholder="e.g., Paracetamol 500mg, Metformin..."
+          className="w-full mt-6 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 rounded-2xl focus:ring-2 focus:ring-purple-500"
         />
 
         <button
           onClick={() => describeMedicine()}
           disabled={loading}
-          className="mt-6 bg-gradient-to-r from-purple-600 to-blue-600 hover:opacity-90 transition text-white px-8 py-3 rounded-xl font-semibold shadow-lg disabled:opacity-50"
+          className="mt-6 bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-3 rounded-xl font-semibold shadow-lg"
         >
-          {loading ? "Analyzing Medicine..." : "Describe Medicine"}
+          {loading ? "Analyzing..." : "Describe Medicine"}
         </button>
       </div>
 
-      {/* 🧠 Result */}
+      {/* Result */}
       {result && (
         <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-xl">
           <h2 className="text-2xl font-semibold mb-6">
             Clinical Medicine Description
           </h2>
 
-          <div className="prose dark:prose-invert max-w-none text-sm leading-relaxed">
+          <div className="prose dark:prose-invert max-w-none text-sm">
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {result}
             </ReactMarkdown>
-          </div>
-        </div>
-      )}
-
-      {/* 📜 History Section (NEW) */}
-      {history.length > 0 && (
-        <div className="bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-2xl">
-          <h2 className="text-2xl font-semibold mb-6">
-            Previous Medicine Analyses
-          </h2>
-
-          <div className="space-y-4">
-            {history.map((item) => (
-              <div
-                key={item.id}
-                onClick={() => {
-                  setMedicineText(item.medicineText);
-                  setResult(item.aiResponse);
-                }}
-                className="cursor-pointer bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 border border-gray-200 dark:border-gray-700 p-5 rounded-2xl hover:shadow-lg transition"
-              >
-                <p className="text-xs text-gray-400 mb-1">
-                  {item.createdAt?.toDate?.().toLocaleString?.() || ""}
-                </p>
-
-                <p className="font-semibold text-lg">
-                  💊 {item.medicineText}
-                </p>
-
-                <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2 mt-1">
-                  {item.aiResponse}
-                </p>
-              </div>
-            ))}
           </div>
         </div>
       )}
