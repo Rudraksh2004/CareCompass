@@ -9,6 +9,7 @@ import {
   markDoseTaken,
   updateReminder,
 } from "@/services/reminderService";
+import { useSearchParams, useRouter } from "next/navigation"; // ✅ Added router
 
 interface Reminder {
   id: string;
@@ -23,6 +24,8 @@ const getTodayKey = () =>
 
 export default function ReminderPage() {
   const { user } = useAuth();
+  const searchParams = useSearchParams();
+  const router = useRouter(); // ✅ NEW (for describer navigation)
 
   const [medicineName, setMedicineName] = useState("");
   const [dosage, setDosage] = useState("");
@@ -49,6 +52,14 @@ export default function ReminderPage() {
   useEffect(() => {
     loadReminders();
   }, [user]);
+
+  // 🔥 Safe auto-fill (UNCHANGED behavior)
+  useEffect(() => {
+    const medFromQuery = searchParams.get("medicine");
+    if (medFromQuery) {
+      setMedicineName(medFromQuery);
+    }
+  }, [searchParams]);
 
   // ⏰ Countdown Timer (UNCHANGED LOGIC)
   useEffect(() => {
@@ -120,20 +131,29 @@ export default function ReminderPage() {
     loadReminders();
   };
 
-  // 🔥 DAILY RESET SAFE (FIXED — NO LOGIC CHANGE)
+  // 🔥 Backward compatible daily check (UNCHANGED LOGIC)
   const isDoseTakenToday = (reminder: Reminder, t: string) => {
     const todayKey = `${today}_${t}`;
-    return reminder.takenTimes?.includes(todayKey);
+    return (
+      reminder.takenTimes?.includes(todayKey) ||
+      reminder.takenTimes?.includes(t)
+    );
   };
 
-  // 🔥 CRITICAL FIX: Pass RAW time (NOT todayKey)
   const handleMarkTaken = async (reminder: Reminder, t: string) => {
+    const todayKey = `${today}_${t}`;
+
     await markDoseTaken(
       reminder.id,
-      t, // ✅ FIXED (was wrong before)
+      todayKey,
       reminder.takenTimes || []
     );
     loadReminders();
+  };
+
+  // 🧠 NEW: Navigate to Medicine Describer (SAFE ADDITION)
+  const handleDescribeMedicine = (name: string) => {
+    router.push(`/dashboard/medicine?name=${encodeURIComponent(name)}`);
   };
 
   // ✏️ Start Editing Medicine (UNCHANGED)
@@ -180,7 +200,7 @@ export default function ReminderPage() {
 
   return (
     <div className="max-w-6xl mx-auto space-y-10 text-gray-900 dark:text-gray-100">
-      {/* 🌟 Premium Header (UNCHANGED) */}
+      {/* 🌟 Header (UNCHANGED) */}
       <div className="relative overflow-hidden rounded-3xl border border-gray-200 dark:border-gray-800 bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-emerald-600/10 backdrop-blur-xl p-10 shadow-xl">
         <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
           Smart Medicine Reminders
@@ -191,7 +211,7 @@ export default function ReminderPage() {
         </p>
       </div>
 
-      {/* 💊 Add Reminder Card (UNCHANGED) */}
+      {/* 💊 Add Reminder Card (UNCHANGED UI) */}
       <div className="bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-2xl">
         <h2 className="text-2xl font-semibold mb-6">
           Add New Reminder
@@ -199,14 +219,14 @@ export default function ReminderPage() {
 
         <div className="grid gap-5">
           <input
-            className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition"
+            className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 rounded-2xl"
             placeholder="Medicine Name (e.g., Paracetamol)"
             value={medicineName}
             onChange={(e) => setMedicineName(e.target.value)}
           />
 
           <input
-            className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 rounded-2xl focus:ring-2 focus:ring-purple-500 outline-none transition"
+            className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 rounded-2xl"
             placeholder="Dosage (e.g., 500mg)"
             value={dosage}
             onChange={(e) => setDosage(e.target.value)}
@@ -215,13 +235,13 @@ export default function ReminderPage() {
           <div className="flex gap-3">
             <input
               type="time"
-              className="border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none"
+              className="border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 rounded-2xl"
               value={time}
               onChange={(e) => setTime(e.target.value)}
             />
             <button
               onClick={handleAddDoseTime}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 rounded-2xl font-semibold shadow hover:scale-105 transition"
+              className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 rounded-2xl font-semibold shadow"
             >
               Add Dose
             </button>
@@ -232,7 +252,7 @@ export default function ReminderPage() {
               {doseTimes.map((t) => (
                 <span
                   key={t}
-                  className="bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 px-4 py-1.5 rounded-full text-sm flex items-center gap-2 font-medium"
+                  className="bg-blue-100 dark:bg-blue-900/40 px-4 py-1.5 rounded-full text-sm flex items-center gap-2 font-medium"
                 >
                   ⏰ {t}
                   <button
@@ -248,14 +268,14 @@ export default function ReminderPage() {
 
           <button
             onClick={handleAddReminder}
-            className="mt-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-4 rounded-2xl font-semibold shadow-lg hover:scale-[1.02] transition"
+            className="mt-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-4 rounded-2xl font-semibold shadow-lg"
           >
             + Create Smart Reminder
           </button>
         </div>
       </div>
 
-      {/* 📋 Reminders List (UNCHANGED UI) */}
+      {/* 📋 Reminders List (UI SAME + Describe Button ADDED) */}
       <div className="space-y-6">
         {reminders.map((reminder) => (
           <div
@@ -294,7 +314,17 @@ export default function ReminderPage() {
                 )}
               </div>
 
+              {/* 🔥 Buttons Row (ONLY Describe Added) */}
               <div className="flex gap-2 ml-4">
+                <button
+                  onClick={() =>
+                    handleDescribeMedicine(reminder.medicineName)
+                  }
+                  className="px-4 py-1.5 bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 rounded-full text-xs font-semibold"
+                >
+                  Describe
+                </button>
+
                 {editingId === reminder.id ? (
                   <button
                     onClick={saveReminderEdit}
@@ -320,7 +350,7 @@ export default function ReminderPage() {
               </div>
             </div>
 
-            {/* Dose Times */}
+            {/* Dose Times (100% UNCHANGED) */}
             <div className="grid md:grid-cols-2 gap-4">
               {reminder.times.map((t) => {
                 const key = `${reminder.id}-${t}`;

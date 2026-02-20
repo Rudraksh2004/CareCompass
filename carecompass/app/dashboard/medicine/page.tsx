@@ -67,9 +67,7 @@ export default function MedicinePage() {
     setDetecting(false);
   };
 
-  const handleFileUpload = async (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -117,8 +115,7 @@ export default function MedicinePage() {
       });
 
       const data = await res.json();
-      const description =
-        data.description || "No description generated.";
+      const description = data.description || "No description generated.";
 
       setResult(description);
 
@@ -163,9 +160,7 @@ export default function MedicinePage() {
         />
 
         {fileLoading && (
-          <p className="text-sm text-gray-500">
-            Extracting text from file...
-          </p>
+          <p className="text-sm text-gray-500">Extracting text from file...</p>
         )}
 
         {/* 🔥 Detected Medicines Chips */}
@@ -177,18 +172,35 @@ export default function MedicinePage() {
 
         {detectedMedicines.length > 0 && (
           <div className="mt-4">
-            <p className="text-sm font-semibold mb-2">
-              Detected Medicines:
-            </p>
+            <p className="text-sm font-semibold mb-2">Detected Medicines:</p>
             <div className="flex flex-wrap gap-2">
               {detectedMedicines.map((med, idx) => (
-                <button
+                <div
                   key={idx}
-                  onClick={() => describeMedicine(med)}
-                  className="px-4 py-1.5 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 text-sm font-medium hover:scale-105 transition"
+                  className="flex items-center gap-2 bg-white/80 dark:bg-gray-800/70 border border-gray-200 dark:border-gray-700 px-3 py-2 rounded-full shadow-sm hover:shadow-md transition"
                 >
-                  💊 {med}
-                </button>
+                  <span className="text-sm font-medium">💊 {med}</span>
+
+                  {/* Describe Button */}
+                  <button
+                    onClick={() => describeMedicine(med)}
+                    className="text-xs px-3 py-1 rounded-full bg-blue-600 text-white hover:bg-blue-700 transition font-semibold"
+                  >
+                    Describe
+                  </button>
+
+                  {/* Add to Reminder Button */}
+                  <button
+                    onClick={() =>
+                      router.push(
+                        `/dashboard/reminders?medicine=${encodeURIComponent(med)}`,
+                      )
+                    }
+                    className="text-xs px-3 py-1 rounded-full bg-emerald-600 text-white hover:bg-emerald-700 transition font-semibold"
+                  >
+                    + Reminder
+                  </button>
+                </div>
               ))}
             </div>
           </div>
@@ -219,9 +231,7 @@ export default function MedicinePage() {
           </h2>
 
           <div className="prose dark:prose-invert max-w-none text-sm">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>
-              {result}
-            </ReactMarkdown>
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{result}</ReactMarkdown>
           </div>
         </div>
       )}
