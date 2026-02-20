@@ -2,21 +2,41 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 import Tesseract from "tesseract.js";
 import { extractTextFromPDF } from "@/utils/pdfExtractor";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import {
+  saveMedicineHistory,
+  getMedicineHistory,
+} from "@/services/medicineHistoryService";
 
 export default function MedicinePage() {
   const searchParams = useSearchParams();
+  const { user } = useAuth();
   const autoMedicine = searchParams.get("name");
 
   const [medicineText, setMedicineText] = useState("");
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
   const [fileLoading, setFileLoading] = useState(false);
+  const [history, setHistory] = useState<any[]>([]);
 
-  // 🔥 Auto-fill from Reminder redirect (Option 1)
+  // 🔥 Load History (NEW)
+  useEffect(() => {
+    if (user) {
+      loadHistory();
+    }
+  }, [user]);
+
+  const loadHistory = async () => {
+    if (!user) return;
+    const data = await getMedicineHistory(user.uid);
+    setHistory(data);
+  };
+
+  // 🔥 Auto-fill from Reminder redirect (UNCHANGED)
   useEffect(() => {
     if (autoMedicine) {
       setMedicineText(autoMedicine);
@@ -72,7 +92,19 @@ export default function MedicinePage() {
       });
 
       const data = await res.json();
-      setResult(data.description || "No description generated.");
+      const description =
+        data.description || "No description generated.";
+
+      setResult(description);
+
+      // 🔥 SAVE HISTORY (NEW)
+      if (user) {
+        await saveMedicineHistory(user.uid, {
+          medicineText: finalText,
+          aiResponse: description,
+        });
+        loadHistory();
+      }
     } catch (error) {
       console.error(error);
       setResult("Failed to analyze medicine.");
@@ -100,7 +132,6 @@ export default function MedicinePage() {
           Enter Medicine Name or Upload Prescription
         </h2>
 
-        {/* File Upload */}
         <div className="mb-6">
           <input
             type="file"
@@ -115,7 +146,6 @@ export default function MedicinePage() {
           )}
         </div>
 
-        {/* Text Input */}
         <textarea
           rows={4}
           value={medicineText}
@@ -133,19 +163,51 @@ export default function MedicinePage() {
         </button>
       </div>
 
-      {/* 🧠 Result Card */}
+      {/* 🧠 Result */}
       {result && (
-        <div className="space-y-4">
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-xl">
-            <h2 className="text-2xl font-semibold mb-6">
-              Clinical Medicine Description
-            </h2>
+        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-xl">
+          <h2 className="text-2xl font-semibold mb-6">
+            Clinical Medicine Description
+          </h2>
 
-            <div className="prose dark:prose-invert max-w-none text-sm leading-relaxed">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                {result}
-              </ReactMarkdown>
-            </div>
+          <div className="prose dark:prose-invert max-w-none text-sm leading-relaxed">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {result}
+            </ReactMarkdown>
+          </div>
+        </div>
+      )}
+
+      {/* 📜 History Section (NEW) */}
+      {history.length > 0 && (
+        <div className="bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-2xl">
+          <h2 className="text-2xl font-semibold mb-6">
+            Previous Medicine Analyses
+          </h2>
+
+          <div className="space-y-4">
+            {history.map((item) => (
+              <div
+                key={item.id}
+                onClick={() => {
+                  setMedicineText(item.medicineText);
+                  setResult(item.aiResponse);
+                }}
+                className="cursor-pointer bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 border border-gray-200 dark:border-gray-700 p-5 rounded-2xl hover:shadow-lg transition"
+              >
+                <p className="text-xs text-gray-400 mb-1">
+                  {item.createdAt?.toDate?.().toLocaleString?.() || ""}
+                </p>
+
+                <p className="font-semibold text-lg">
+                  💊 {item.medicineText}
+                </p>
+
+                <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2 mt-1">
+                  {item.aiResponse}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
       )}
