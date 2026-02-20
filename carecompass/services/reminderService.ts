@@ -18,20 +18,21 @@ export interface Reminder {
   medicineName: string;
   dosage?: string;
   times: string[];
-  takenTimes: string[];
+  takenTimes: string[]; // format: YYYY-MM-DD_HH:MM
   createdAt?: any;
 }
 
+// 🔑 Helper: Today Key (Used for Daily Reset Logic)
 const getTodayKey = () => {
-  return new Date().toISOString().split("T")[0]; // YYYY-MM-DD
+  return new Date().toISOString().split("T")[0];
 };
 
-// ➕ Add Reminder (Supports Multiple Times)
+// ➕ Add Reminder (Supports Multi-Dose)
 export const addReminder = async (
   uid: string,
   medicineName: string,
   dosage: string,
-  time: string,
+  time: string
 ) => {
   if (!uid || !medicineName || !time) return;
 
@@ -39,13 +40,13 @@ export const addReminder = async (
     userId: uid,
     medicineName,
     dosage: dosage || "",
-    times: [time], // multi-dose ready
-    takenTimes: [], // 🔒 SAME SCHEMA (unchanged)
+    times: [time], // multi-dose schema
+    takenTimes: [], // daily tracked entries like 2026-02-20_08:00
     createdAt: serverTimestamp(),
   });
 };
 
-// 📥 Get All User Reminders (Schema Safe + Backward Compatible)
+// 📥 Get User Reminders (Schema Safe + Backward Compatible)
 export const getUserReminders = async (uid: string): Promise<Reminder[]> => {
   if (!uid) return [];
 
@@ -55,6 +56,7 @@ export const getUserReminders = async (uid: string): Promise<Reminder[]> => {
   return snapshot.docs.map((docSnap) => {
     const data = docSnap.data();
 
+    // Backward compatibility (old schema had "time")
     const safeTimes =
       Array.isArray(data.times)
         ? data.times
@@ -74,86 +76,77 @@ export const getUserReminders = async (uid: string): Promise<Reminder[]> => {
   });
 };
 
-// 🗑 Delete Reminder (Safe)
+// 🗑 Delete Reminder
 export const deleteReminder = async (reminderId: string) => {
   if (!reminderId) return;
-
-  try {
-    await deleteDoc(doc(db, "reminders", reminderId));
-  } catch (error) {
-    console.error("Error deleting reminder:", error);
-  }
+  await deleteDoc(doc(db, "reminders", reminderId));
 };
 
-// ✏️ Update Reminder (Crash-Proof Edit Fix — PRESERVES YOUR LOGIC)
+// ✏️ Update Reminder (Crash-Proof)
 export const updateReminder = async (
   reminderId: string,
   data: {
     medicineName?: string;
     dosage?: string;
     times?: string[];
-  },
-) => {
-  if (!reminderId) {
-    console.error("No reminderId provided for update");
-    return;
   }
+) => {
+  if (!reminderId) return;
 
   try {
     const docRef = doc(db, "reminders", reminderId);
     const docSnap = await getDoc(docRef);
 
+    // Prevent "No document to update" error (your previous bug)
     if (!docSnap.exists()) {
       console.error("Reminder document does not exist:", reminderId);
       return;
     }
 
-    const updatePayload: any = {};
+    const payload: any = {};
 
-    if (data.medicineName !== undefined) {
-      updatePayload.medicineName = data.medicineName;
-    }
+    if (data.medicineName !== undefined)
+      payload.medicineName = data.medicineName;
 
-    if (data.dosage !== undefined) {
-      updatePayload.dosage = data.dosage;
-    }
+    if (data.dosage !== undefined) payload.dosage = data.dosage;
 
-    if (data.times !== undefined) {
-      updatePayload.times = data.times;
-    }
+    if (data.times !== undefined) payload.times = data.times;
 
-    await updateDoc(docRef, updatePayload);
+    await updateDoc(docRef, payload);
   } catch (error) {
     console.error("Error updating reminder:", error);
   }
 };
 
-// ✅ Mark Dose as Taken (DAILY RESET FIX — NO SCHEMA CHANGE)
+// ✅ Mark Dose as Taken (PER DOSE + PER DAY)  — A+B+C+D CORE FIX
 export const markDoseTaken = async (
   reminderId: string,
   time: string,
-  currentTaken: string[] = [],
+  currentTaken: string[] = []
 ) => {
   if (!reminderId || !time) return;
 
   try {
-    const today = getTodayKey();
-    const todayKey = `${today}_${time}`; // 🔥 DAILY UNIQUE KEY
-
     const docRef = doc(db, "reminders", reminderId);
     const docSnap = await getDoc(docRef);
 
+    // Prevent runtime crash
     if (!docSnap.exists()) {
-      console.error("Reminder not found for marking taken:", reminderId);
+      console.error("Reminder not found:", reminderId);
       return;
     }
 
-    const takenTimes = Array.isArray(currentTaken) ? currentTaken : [];
+    const today = getTodayKey();
+    const todayDoseKey = `${today}_${time}`; // e.g. 2026-02-20_08:00
 
-    // Prevent duplicate marking for SAME DAY
-    if (takenTimes.includes(todayKey)) return;
+    const takenArray = Array.isArray(currentTaken) ? currentTaken : [];
 
-    const updatedTaken = [...takenTimes, todayKey];
+    // 🔒 Prevent duplicate marking (Bug D fix)
+    if (takenArray.includes(todayDoseKey)) {
+      return;
+    }
+
+    const updatedTaken = [...takenArray, todayDoseKey];
 
     await updateDoc(docRef, {
       takenTimes: updatedTaken,
@@ -161,4 +154,20 @@ export const markDoseTaken = async (
   } catch (error) {
     console.error("Error marking dose as taken:", error);
   }
+};
+
+// 📊 Get Today's Progress (Used for Dashboard + UI Progress Bar)
+export const getTodayProgress = (reminder: Reminder) => {
+  const today = getTodayKey();
+  const totalDoses = reminder.times?.length || 0;
+
+  const takenToday =
+    reminder.takenTimes?.filter((t) => t.startsWith(today)).length || 0;
+
+  return {
+    takenToday,
+    totalDoses,
+    progressPercent:
+      totalDoses === 0 ? 0 : Math.round((takenToday / totalDoses) * 100),
+  };
 };
