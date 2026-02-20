@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Tesseract from "tesseract.js";
 import { extractTextFromPDF } from "@/utils/pdfExtractor";
-import { exportMedicalPDF } from "@/utils/pdfExporter";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -148,20 +147,6 @@ export default function MedicinePage() {
               </ReactMarkdown>
             </div>
           </div>
-
-          {/* 📄 PDF Export */}
-          <button
-            onClick={() =>
-              exportMedicalPDF(
-                "Medicine Clinical Report",
-                medicineText,
-                result
-              )
-            }
-            className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg transition"
-          >
-            Download Clinical PDF Report
-          </button>
         </div>
       )}
     </div>
