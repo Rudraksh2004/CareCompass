@@ -25,7 +25,11 @@ export interface Reminder {
 
 // 🔑 Helper: Today Key (Used for Daily Reset Logic)
 const getTodayKey = () => {
-  return new Date().toISOString().split("T")[0];
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 };
 
 // ➕ Add Reminder (Supports Multi-Dose)
@@ -33,7 +37,7 @@ export const addReminder = async (
   uid: string,
   medicineName: string,
   dosage: string,
-  time: string
+  time: string,
 ) => {
   if (!uid || !medicineName || !time) return;
 
@@ -60,8 +64,8 @@ export const getUserReminders = async (uid: string): Promise<Reminder[]> => {
     const safeTimes = Array.isArray(data.times)
       ? data.times
       : data.time
-      ? [data.time]
-      : [];
+        ? [data.time]
+        : [];
 
     return {
       id: docSnap.id,
@@ -88,7 +92,7 @@ export const updateReminder = async (
     medicineName?: string;
     dosage?: string;
     times?: string[];
-  }
+  },
 ) => {
   if (!reminderId) return;
 
@@ -120,7 +124,7 @@ export const updateReminder = async (
 export const markDoseTaken = async (
   reminderId: string,
   todayDoseKey: string, // IMPORTANT: already formatted like 2026-02-21_14:00
-  currentTaken: string[] = []
+  currentTaken: string[] = [],
 ) => {
   if (!reminderId || !todayDoseKey) return;
 
