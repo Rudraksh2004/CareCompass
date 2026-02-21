@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import Tesseract from "tesseract.js";
@@ -29,7 +29,10 @@ export default function MedicinePage() {
   const [fileLoading, setFileLoading] = useState(false);
   const [history, setHistory] = useState<MedicineHistory[]>([]);
 
-  // 🔥 Load medicine history (Option B)
+  // 🔒 NEW: Prevent double auto-generation
+  const hasAutoDescribed = useRef(false);
+  const isGeneratingRef = useRef(false);
+
   const loadHistory = async () => {
     if (!user) return;
     try {
@@ -44,9 +47,10 @@ export default function MedicinePage() {
     loadHistory();
   }, [user]);
 
-  // 🔥 Auto-fill from Reminder redirect (UNCHANGED)
+  // 🔥 FIXED: Safe auto-describe (runs ONLY once)
   useEffect(() => {
-    if (autoMedicine) {
+    if (autoMedicine && !hasAutoDescribed.current) {
+      hasAutoDescribed.current = true;
       setMedicineText(autoMedicine);
       describeMedicine(autoMedicine);
     }
@@ -82,9 +86,13 @@ export default function MedicinePage() {
   };
 
   const describeMedicine = async (text?: string) => {
+    // 🔒 Prevent double execution (VERY IMPORTANT)
+    if (isGeneratingRef.current) return;
+
     const finalText = text || medicineText;
     if (!finalText.trim()) return;
 
+    isGeneratingRef.current = true;
     setLoading(true);
     setResult("");
 
@@ -105,26 +113,27 @@ export default function MedicinePage() {
 
       setResult(description);
 
-      // 🔥 NEW: Save to Firestore history (WITHOUT breaking anything)
+      // 🔥 Safe Firestore save (deduplicated)
       if (user) {
         await saveMedicineHistory(
           user.uid,
           finalText,
           description
         );
-        loadHistory(); // refresh history instantly
+        await loadHistory(); // refresh history safely
       }
     } catch (error) {
       console.error(error);
       setResult("Failed to analyze medicine.");
+    } finally {
+      setLoading(false);
+      isGeneratingRef.current = false; // unlock
     }
-
-    setLoading(false);
   };
 
   return (
     <div className="max-w-5xl mx-auto space-y-8 text-gray-900 dark:text-gray-100">
-      {/* 🌟 Premium Header (UNCHANGED) */}
+      {/* Header */}
       <div className="relative overflow-hidden rounded-3xl border border-gray-200 dark:border-gray-800 bg-gradient-to-r from-purple-600/10 via-blue-600/10 to-emerald-600/10 backdrop-blur-xl p-8 shadow-xl">
         <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
           Medicine Describer
@@ -135,13 +144,12 @@ export default function MedicinePage() {
         </p>
       </div>
 
-      {/* 💊 Input Card (UNCHANGED) */}
+      {/* Input Card */}
       <div className="bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-2xl">
         <h2 className="text-xl font-semibold mb-6">
           Enter Medicine Name or Upload Prescription
         </h2>
 
-        {/* File Upload */}
         <div className="mb-6">
           <input
             type="file"
@@ -156,7 +164,6 @@ export default function MedicinePage() {
           )}
         </div>
 
-        {/* Text Input */}
         <textarea
           rows={4}
           value={medicineText}
@@ -174,7 +181,7 @@ export default function MedicinePage() {
         </button>
       </div>
 
-      {/* 🧠 Result Card (UNCHANGED) */}
+      {/* Result */}
       {result && (
         <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-xl">
           <h2 className="text-2xl font-semibold mb-6">
@@ -189,7 +196,7 @@ export default function MedicinePage() {
         </div>
       )}
 
-      {/* 📚 Previous Analyses (OPTION B – NEW FEATURE) */}
+      {/* History */}
       {history.length > 0 && (
         <div className="bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-2xl">
           <h2 className="text-2xl font-semibold mb-6">
