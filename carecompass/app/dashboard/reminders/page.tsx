@@ -19,8 +19,7 @@ interface Reminder {
   takenTimes?: string[];
 }
 
-const getTodayKey = () =>
-  new Date().toISOString().split("T")[0];
+const getTodayKey = () => new Date().toISOString().split("T")[0];
 
 export default function ReminderPage() {
   const { user } = useAuth();
@@ -80,9 +79,7 @@ export default function ReminderPage() {
 
           const diff = nextDose.getTime() - now.getTime();
           const hours = Math.floor(diff / (1000 * 60 * 60));
-          const minutes = Math.floor(
-            (diff % (1000 * 60 * 60)) / (1000 * 60)
-          );
+          const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
 
           updated[`${reminder.id}-${t}`] = `${hours}h ${minutes}m`;
         });
@@ -143,12 +140,29 @@ export default function ReminderPage() {
   const handleMarkTaken = async (reminder: Reminder, t: string) => {
     const todayKey = `${today}_${t}`;
 
-    await markDoseTaken(
-      reminder.id,
-      todayKey,
-      reminder.takenTimes || []
+    // 🔥 Optimistic UI update (instant button change)
+    setReminders((prev) =>
+      prev.map((r) =>
+        r.id === reminder.id
+          ? {
+              ...r,
+              takenTimes: [...(r.takenTimes || []), todayKey],
+            }
+          : r,
+      ),
     );
-    loadReminders();
+
+    try {
+      await markDoseTaken(
+        reminder.id,
+        todayKey, // already correctly formatted
+        reminder.takenTimes || [],
+      );
+    } catch (error) {
+      console.error("Failed to mark dose as taken:", error);
+      // rollback if Firestore fails
+      loadReminders();
+    }
   };
 
   // 🧠 NEW: Navigate to Medicine Describer (SAFE ADDITION)
@@ -183,7 +197,7 @@ export default function ReminderPage() {
 
   const saveTimeEdit = async (reminder: Reminder, oldTime: string) => {
     const updatedTimes = reminder.times.map((t) =>
-      t === oldTime ? editTimeValue : t
+      t === oldTime ? editTimeValue : t,
     );
 
     await updateReminder(reminder.id, { times: updatedTimes });
@@ -206,16 +220,14 @@ export default function ReminderPage() {
           Smart Medicine Reminders
         </h1>
         <p className="text-gray-600 dark:text-gray-400 mt-3 text-sm max-w-2xl">
-          Manage multi-dose medications, edit schedules, track daily intake,
-          and never miss a dose with your premium CareCompass reminder system.
+          Manage multi-dose medications, edit schedules, track daily intake, and
+          never miss a dose with your premium CareCompass reminder system.
         </p>
       </div>
 
       {/* 💊 Add Reminder Card (UNCHANGED UI) */}
       <div className="bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-2xl">
-        <h2 className="text-2xl font-semibold mb-6">
-          Add New Reminder
-        </h2>
+        <h2 className="text-2xl font-semibold mb-6">Add New Reminder</h2>
 
         <div className="grid gap-5">
           <input
@@ -290,16 +302,12 @@ export default function ReminderPage() {
                     <input
                       className="w-full border p-3 rounded-xl"
                       value={editMedicine}
-                      onChange={(e) =>
-                        setEditMedicine(e.target.value)
-                      }
+                      onChange={(e) => setEditMedicine(e.target.value)}
                     />
                     <input
                       className="w-full border p-3 rounded-xl"
                       value={editDosage}
-                      onChange={(e) =>
-                        setEditDosage(e.target.value)
-                      }
+                      onChange={(e) => setEditDosage(e.target.value)}
                     />
                   </div>
                 ) : (
@@ -317,9 +325,7 @@ export default function ReminderPage() {
               {/* 🔥 Buttons Row (ONLY Describe Added) */}
               <div className="flex gap-2 ml-4">
                 <button
-                  onClick={() =>
-                    handleDescribeMedicine(reminder.medicineName)
-                  }
+                  onClick={() => handleDescribeMedicine(reminder.medicineName)}
                   className="px-4 py-1.5 bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 rounded-full text-xs font-semibold"
                 >
                   Describe
@@ -366,20 +372,15 @@ export default function ReminderPage() {
                         <input
                           type="time"
                           value={editTimeValue}
-                          onChange={(e) =>
-                            setEditTimeValue(e.target.value)
-                          }
+                          onChange={(e) => setEditTimeValue(e.target.value)}
                           className="border p-2 rounded-lg"
                         />
                       ) : (
-                        <p className="font-semibold text-lg">
-                          ⏰ {t}
-                        </p>
+                        <p className="font-semibold text-lg">⏰ {t}</p>
                       )}
 
                       <p className="text-xs text-gray-500">
-                        Next dose in{" "}
-                        {countdowns[key] || "Calculating..."}
+                        Next dose in {countdowns[key] || "Calculating..."}
                       </p>
                     </div>
 
@@ -387,9 +388,7 @@ export default function ReminderPage() {
                       {editingTimeKey === key ? (
                         <>
                           <button
-                            onClick={() =>
-                              saveTimeEdit(reminder, t)
-                            }
+                            onClick={() => saveTimeEdit(reminder, t)}
                             className="px-3 py-1 bg-blue-600 text-white rounded-full text-xs"
                           >
                             Save
@@ -404,18 +403,14 @@ export default function ReminderPage() {
                       ) : (
                         <>
                           <button
-                            onClick={() =>
-                              startEditTime(reminder.id, t)
-                            }
+                            onClick={() => startEditTime(reminder.id, t)}
                             className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-semibold"
                           >
                             Edit Time
                           </button>
 
                           <button
-                            onClick={() =>
-                              handleMarkTaken(reminder, t)
-                            }
+                            onClick={() => handleMarkTaken(reminder, t)}
                             disabled={isTaken}
                             className={`px-5 py-2 rounded-full text-sm font-semibold transition ${
                               isTaken

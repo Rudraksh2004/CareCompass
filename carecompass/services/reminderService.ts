@@ -10,6 +10,7 @@ import {
   updateDoc,
   serverTimestamp,
   getDoc,
+  arrayUnion,
 } from "firebase/firestore";
 
 export interface Reminder {
@@ -40,8 +41,8 @@ export const addReminder = async (
     userId: uid,
     medicineName,
     dosage: dosage || "",
-    times: [time], // multi-dose schema
-    takenTimes: [], // daily tracked entries like 2026-02-20_08:00
+    times: [time],
+    takenTimes: [],
     createdAt: serverTimestamp(),
   });
 };
@@ -56,13 +57,11 @@ export const getUserReminders = async (uid: string): Promise<Reminder[]> => {
   return snapshot.docs.map((docSnap) => {
     const data = docSnap.data();
 
-    // Backward compatibility (old schema had "time")
-    const safeTimes =
-      Array.isArray(data.times)
-        ? data.times
-        : data.time
-        ? [data.time]
-        : [];
+    const safeTimes = Array.isArray(data.times)
+      ? data.times
+      : data.time
+      ? [data.time]
+      : [];
 
     return {
       id: docSnap.id,
@@ -97,7 +96,6 @@ export const updateReminder = async (
     const docRef = doc(db, "reminders", reminderId);
     const docSnap = await getDoc(docRef);
 
-    // Prevent "No document to update" error (your previous bug)
     if (!docSnap.exists()) {
       console.error("Reminder document does not exist:", reminderId);
       return;
@@ -118,45 +116,32 @@ export const updateReminder = async (
   }
 };
 
-// ✅ Mark Dose as Taken (PER DOSE + PER DAY)  — A+B+C+D CORE FIX
+// ✅ FIXED: Mark Dose as Taken (DATE-SAFE + ATOMIC + NO DOUBLE PREFIX BUG)
 export const markDoseTaken = async (
   reminderId: string,
-  time: string,
+  todayDoseKey: string, // IMPORTANT: already formatted like 2026-02-21_14:00
   currentTaken: string[] = []
 ) => {
-  if (!reminderId || !time) return;
+  if (!reminderId || !todayDoseKey) return;
 
   try {
     const docRef = doc(db, "reminders", reminderId);
-    const docSnap = await getDoc(docRef);
 
-    // Prevent runtime crash
-    if (!docSnap.exists()) {
-      console.error("Reminder not found:", reminderId);
+    // 🔒 Prevent duplicate marking
+    if (currentTaken?.includes(todayDoseKey)) {
       return;
     }
 
-    const today = getTodayKey();
-    const todayDoseKey = `${today}_${time}`; // e.g. 2026-02-20_08:00
-
-    const takenArray = Array.isArray(currentTaken) ? currentTaken : [];
-
-    // 🔒 Prevent duplicate marking (Bug D fix)
-    if (takenArray.includes(todayDoseKey)) {
-      return;
-    }
-
-    const updatedTaken = [...takenArray, todayDoseKey];
-
+    // 🚀 Atomic Firestore update (NO overwrite bug)
     await updateDoc(docRef, {
-      takenTimes: updatedTaken,
+      takenTimes: arrayUnion(todayDoseKey),
     });
   } catch (error) {
     console.error("Error marking dose as taken:", error);
   }
 };
 
-// 📊 Get Today's Progress (Used for Dashboard + UI Progress Bar)
+// 📊 Get Today's Progress (Dashboard Safe)
 export const getTodayProgress = (reminder: Reminder) => {
   const today = getTodayKey();
   const totalDoses = reminder.times?.length || 0;
