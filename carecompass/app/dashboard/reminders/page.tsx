@@ -107,14 +107,8 @@ export default function ReminderPage() {
   const handleAddReminder = async () => {
     if (!user || !medicineName || doseTimes.length === 0) return;
 
-    await addReminder(user.uid, medicineName, dosage, doseTimes[0]);
-
-    const data = await getUserReminders(user.uid);
-    const latest = data[0];
-
-    if (latest) {
-      await updateReminder(latest.id, { times: doseTimes });
-    }
+    // 🔥 Save ALL doses in one atomic write (no race condition)
+    await addReminder(user.uid, medicineName, dosage, doseTimes);
 
     setMedicineName("");
     setDosage("");

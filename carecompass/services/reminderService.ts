@@ -19,11 +19,10 @@ export interface Reminder {
   medicineName: string;
   dosage?: string;
   times: string[];
-  takenTimes: string[]; // format: YYYY-MM-DD_HH:MM
+  takenTimes: string[];
   createdAt?: any;
 }
 
-// 🔑 Helper: Today Key (Used for Daily Reset Logic)
 const getTodayKey = () => {
   const now = new Date();
   const year = now.getFullYear();
@@ -32,26 +31,26 @@ const getTodayKey = () => {
   return `${year}-${month}-${day}`;
 };
 
-// ➕ Add Reminder (Supports Multi-Dose)
+// ✅ FIXED: Now supports MULTI-DOSE directly (no race condition)
 export const addReminder = async (
   uid: string,
   medicineName: string,
   dosage: string,
-  time: string,
+  times: string[] // 🔥 CHANGED from string → string[]
 ) => {
-  if (!uid || !medicineName || !time) return;
+  if (!uid || !medicineName || !times || times.length === 0) return;
 
   await addDoc(collection(db, "reminders"), {
     userId: uid,
     medicineName,
     dosage: dosage || "",
-    times: [time],
+    times: times, // 🔥 save all doses at once
     takenTimes: [],
     createdAt: serverTimestamp(),
   });
 };
 
-// 📥 Get User Reminders (Schema Safe + Backward Compatible)
+// 📥 Get User Reminders (UNCHANGED)
 export const getUserReminders = async (uid: string): Promise<Reminder[]> => {
   if (!uid) return [];
 
@@ -64,8 +63,8 @@ export const getUserReminders = async (uid: string): Promise<Reminder[]> => {
     const safeTimes = Array.isArray(data.times)
       ? data.times
       : data.time
-        ? [data.time]
-        : [];
+      ? [data.time]
+      : [];
 
     return {
       id: docSnap.id,
@@ -79,20 +78,20 @@ export const getUserReminders = async (uid: string): Promise<Reminder[]> => {
   });
 };
 
-// 🗑 Delete Reminder
+// 🗑 Delete Reminder (UNCHANGED)
 export const deleteReminder = async (reminderId: string) => {
   if (!reminderId) return;
   await deleteDoc(doc(db, "reminders", reminderId));
 };
 
-// ✏️ Update Reminder (Crash-Proof)
+// ✏️ Update Reminder (UNCHANGED)
 export const updateReminder = async (
   reminderId: string,
   data: {
     medicineName?: string;
     dosage?: string;
     times?: string[];
-  },
+  }
 ) => {
   if (!reminderId) return;
 
@@ -120,23 +119,21 @@ export const updateReminder = async (
   }
 };
 
-// ✅ FIXED: Mark Dose as Taken (DATE-SAFE + ATOMIC + NO DOUBLE PREFIX BUG)
+// ✅ Mark Dose as Taken (UNCHANGED)
 export const markDoseTaken = async (
   reminderId: string,
-  todayDoseKey: string, // IMPORTANT: already formatted like 2026-02-21_14:00
-  currentTaken: string[] = [],
+  todayDoseKey: string,
+  currentTaken: string[] = []
 ) => {
   if (!reminderId || !todayDoseKey) return;
 
   try {
     const docRef = doc(db, "reminders", reminderId);
 
-    // 🔒 Prevent duplicate marking
     if (currentTaken?.includes(todayDoseKey)) {
       return;
     }
 
-    // 🚀 Atomic Firestore update (NO overwrite bug)
     await updateDoc(docRef, {
       takenTimes: arrayUnion(todayDoseKey),
     });
@@ -145,7 +142,7 @@ export const markDoseTaken = async (
   }
 };
 
-// 📊 Get Today's Progress (Dashboard Safe)
+// 📊 Progress (UNCHANGED)
 export const getTodayProgress = (reminder: Reminder) => {
   const today = getTodayKey();
   const totalDoses = reminder.times?.length || 0;
