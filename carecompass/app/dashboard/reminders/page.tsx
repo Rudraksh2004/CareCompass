@@ -107,7 +107,7 @@ export default function ReminderPage() {
   const handleAddReminder = async () => {
     if (!user || !medicineName || doseTimes.length === 0) return;
 
-    // 🔥 Save ALL doses in one atomic write (no race condition)
+    // 🔥 FIX: send full array instead of first element
     await addReminder(user.uid, medicineName, dosage, doseTimes);
 
     setMedicineName("");
