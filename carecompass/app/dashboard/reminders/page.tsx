@@ -33,7 +33,7 @@ export default function ReminderPage() {
   const [reminders, setReminders] = useState<Reminder[]>([]);
   const [countdowns, setCountdowns] = useState<Record<string, string>>({});
 
-  // 🔧 ORIGINAL Editing States (RESTORED)
+  // 🔧 ORIGINAL Editing States (UNCHANGED)
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editMedicine, setEditMedicine] = useState("");
   const [editDosage, setEditDosage] = useState("");
@@ -94,7 +94,7 @@ export default function ReminderPage() {
     return () => clearInterval(interval);
   }, [reminders]);
 
-  // 🆕 MISSED DOSE DETECTION (SAFE ADDITION ONLY)
+  // 🆕 MISSED DOSE DETECTION (UNCHANGED)
   const getDoseStatus = (reminder: Reminder, t: string) => {
     const now = new Date();
     const [h, m] = t.split(":").map(Number);
@@ -122,7 +122,7 @@ export default function ReminderPage() {
     setDoseTimes((prev) => prev.filter((dt) => dt !== t));
   };
 
-  // 🔥 MULTI-DOSE FIX (UNCHANGED FROM YOUR WORKING VERSION)
+  // 🔥 MULTI-DOSE (UNCHANGED)
   const handleAddReminder = async () => {
     if (!user || !medicineName || doseTimes.length === 0) return;
 
@@ -180,7 +180,7 @@ export default function ReminderPage() {
     router.push(`/dashboard/medicine?name=${encodeURIComponent(name)}`);
   };
 
-  // ✏️ ORIGINAL EDIT LOGIC (RESTORED)
+  // ✏️ ORIGINAL EDIT LOGIC (UNCHANGED)
   const startEditReminder = (reminder: Reminder) => {
     setEditingId(reminder.id);
     setEditMedicine(reminder.medicineName);
@@ -199,7 +199,7 @@ export default function ReminderPage() {
     loadReminders();
   };
 
-  // ⏰ ORIGINAL TIME EDIT (RESTORED)
+  // ⏰ ORIGINAL TIME EDIT (UNCHANGED)
   const startEditTime = (reminderId: string, currentTime: string) => {
     setEditingTimeKey(`${reminderId}-${currentTime}`);
     setEditTimeValue(currentTime);
@@ -223,28 +223,30 @@ export default function ReminderPage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto space-y-10 text-gray-900 dark:text-gray-100">
-      {/* Header (UNCHANGED) */}
-      <div className="relative overflow-hidden rounded-3xl border border-gray-200 dark:border-gray-800 bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-emerald-600/10 backdrop-blur-xl p-10 shadow-xl">
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+    <div className="max-w-6xl mx-auto space-y-10 text-white">
+      {/* Header — UI ONLY */}
+      <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800 backdrop-blur-xl p-10 shadow-2xl">
+        <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
           Smart Medicine Reminders
         </h1>
       </div>
 
-      {/* Add Reminder Card (UNCHANGED UI) */}
-      <div className="bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-2xl">
-        <h2 className="text-2xl font-semibold mb-6">Add New Reminder</h2>
+      {/* Add Reminder Card — UI ONLY */}
+      <div className="bg-white/5 dark:bg-white/5 backdrop-blur-xl border border-white/10 p-8 rounded-3xl shadow-2xl">
+        <h2 className="text-2xl font-semibold mb-6 text-white">
+          Add New Reminder
+        </h2>
 
         <div className="grid gap-5">
           <input
-            className="w-full border p-4 rounded-2xl"
+            className="w-full border border-white/10 bg-black/30 p-4 rounded-2xl text-white placeholder:text-slate-400"
             placeholder="Medicine Name"
             value={medicineName}
             onChange={(e) => setMedicineName(e.target.value)}
           />
 
           <input
-            className="w-full border p-4 rounded-2xl"
+            className="w-full border border-white/10 bg-black/30 p-4 rounded-2xl text-white placeholder:text-slate-400"
             placeholder="Dosage"
             value={dosage}
             onChange={(e) => setDosage(e.target.value)}
@@ -253,13 +255,13 @@ export default function ReminderPage() {
           <div className="flex gap-3">
             <input
               type="time"
-              className="border p-4 rounded-2xl"
+              className="border border-white/10 bg-black/30 p-4 rounded-2xl text-white"
               value={time}
               onChange={(e) => setTime(e.target.value)}
             />
             <button
               onClick={handleAddDoseTime}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 rounded-2xl font-semibold"
+              className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 rounded-2xl font-semibold shadow-lg hover:opacity-90 transition"
             >
               Add Dose
             </button>
@@ -267,55 +269,55 @@ export default function ReminderPage() {
 
           <button
             onClick={handleAddReminder}
-            className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-4 rounded-2xl font-semibold"
+            className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-4 rounded-2xl font-semibold shadow-xl hover:opacity-90 transition"
           >
             + Create Smart Reminder
           </button>
         </div>
       </div>
 
-      {/* Reminders List (ORIGINAL STRUCTURE + MISSED BADGE) */}
+      {/* Reminders List — STRUCTURE UNCHANGED, UI POLISHED ONLY */}
       <div className="space-y-6">
         {reminders.map((reminder) => (
           <div
             key={reminder.id}
-            className="bg-white/70 dark:bg-gray-900/60 border p-7 rounded-3xl shadow-xl"
+            className="bg-white/5 dark:bg-white/5 border border-white/10 p-7 rounded-3xl shadow-xl backdrop-blur-xl"
           >
-            {/* TOP SECTION (EDIT UI RESTORED) */}
+            {/* TOP SECTION (UNCHANGED LOGIC) */}
             <div className="flex justify-between items-start mb-5">
               <div className="flex-1">
                 {editingId === reminder.id ? (
                   <div className="space-y-3">
                     <input
-                      className="w-full border p-3 rounded-xl"
+                      className="w-full border border-white/10 bg-black/30 p-3 rounded-xl text-white"
                       value={editMedicine}
                       onChange={(e) => setEditMedicine(e.target.value)}
                     />
                     <input
-                      className="w-full border p-3 rounded-xl"
+                      className="w-full border border-white/10 bg-black/30 p-3 rounded-xl text-white"
                       value={editDosage}
                       onChange={(e) => setEditDosage(e.target.value)}
                     />
                   </div>
                 ) : (
                   <>
-                    <h3 className="text-2xl font-bold">
+                    <h3 className="text-2xl font-bold text-white">
                       {reminder.medicineName}
                     </h3>
-                    <p className="text-gray-500">
+                    <p className="text-slate-400">
                       {reminder.dosage || "No dosage specified"}
                     </p>
                   </>
                 )}
               </div>
 
-              {/* BUTTONS RESTORED */}
+              {/* BUTTONS — UNTOUCHED LOGIC */}
               <div className="flex gap-2 ml-4">
                 <button
                   onClick={() =>
                     handleDescribeMedicine(reminder.medicineName)
                   }
-                  className="px-4 py-1.5 bg-indigo-100 text-indigo-700 rounded-full text-xs font-semibold"
+                  className="px-4 py-1.5 bg-indigo-500/20 text-indigo-300 rounded-full text-xs font-semibold hover:bg-indigo-500/30 transition"
                 >
                   Describe
                 </button>
@@ -323,14 +325,14 @@ export default function ReminderPage() {
                 {editingId === reminder.id ? (
                   <button
                     onClick={saveReminderEdit}
-                    className="px-4 py-1.5 bg-emerald-500 text-white rounded-full text-xs font-semibold"
+                    className="px-4 py-1.5 bg-emerald-500 text-white rounded-full text-xs font-semibold shadow"
                   >
                     Save
                   </button>
                 ) : (
                   <button
                     onClick={() => startEditReminder(reminder)}
-                    className="px-4 py-1.5 bg-amber-100 text-amber-700 rounded-full text-xs font-semibold"
+                    className="px-4 py-1.5 bg-amber-500/20 text-amber-300 rounded-full text-xs font-semibold hover:bg-amber-500/30 transition"
                   >
                     Edit
                   </button>
@@ -338,14 +340,14 @@ export default function ReminderPage() {
 
                 <button
                   onClick={() => handleDelete(reminder.id)}
-                  className="px-4 py-1.5 bg-red-100 text-red-600 rounded-full text-xs font-semibold"
+                  className="px-4 py-1.5 bg-red-500/20 text-red-300 rounded-full text-xs font-semibold hover:bg-red-500/30 transition"
                 >
                   Delete
                 </button>
               </div>
             </div>
 
-            {/* DOSE TIMES WITH MISSED BADGE */}
+            {/* DOSE TIMES — LOGIC UNCHANGED */}
             <div className="grid md:grid-cols-2 gap-4">
               {reminder.times.map((t) => {
                 const key = `${reminder.id}-${t}`;
@@ -355,28 +357,30 @@ export default function ReminderPage() {
                 return (
                   <div
                     key={key}
-                    className="bg-white dark:bg-gray-800 border p-5 rounded-2xl flex items-center justify-between shadow-sm"
+                    className="bg-black/30 border border-white/10 p-5 rounded-2xl flex items-center justify-between backdrop-blur-lg"
                   >
                     <div>
-                      <p className="font-semibold text-lg">⏰ {t}</p>
+                      <p className="font-semibold text-lg text-white">
+                        ⏰ {t}
+                      </p>
 
                       {status === "missed" && (
-                        <p className="text-red-500 text-xs font-semibold">
+                        <p className="text-red-400 text-xs font-semibold">
                           🔴 Missed Dose
                         </p>
                       )}
                       {status === "upcoming" && (
-                        <p className="text-amber-500 text-xs">
+                        <p className="text-amber-400 text-xs">
                           ⏳ Upcoming
                         </p>
                       )}
                       {status === "taken" && (
-                        <p className="text-emerald-500 text-xs font-semibold">
+                        <p className="text-emerald-400 text-xs font-semibold">
                           ✅ Taken Today
                         </p>
                       )}
 
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-slate-400">
                         Next dose in {countdowns[key] || "Calculating..."}
                       </p>
                     </div>
@@ -390,7 +394,7 @@ export default function ReminderPage() {
                             onChange={(e) =>
                               setEditTimeValue(e.target.value)
                             }
-                            className="border p-2 rounded-lg"
+                            className="border border-white/10 bg-black/30 p-2 rounded-lg text-white"
                           />
                           <button
                             onClick={() =>
@@ -402,7 +406,7 @@ export default function ReminderPage() {
                           </button>
                           <button
                             onClick={cancelTimeEdit}
-                            className="px-3 py-1 bg-gray-400 text-white rounded-full text-xs"
+                            className="px-3 py-1 bg-gray-500 text-white rounded-full text-xs"
                           >
                             Cancel
                           </button>
@@ -413,7 +417,7 @@ export default function ReminderPage() {
                             onClick={() =>
                               startEditTime(reminder.id, t)
                             }
-                            className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-semibold"
+                            className="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-xs font-semibold hover:bg-purple-500/30 transition"
                           >
                             Edit Time
                           </button>
@@ -423,10 +427,10 @@ export default function ReminderPage() {
                               handleMarkTaken(reminder, t)
                             }
                             disabled={isTaken}
-                            className={`px-5 py-2 rounded-full text-sm font-semibold ${
+                            className={`px-5 py-2 rounded-full text-sm font-semibold transition ${
                               isTaken
-                                ? "bg-emerald-200 text-emerald-700 cursor-not-allowed"
-                                : "bg-emerald-500 text-white"
+                                ? "bg-emerald-500/20 text-emerald-300 cursor-not-allowed"
+                                : "bg-emerald-500 hover:bg-emerald-600 text-white shadow"
                             }`}
                           >
                             {isTaken ? "Taken ✓" : "Mark as Taken"}
