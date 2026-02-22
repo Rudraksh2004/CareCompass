@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { getUserReminders } from "@/services/reminderService";
 import { getHealthLogs } from "@/services/healthService";
@@ -12,6 +12,15 @@ interface Reminder {
   times: string[];
   takenTimes?: string[];
 }
+
+// 🔒 Local date key (IST-safe & daily reset accurate)
+const getTodayKey = () => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -39,6 +48,35 @@ export default function DashboardPage() {
 
     loadData();
   }, [user]);
+
+  // 💊 NEW: Calculate today's adherence (SAFE - uses existing schema)
+  const adherenceData = useMemo(() => {
+    const today = getTodayKey();
+    let totalDoses = 0;
+    let takenToday = 0;
+
+    reminders.forEach((reminder) => {
+      const times = reminder.times || [];
+      const takenTimes = reminder.takenTimes || [];
+
+      totalDoses += times.length;
+
+      takenToday += takenTimes.filter((t) =>
+        t.startsWith(today)
+      ).length;
+    });
+
+    const progressPercent =
+      totalDoses === 0
+        ? 0
+        : Math.round((takenToday / totalDoses) * 100);
+
+    return {
+      totalDoses,
+      takenToday,
+      progressPercent,
+    };
+  }, [reminders]);
 
   // ⏰ Countdown for upcoming doses (Dashboard Widget)
   useEffect(() => {
@@ -142,7 +180,44 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* 💊 NEW: Smart Reminders Widget (Premium) */}
+      {/* 💊 NEW: Daily Adherence Widget (NON-BREAKING ADDITION) */}
+      <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl p-8 shadow-2xl">
+        <p className="text-sm text-slate-400">
+          Today’s Medication Adherence
+        </p>
+
+        <div className="mt-4 flex items-center justify-between">
+          <div>
+            <h2 className="text-3xl font-bold text-white">
+              {adherenceData.takenToday} / {adherenceData.totalDoses}
+            </h2>
+            <p className="text-xs text-slate-500 mt-1">
+              Doses taken today
+            </p>
+          </div>
+
+          <div className="text-right">
+            <p className="text-2xl font-bold text-emerald-400">
+              {adherenceData.progressPercent}%
+            </p>
+            <p className="text-xs text-slate-500">
+              Daily consistency
+            </p>
+          </div>
+        </div>
+
+        {/* Progress Bar */}
+        <div className="mt-5 w-full bg-white/10 rounded-full h-3 overflow-hidden">
+          <div
+            className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-500"
+            style={{
+              width: `${adherenceData.progressPercent}%`,
+            }}
+          />
+        </div>
+      </div>
+
+      {/* 💊 Smart Reminders Widget (UNCHANGED) */}
       <div className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800 border border-slate-800 p-8 rounded-3xl shadow-2xl">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(245,158,11,0.12),_transparent_40%)]" />
 
