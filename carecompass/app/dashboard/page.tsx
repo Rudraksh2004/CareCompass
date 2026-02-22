@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
+import Link from "next/link"; // ✅ NEW (safe import)
 import { useAuth } from "@/context/AuthContext";
 import { getUserReminders } from "@/services/reminderService";
 import { getHealthLogs } from "@/services/healthService";
@@ -180,6 +181,30 @@ export default function DashboardPage() {
         </div>
       </div>
 
+      {/* 🧠 NEW: Disease Predictor Card (OPTION B - NON-BREAKING ADDITION) */}
+      <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl p-8 shadow-2xl">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(168,85,247,0.12),_transparent_40%)]" />
+
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+          <div>
+            <h3 className="text-2xl font-bold text-white">
+              🧠 AI Disease Predictor
+            </h3>
+            <p className="text-slate-400 text-sm mt-2 max-w-xl">
+              Analyze symptoms using hybrid AI, clinical logic, and location-aware
+              insights with optional medical Q&A for smarter non-diagnostic guidance.
+            </p>
+          </div>
+
+          <Link
+            href="/dashboard/disease-predictor"
+            className="inline-flex items-center justify-center bg-gradient-to-r from-purple-600 to-blue-600 hover:opacity-90 transition text-white px-8 py-4 rounded-2xl font-semibold shadow-lg"
+          >
+            🧠 Start Analysis →
+          </Link>
+        </div>
+      </div>
+
       {/* 💊 NEW: Daily Adherence Widget (NON-BREAKING ADDITION) */}
       <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl p-8 shadow-2xl">
         <p className="text-sm text-slate-400">
@@ -206,7 +231,6 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Progress Bar */}
         <div className="mt-5 w-full bg-white/10 rounded-full h-3 overflow-hidden">
           <div
             className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-500"
