@@ -1,71 +1,35 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
-import {
-  saveDiseaseHistory,
-  getDiseaseHistory,
-} from "@/services/diseaseService";
-
-interface QAState {
-  allergies?: boolean;
-  surgeries?: boolean;
-  chronicConditions: string[];
-  duration?: string;
-  medications?: string;
-}
-
-interface HistoryItem {
-  id: string;
-  symptoms: string[];
-  customText?: string;
-  location?: string;
-  severity: "Low" | "Moderate" | "High";
-  prediction: string;
-}
 
 const SYMPTOM_CHIPS = [
   "Fever",
   "Cough",
   "Headache",
-  "Body Pain",
   "Fatigue",
   "Sore Throat",
+  "Body Pain",
   "Nausea",
   "Vomiting",
-  "Chest Pain", // red flag
-  "Breathing Difficulty", // red flag
+  "Diarrhea",
   "Dizziness",
+  "Chest Pain",
+  "Shortness of Breath",
 ];
-
-const RED_FLAGS = ["Chest Pain", "Breathing Difficulty"];
 
 export default function DiseasePredictorPage() {
   const { user } = useAuth();
-  const resultRef = useRef<HTMLDivElement | null>(null);
 
-  const [step, setStep] = useState(1);
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
-  const [customText, setCustomText] = useState("");
+  const [customSymptoms, setCustomSymptoms] = useState("");
   const [location, setLocation] = useState("");
+  const [allergy, setAllergy] = useState("");
+  const [pastSurgery, setPastSurgery] = useState("");
+  const [chronicIllness, setChronicIllness] = useState("");
   const [loading, setLoading] = useState(false);
-  const [prediction, setPrediction] = useState("");
-  const [severity, setSeverity] = useState<"Low" | "Moderate" | "High" | "">("");
-  const [history, setHistory] = useState<HistoryItem[]>([]);
-
-  const [qa, setQa] = useState<QAState>({
-    chronicConditions: [],
-  });
-
-  const loadHistory = async () => {
-    if (!user) return;
-    const data = await getDiseaseHistory(user.uid);
-    setHistory(data as HistoryItem[]);
-  };
-
-  useEffect(() => {
-    loadHistory();
-  }, [user]);
+  const [result, setResult] = useState("");
+  const [severity, setSeverity] = useState<string>("");
 
   const toggleSymptom = (symptom: string) => {
     setSelectedSymptoms((prev) =>
@@ -75,21 +39,13 @@ export default function DiseasePredictorPage() {
     );
   };
 
-  const toggleChronic = (condition: string) => {
-    setQa((prev) => ({
-      ...prev,
-      chronicConditions: prev.chronicConditions.includes(condition)
-        ? prev.chronicConditions.filter((c) => c !== condition)
-        : [...prev.chronicConditions, condition],
-    }));
-  };
-
-  const handleAnalyze = async () => {
+  const handlePredict = async () => {
     if (!user) return;
-    if (selectedSymptoms.length === 0 && !customText.trim()) return;
+    if (selectedSymptoms.length === 0 && !customSymptoms.trim()) return;
 
     setLoading(true);
-    setPrediction("");
+    setResult("");
+    setSeverity("");
 
     try {
       const res = await fetch("/api/ai/disease-predictor", {
@@ -99,107 +55,64 @@ export default function DiseasePredictorPage() {
         },
         body: JSON.stringify({
           symptoms: selectedSymptoms,
-          customText,
+          customText: customSymptoms, // MATCHES YOUR API
           location,
-          qa,
+          qa: {
+            allergy,
+            pastSurgery,
+            chronicIllness,
+          },
         }),
       });
 
       const data = await res.json();
-      setPrediction(data.prediction);
-      setSeverity(data.severity);
 
-      await saveDiseaseHistory(user.uid, {
-        symptoms: selectedSymptoms,
-        customText,
-        location,
-        qa,
-        severity: data.severity,
-        prediction: data.prediction,
-      });
-
-      loadHistory();
-
-      // Auto-scroll (Result UX: A)
-      setTimeout(() => {
-        resultRef.current?.scrollIntoView({ behavior: "smooth" });
-      }, 300);
+      // 🔥 FIX: Match your route.ts response shape
+      setResult(data.prediction || "No analysis generated.");
+      setSeverity(data.severity || "");
     } catch (error) {
       console.error(error);
-      setPrediction("Failed to analyze symptoms.");
+      setResult("Failed to generate prediction.");
     }
 
     setLoading(false);
   };
 
-  const SeverityBadge = () => {
-    if (!severity) return null;
-
-    const color =
-      severity === "High"
-        ? "bg-red-500"
-        : severity === "Moderate"
-        ? "bg-amber-500"
-        : "bg-emerald-500";
-
-    return (
-      <span className={`${color} text-white px-4 py-1 rounded-full text-sm font-semibold`}>
-        {severity} Risk
-      </span>
-    );
-  };
-
   return (
-    <div className="max-w-6xl mx-auto space-y-10 text-gray-900 dark:text-gray-100">
-      {/* Header */}
-      <div className="rounded-3xl border border-gray-200 dark:border-gray-800 bg-gradient-to-r from-purple-600/10 via-blue-600/10 to-emerald-600/10 backdrop-blur-xl p-10 shadow-xl">
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-          🧠 AI Disease Predictor
+    <div className="max-w-5xl mx-auto space-y-8 text-gray-900 dark:text-gray-100">
+      {/* 🌟 Header */}
+      <div className="relative overflow-hidden rounded-3xl border border-gray-200 dark:border-gray-800 bg-gradient-to-r from-indigo-600/10 via-purple-600/10 to-emerald-600/10 backdrop-blur-xl p-8 shadow-xl">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+          AI Disease Risk Predictor
         </h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-3 text-sm">
-          Hybrid symptom analysis using AI, clinical logic, and location-aware insights.
-          (Non-diagnostic)
+        <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 max-w-2xl">
+          Enter symptoms, location, and optional health context to receive
+          AI-powered non-diagnostic health risk insights.
         </p>
       </div>
 
-      {/* Step Indicator */}
-      <div className="flex justify-center gap-4">
-        {[1, 2, 3].map((s) => (
-          <div
-            key={s}
-            className={`px-4 py-2 rounded-full text-sm font-semibold ${
-              step === s
-                ? "bg-blue-600 text-white"
-                : "bg-gray-200 dark:bg-gray-800"
-            }`}
-          >
-            Step {s}
-          </div>
-        ))}
-      </div>
+      {/* 🧠 Input Card */}
+      <div className="bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-2xl space-y-6">
+        <h2 className="text-2xl font-semibold">
+          Symptom Input (Hybrid Mode)
+        </h2>
 
-      {/* STEP 1: Symptoms */}
-      {step === 1 && (
-        <div className="bg-white/70 dark:bg-gray-900/60 p-8 rounded-3xl shadow-2xl border">
-          <h2 className="text-2xl font-semibold mb-6">
-            Select Your Symptoms
-          </h2>
-
-          <div className="flex flex-wrap gap-3 mb-6">
+        {/* Symptom Chips */}
+        <div>
+          <p className="text-sm font-medium mb-3">
+            Select Symptoms
+          </p>
+          <div className="flex flex-wrap gap-3">
             {SYMPTOM_CHIPS.map((symptom) => {
-              const isRed = RED_FLAGS.includes(symptom);
               const active = selectedSymptoms.includes(symptom);
-
               return (
                 <button
                   key={symptom}
                   onClick={() => toggleSymptom(symptom)}
                   className={`px-4 py-2 rounded-full text-sm font-semibold transition ${
                     active
-                      ? isRed
-                        ? "bg-red-500 text-white"
-                        : "bg-blue-600 text-white"
-                      : "bg-gray-200 dark:bg-gray-800"
+                      ? "bg-indigo-600 text-white shadow"
+                      : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
                   }`}
                 >
                   {symptom}
@@ -207,150 +120,92 @@ export default function DiseasePredictorPage() {
               );
             })}
           </div>
-
-          <textarea
-            rows={4}
-            value={customText}
-            onChange={(e) => setCustomText(e.target.value)}
-            placeholder="Describe additional symptoms..."
-            className="w-full border p-4 rounded-2xl"
-          />
-
-          <button
-            onClick={() => setStep(2)}
-            className="mt-6 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-xl font-semibold"
-          >
-            Next →
-          </button>
         </div>
-      )}
 
-      {/* STEP 2: Location */}
-      {step === 2 && (
-        <div className="bg-white/70 dark:bg-gray-900/60 p-8 rounded-3xl shadow-2xl border">
-          <h2 className="text-2xl font-semibold mb-4">
-            🌍 Your Location (Recommended)
-          </h2>
+        {/* Custom Symptoms */}
+        <div>
+          <p className="text-sm font-medium mb-2">
+            Additional Symptoms (Optional)
+          </p>
+          <textarea
+            rows={3}
+            value={customSymptoms}
+            onChange={(e) => setCustomSymptoms(e.target.value)}
+            placeholder="Type symptoms like: chills, loss of smell, mild fever..."
+            className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+        </div>
+
+        {/* Location Input */}
+        <div>
+          <p className="text-sm font-medium mb-2">
+            Your Location (Manual Input)
+          </p>
           <input
             value={location}
             onChange={(e) => setLocation(e.target.value)}
             placeholder="e.g., Kolkata, India"
-            className="w-full border p-4 rounded-2xl"
+            className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 rounded-2xl"
           />
-
-          <div className="flex justify-between mt-6">
-            <button
-              onClick={() => setStep(1)}
-              className="px-6 py-2 rounded-xl bg-gray-300"
-            >
-              ← Back
-            </button>
-            <button
-              onClick={() => setStep(3)}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-xl font-semibold"
-            >
-              Next →
-            </button>
-          </div>
         </div>
-      )}
 
-      {/* STEP 3: Optional QA */}
-      {step === 3 && (
-        <div className="bg-white/70 dark:bg-gray-900/60 p-8 rounded-3xl shadow-2xl border space-y-6">
-          <h2 className="text-2xl font-semibold">
-            🧾 Clinical Questions (Optional)
-          </h2>
-
-          <div className="flex gap-4">
-            <button
-              onClick={() => setQa({ ...qa, allergies: true })}
-              className="px-4 py-2 rounded-full bg-amber-100"
-            >
-              Allergies: Yes
-            </button>
-            <button
-              onClick={() => setQa({ ...qa, allergies: false })}
-              className="px-4 py-2 rounded-full bg-gray-200"
-            >
-              Allergies: No
-            </button>
-          </div>
+        {/* Optional QA */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">
+            Optional Health Questions
+          </h3>
 
           <input
-            value={qa.medications || ""}
-            onChange={(e) =>
-              setQa({ ...qa, medications: e.target.value })
-            }
-            placeholder="Current medications (optional)"
-            className="w-full border p-4 rounded-2xl"
+            value={allergy}
+            onChange={(e) => setAllergy(e.target.value)}
+            placeholder="Any allergies? (optional)"
+            className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 rounded-xl"
           />
 
-          <div className="flex justify-between">
-            <button
-              onClick={() => setStep(2)}
-              className="px-6 py-2 rounded-xl bg-gray-300"
-            >
-              ← Back
-            </button>
-            <button
-              onClick={handleAnalyze}
-              disabled={loading}
-              className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-10 py-4 rounded-2xl font-bold shadow-lg disabled:opacity-50"
-            >
-              {loading ? "Analyzing..." : "🧠 Analyze with AI"}
-            </button>
-          </div>
-        </div>
-      )}
+          <input
+            value={pastSurgery}
+            onChange={(e) => setPastSurgery(e.target.value)}
+            placeholder="Any past surgeries? (optional)"
+            className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 rounded-xl"
+          />
 
-      {/* RESULT SECTION (Auto-scroll target) */}
-      {prediction && (
-        <div
-          ref={resultRef}
-          className="bg-white dark:bg-gray-900 border p-8 rounded-3xl shadow-xl"
+          <input
+            value={chronicIllness}
+            onChange={(e) => setChronicIllness(e.target.value)}
+            placeholder="Any chronic illness (optional)"
+            className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 rounded-xl"
+          />
+        </div>
+
+        <button
+          onClick={handlePredict}
+          disabled={loading}
+          className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 rounded-2xl font-semibold shadow-lg hover:opacity-90 transition disabled:opacity-50"
         >
-          <div className="flex justify-between items-center mb-6">
+          {loading ? "Analyzing Symptoms..." : "Analyze Disease Risk"}
+        </button>
+      </div>
+
+      {/* 📊 Result Card */}
+      {result && (
+        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-xl">
+          <div className="flex items-center justify-between mb-4">
             <h2 className="text-2xl font-semibold">
-              AI Clinical Analysis
+              AI Health Risk Analysis
             </h2>
-            <SeverityBadge />
+            {severity && (
+              <span className="px-4 py-1 rounded-full text-sm font-semibold bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
+                Severity: {severity}
+              </span>
+            )}
           </div>
 
-          <div className="prose dark:prose-invert max-w-none text-sm">
-            {prediction}
-          </div>
-
-          <p className="text-xs text-red-500 mt-6">
-            ⚠️ This AI analysis is for educational purposes only and not a medical diagnosis.
-            Please consult a healthcare professional for medical advice.
+          <p className="text-sm text-gray-500 mb-4">
+            ⚠️ This is non-diagnostic AI guidance, not a medical diagnosis.
           </p>
-        </div>
-      )}
 
-      {/* HISTORY */}
-      {history.length > 0 && (
-        <div className="bg-white/70 dark:bg-gray-900/60 p-8 rounded-3xl shadow-2xl border">
-          <h2 className="text-2xl font-semibold mb-6">
-            Previous Analyses
-          </h2>
-          <div className="space-y-4 max-h-[400px] overflow-y-auto">
-            {history.map((item) => (
-              <div
-                key={item.id}
-                className="border p-5 rounded-2xl bg-white dark:bg-gray-800"
-              >
-                <p className="font-semibold">
-                  Symptoms: {item.symptoms.join(", ")}
-                </p>
-                <p className="text-sm text-gray-500">
-                  Location: {item.location || "Not provided"}
-                </p>
-                <p className="text-xs mt-2 line-clamp-3">
-                  {item.prediction}
-                </p>
-              </div>
-            ))}
+          <div className="text-sm leading-relaxed whitespace-pre-line">
+            {result}
           </div>
         </div>
       )}
