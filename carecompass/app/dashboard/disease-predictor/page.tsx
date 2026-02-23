@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
+import { saveDiseaseHistory } from "@/services/diseaseService";
 
 const SYMPTOM_CHIPS = [
   "Fever",
@@ -29,7 +30,7 @@ export default function DiseasePredictorPage() {
   const [chronicIllness, setChronicIllness] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState("");
-  const [severity, setSeverity] = useState<string>("");
+  const [severity, setSeverity] = useState<"Low" | "Moderate" | "High" | "">("");
 
   const toggleSymptom = (symptom: string) => {
     setSelectedSymptoms((prev) =>
@@ -55,21 +56,49 @@ export default function DiseasePredictorPage() {
         },
         body: JSON.stringify({
           symptoms: selectedSymptoms,
-          customText: customSymptoms, // MATCHES YOUR API
+          customText: customSymptoms, // ✅ Matches your API route schema
           location,
           qa: {
-            allergy,
-            pastSurgery,
-            chronicIllness,
+            allergies: allergy ? true : false,
+            surgeries: pastSurgery ? true : false,
+            chronicConditions: chronicIllness
+              ? [chronicIllness]
+              : [],
+            duration: undefined,
+            medications: undefined,
           },
         }),
       });
 
       const data = await res.json();
 
-      // 🔥 FIX: Match your route.ts response shape
-      setResult(data.prediction || "No analysis generated.");
-      setSeverity(data.severity || "");
+      const predictionText =
+        data?.prediction || data?.analysis || "No analysis generated.";
+      const severityLevel =
+        data?.severity || "Low";
+
+      setResult(predictionText);
+      setSeverity(severityLevel);
+
+      // 💾 Save to Firestore (NON-BREAKING + matches your service schema)
+      if (user) {
+        await saveDiseaseHistory(user.uid, {
+          symptoms: selectedSymptoms,
+          customText: customSymptoms,
+          location,
+          qa: {
+            allergies: allergy ? true : false,
+            surgeries: pastSurgery ? true : false,
+            chronicConditions: chronicIllness
+              ? [chronicIllness]
+              : [],
+            duration: undefined,
+            medications: undefined,
+          },
+          severity: severityLevel,
+          prediction: predictionText,
+        });
+      }
     } catch (error) {
       console.error(error);
       setResult("Failed to generate prediction.");
@@ -149,10 +178,10 @@ export default function DiseasePredictorPage() {
           />
         </div>
 
-        {/* Optional QA */}
+        {/* Optional QA Section */}
         <div className="space-y-4">
           <h3 className="text-lg font-semibold">
-            Optional Health Questions
+            Optional Health Questions (Optional)
           </h3>
 
           <input
@@ -172,7 +201,7 @@ export default function DiseasePredictorPage() {
           <input
             value={chronicIllness}
             onChange={(e) => setChronicIllness(e.target.value)}
-            placeholder="Any chronic illness (optional)"
+            placeholder="Any chronic illness (diabetes, asthma, etc.) (optional)"
             className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 rounded-xl"
           />
         </div>
@@ -193,15 +222,24 @@ export default function DiseasePredictorPage() {
             <h2 className="text-2xl font-semibold">
               AI Health Risk Analysis
             </h2>
+
             {severity && (
-              <span className="px-4 py-1 rounded-full text-sm font-semibold bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
+              <span
+                className={`px-4 py-1 rounded-full text-sm font-semibold ${
+                  severity === "High"
+                    ? "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300"
+                    : severity === "Moderate"
+                    ? "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300"
+                    : "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300"
+                }`}
+              >
                 Severity: {severity}
               </span>
             )}
           </div>
 
           <p className="text-sm text-gray-500 mb-4">
-            ⚠️ This is non-diagnostic AI guidance, not a medical diagnosis.
+            ⚠️ This is non-diagnostic AI guidance and does not replace professional medical advice.
           </p>
 
           <div className="text-sm leading-relaxed whitespace-pre-line">
