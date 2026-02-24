@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 
-// 🔴 Red Flag Symptoms (instant severity boost)
 const RED_FLAG_SYMPTOMS = [
   "chest pain",
   "breathing difficulty",
@@ -11,10 +10,8 @@ const RED_FLAG_SYMPTOMS = [
   "persistent high fever",
 ];
 
-// 🧠 Normalize text safely
 const normalize = (text: string) => text.toLowerCase().trim();
 
-// 🧠 Hybrid Severity Logic (Type C)
 const calculateSeverity = (
   symptoms: string[],
   customText: string,
@@ -25,7 +22,6 @@ const calculateSeverity = (
     normalize(customText || ""),
   ].join(" ");
 
-  // 🚨 Red flag detection (highest priority)
   const hasRedFlag = RED_FLAG_SYMPTOMS.some((rf) =>
     allText.includes(rf)
   );
@@ -51,7 +47,6 @@ export async function POST(req: NextRequest) {
       qa = null,
     } = body;
 
-    // 🔒 Validation (at least one symptom required)
     if ((!symptoms || symptoms.length === 0) && !customText) {
       return NextResponse.json(
         { error: "Please provide at least one symptom." },
@@ -59,67 +54,56 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 🧠 Hybrid logic BEFORE AI
     const severity = calculateSeverity(
       symptoms,
       customText,
       qa?.duration
     );
 
-    // 🌍 Location Context (optional-safe)
     const locationContext = location
-      ? `User location: ${location}. Consider regional diseases and environmental factors common in this region.`
+      ? `User location: ${location}. Consider regional diseases and seasonal factors.`
       : `Location not provided. Perform general global medical analysis.`;
 
-    // 🧾 Optional Clinical Q&A Context (SAFE)
-    const qaContext = qa
-      ? `
-Optional Clinical Background:
-- Allergies: ${qa.allergies ? "Yes" : "No / Not specified"}
-- Past Surgeries: ${qa.surgeries ? "Yes" : "No / Not specified"}
-- Chronic Conditions: ${
-          qa.chronicConditions?.length
-            ? qa.chronicConditions.join(", ")
-            : "None / Not specified"
-        }
-- Symptom Duration: ${qa.duration || "Not specified"}
-- Current Medications: ${qa.medications || "Not specified"}
-`
-      : "No additional clinical background provided.";
-
     const prompt = `
-You are an AI health assistant inside a student health app called CareCompass.
+You are an AI health assistant inside CareCompass (a student health app).
 
-IMPORTANT:
-- Do NOT give a medical diagnosis
-- Provide educational, non-diagnostic insights only
-- Use simple, student-friendly language
-- Always include a medical disclaimer
+STRICT RULES:
+- DO NOT give a medical diagnosis
+- Provide risk-based educational analysis only
+- Use simple language
+- Show illness likelihood in percentages
+- Be structured and clean
 
-User Selected Symptoms:
+User Symptoms (selected):
 ${symptoms.join(", ") || "None"}
 
-Additional Symptom Description:
+Additional Symptoms:
 ${customText || "None"}
 
 ${locationContext}
 
-${qaContext}
+Pre-calculated Severity: ${severity}
 
-Pre-calculated Severity (from hybrid logic): ${severity}
+Generate response in EXACT format:
 
-Generate a structured response with:
-1. Possible Conditions (Top 3, non-diagnostic)
-2. Severity Assessment (with reasoning)
-3. Location-based insight (if location given)
-4. Recommended Care Steps
-5. When to See a Doctor (red flag guidance)
-6. Medical Disclaimer (clear and safe)
+🔎 Possible Conditions (with likelihood %)
+1. Condition Name — XX%
+2. Condition Name — XX%
+3. Condition Name — XX%
 
-Keep it clinically structured but easy to understand.
+🧠 Reasoning:
+(Explain based on symptoms + location)
+
+🩺 Recommended Next Steps:
+(simple actionable advice)
+
+🚨 When to See a Doctor:
+(red flag guidance)
+
+⚠️ Disclaimer:
+This is non-diagnostic AI guidance, not a medical diagnosis.
 `;
 
-    // 🔥 DIRECT GEMINI URL (Matches your existing routes)
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1/models/gemini-3-flash-preview:generateContent?key=${process.env.GEMINI_API_KEY}`,
       {
@@ -139,13 +123,19 @@ Keep it clinically structured but easy to understand.
 
     const data = await response.json();
 
-    const aiText =
-      data?.candidates?.[0]?.content?.parts?.[0]?.text ||
-      "Unable to generate analysis at the moment.";
+    // 🔥 ROBUST PARSING (FIXES your issue)
+    let aiText = "Unable to generate analysis at the moment.";
+
+    if (data?.candidates?.length > 0) {
+      const parts = data.candidates[0]?.content?.parts;
+      if (Array.isArray(parts)) {
+        aiText = parts.map((p: any) => p.text || "").join("\n");
+      }
+    }
 
     return NextResponse.json({
       prediction: aiText,
-      severity, // Hybrid logic output
+      severity,
     });
   } catch (error) {
     console.error("Disease Predictor API Error:", error);
