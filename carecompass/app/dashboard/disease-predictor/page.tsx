@@ -31,14 +31,14 @@ export default function DiseasePredictorPage() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState("");
   const [severity, setSeverity] = useState<"Low" | "Moderate" | "High" | "">(
-    "",
+    ""
   );
 
   const toggleSymptom = (symptom: string) => {
     setSelectedSymptoms((prev) =>
       prev.includes(symptom)
         ? prev.filter((s) => s !== symptom)
-        : [...prev, symptom],
+        : [...prev, symptom]
     );
   };
 
@@ -58,14 +58,14 @@ export default function DiseasePredictorPage() {
         },
         body: JSON.stringify({
           symptoms: selectedSymptoms,
-          customText: customSymptoms, // ✅ Matches your API route schema
+          customText: customSymptoms,
           location,
           qa: {
             allergies: allergy ? true : false,
             surgeries: pastSurgery ? true : false,
             chronicConditions: chronicIllness ? [chronicIllness] : [],
-            duration: null,
-            medications: null,
+            duration: null, // API-safe
+            medications: null, // API-safe
           },
         }),
       });
@@ -79,19 +79,19 @@ export default function DiseasePredictorPage() {
       setResult(predictionText);
       setSeverity(severityLevel);
 
-      // 💾 Save to Firestore (NON-BREAKING + matches your service schema)
+      // 💾 Firestore SAFE SAVE (FIXED: no undefined fields)
       if (user) {
+        const qaPayload = {
+          allergies: allergy ? true : false,
+          surgeries: pastSurgery ? true : false,
+          chronicConditions: chronicIllness ? [chronicIllness] : [],
+        };
+
         await saveDiseaseHistory(user.uid, {
           symptoms: selectedSymptoms,
           customText: customSymptoms,
           location,
-          qa: {
-            allergies: allergy ? true : false,
-            surgeries: pastSurgery ? true : false,
-            chronicConditions: chronicIllness ? [chronicIllness] : [],
-            duration: undefined,
-            medications: undefined,
-          },
+          qa: qaPayload, // 🔥 Removed undefined fields (Firebase-safe)
           severity: severityLevel,
           prediction: predictionText,
         });
@@ -212,7 +212,9 @@ export default function DiseasePredictorPage() {
       {result && (
         <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-xl">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl font-semibold">AI Health Risk Analysis</h2>
+            <h2 className="text-2xl font-semibold">
+              AI Health Risk Analysis
+            </h2>
 
             {severity && (
               <span
@@ -220,8 +222,8 @@ export default function DiseasePredictorPage() {
                   severity === "High"
                     ? "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300"
                     : severity === "Moderate"
-                      ? "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300"
-                      : "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300"
+                    ? "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300"
+                    : "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300"
                 }`}
               >
                 Severity: {severity}
