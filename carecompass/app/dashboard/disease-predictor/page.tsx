@@ -19,20 +19,46 @@ const SYMPTOM_CHIPS = [
   "Shortness of Breath",
 ];
 
+// 🇮🇳 Major Indian Cities List (UI Only)
+const INDIAN_CITIES = [
+  "Kolkata",
+  "Delhi",
+  "Mumbai",
+  "Bangalore",
+  "Chennai",
+  "Hyderabad",
+  "Pune",
+  "Ahmedabad",
+  "Jaipur",
+  "Lucknow",
+  "Bhopal",
+  "Patna",
+  "Chandigarh",
+  "Bhubaneswar",
+  "Guwahati",
+  "Kochi",
+  "Indore",
+  "Nagpur",
+  "Surat",
+  "Visakhapatnam",
+];
+
 export default function DiseasePredictorPage() {
   const { user } = useAuth();
 
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
   const [customSymptoms, setCustomSymptoms] = useState("");
   const [location, setLocation] = useState("");
+  const [useManualLocation, setUseManualLocation] = useState(false);
+
   const [allergy, setAllergy] = useState("");
   const [pastSurgery, setPastSurgery] = useState("");
   const [chronicIllness, setChronicIllness] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState("");
-  const [severity, setSeverity] = useState<"Low" | "Moderate" | "High" | "">(
-    ""
-  );
+  const [severity, setSeverity] = useState<
+    "Low" | "Moderate" | "High" | ""
+  >("");
 
   const toggleSymptom = (symptom: string) => {
     setSelectedSymptoms((prev) =>
@@ -63,9 +89,11 @@ export default function DiseasePredictorPage() {
           qa: {
             allergies: allergy ? true : false,
             surgeries: pastSurgery ? true : false,
-            chronicConditions: chronicIllness ? [chronicIllness] : [],
-            duration: null, // API-safe
-            medications: null, // API-safe
+            chronicConditions: chronicIllness
+              ? [chronicIllness]
+              : [],
+            duration: null,
+            medications: null,
           },
         }),
       });
@@ -73,25 +101,26 @@ export default function DiseasePredictorPage() {
       const data = await res.json();
 
       const predictionText =
-        data?.prediction || data?.analysis || "No analysis generated.";
+        data?.prediction || "No analysis generated.";
       const severityLevel = data?.severity || "Low";
 
       setResult(predictionText);
       setSeverity(severityLevel);
 
-      // 💾 Firestore SAFE SAVE (FIXED: no undefined fields)
       if (user) {
-        const qaPayload = {
-          allergies: allergy ? true : false,
-          surgeries: pastSurgery ? true : false,
-          chronicConditions: chronicIllness ? [chronicIllness] : [],
-        };
-
         await saveDiseaseHistory(user.uid, {
           symptoms: selectedSymptoms,
           customText: customSymptoms,
           location,
-          qa: qaPayload, // 🔥 Removed undefined fields (Firebase-safe)
+          qa: {
+            allergies: allergy ? true : false,
+            surgeries: pastSurgery ? true : false,
+            chronicConditions: chronicIllness
+              ? [chronicIllness]
+              : [],
+            duration: undefined,
+            medications: undefined,
+          },
           severity: severityLevel,
           prediction: predictionText,
         });
@@ -119,14 +148,19 @@ export default function DiseasePredictorPage() {
 
       {/* 🧠 Input Card */}
       <div className="bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-2xl space-y-6">
-        <h2 className="text-2xl font-semibold">Symptom Input (Hybrid Mode)</h2>
+        <h2 className="text-2xl font-semibold">
+          Symptom Input (Hybrid Mode)
+        </h2>
 
         {/* Symptom Chips */}
         <div>
-          <p className="text-sm font-medium mb-3">Select Symptoms</p>
+          <p className="text-sm font-medium mb-3">
+            Select Symptoms
+          </p>
           <div className="flex flex-wrap gap-3">
             {SYMPTOM_CHIPS.map((symptom) => {
-              const active = selectedSymptoms.includes(symptom);
+              const active =
+                selectedSymptoms.includes(symptom);
               return (
                 <button
                   key={symptom}
@@ -152,23 +186,65 @@ export default function DiseasePredictorPage() {
           <textarea
             rows={3}
             value={customSymptoms}
-            onChange={(e) => setCustomSymptoms(e.target.value)}
+            onChange={(e) =>
+              setCustomSymptoms(e.target.value)
+            }
             placeholder="Type symptoms like: chills, loss of smell, mild fever..."
             className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
         </div>
 
-        {/* Location Input */}
+        {/* 🇮🇳 Location Dropdown (NEW UI ONLY) */}
         <div>
           <p className="text-sm font-medium mb-2">
-            Your Location (Manual Input)
+            Your Location (India)
           </p>
-          <input
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-            placeholder="e.g., Kolkata, India"
-            className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 rounded-2xl"
-          />
+
+          {!useManualLocation ? (
+            <>
+              <select
+                value={location}
+                onChange={(e) =>
+                  setLocation(e.target.value)
+                }
+                className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 rounded-2xl"
+              >
+                <option value="">
+                  Select your city (optional)
+                </option>
+                {INDIAN_CITIES.map((city) => (
+                  <option key={city} value={`${city}, India`}>
+                    {city}
+                  </option>
+                ))}
+                <option value="manual">
+                  Other (Type manually)
+                </option>
+              </select>
+
+              {location === "manual" && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setUseManualLocation(true);
+                    setLocation("");
+                  }}
+                  className="mt-2 text-sm text-indigo-600 font-semibold"
+                >
+                  Enter custom location
+                </button>
+              )}
+            </>
+          ) : (
+            <input
+              value={location}
+              onChange={(e) =>
+                setLocation(e.target.value)
+              }
+              placeholder="Type your city (e.g., Siliguri, India)"
+              className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 rounded-2xl"
+            />
+          )}
         </div>
 
         {/* Optional QA Section */}
@@ -186,15 +262,19 @@ export default function DiseasePredictorPage() {
 
           <input
             value={pastSurgery}
-            onChange={(e) => setPastSurgery(e.target.value)}
+            onChange={(e) =>
+              setPastSurgery(e.target.value)
+            }
             placeholder="Any past surgeries? (optional)"
             className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 rounded-xl"
           />
 
           <input
             value={chronicIllness}
-            onChange={(e) => setChronicIllness(e.target.value)}
-            placeholder="Any chronic illness (diabetes, asthma, etc.) (optional)"
+            onChange={(e) =>
+              setChronicIllness(e.target.value)
+            }
+            placeholder="Any chronic illness (optional)"
             className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 rounded-xl"
           />
         </div>
@@ -204,43 +284,11 @@ export default function DiseasePredictorPage() {
           disabled={loading}
           className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 rounded-2xl font-semibold shadow-lg hover:opacity-90 transition disabled:opacity-50"
         >
-          {loading ? "Analyzing Symptoms..." : "Analyze Disease Risk"}
+          {loading
+            ? "Analyzing Symptoms..."
+            : "Analyze Disease Risk"}
         </button>
       </div>
-
-      {/* 📊 Result Card */}
-      {result && (
-        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-xl">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl font-semibold">
-              AI Health Risk Analysis
-            </h2>
-
-            {severity && (
-              <span
-                className={`px-4 py-1 rounded-full text-sm font-semibold ${
-                  severity === "High"
-                    ? "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300"
-                    : severity === "Moderate"
-                    ? "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300"
-                    : "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300"
-                }`}
-              >
-                Severity: {severity}
-              </span>
-            )}
-          </div>
-
-          <p className="text-sm text-gray-500 mb-4">
-            ⚠️ This is non-diagnostic AI guidance and does not replace
-            professional medical advice.
-          </p>
-
-          <div className="text-sm leading-relaxed whitespace-pre-line">
-            {result}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
