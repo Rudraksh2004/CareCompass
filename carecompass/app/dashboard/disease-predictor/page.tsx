@@ -56,15 +56,15 @@ export default function DiseasePredictorPage() {
   const [chronicIllness, setChronicIllness] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState("");
-  const [severity, setSeverity] = useState<
-    "Low" | "Moderate" | "High" | ""
-  >("");
+  const [severity, setSeverity] = useState<"Low" | "Moderate" | "High" | "">(
+    "",
+  );
 
   const toggleSymptom = (symptom: string) => {
     setSelectedSymptoms((prev) =>
       prev.includes(symptom)
         ? prev.filter((s) => s !== symptom)
-        : [...prev, symptom]
+        : [...prev, symptom],
     );
   };
 
@@ -89,9 +89,7 @@ export default function DiseasePredictorPage() {
           qa: {
             allergies: allergy ? true : false,
             surgeries: pastSurgery ? true : false,
-            chronicConditions: chronicIllness
-              ? [chronicIllness]
-              : [],
+            chronicConditions: chronicIllness ? [chronicIllness] : [],
             duration: null,
             medications: null,
           },
@@ -100,8 +98,7 @@ export default function DiseasePredictorPage() {
 
       const data = await res.json();
 
-      const predictionText =
-        data?.prediction || "No analysis generated.";
+      const predictionText = data?.prediction || "No analysis generated.";
       const severityLevel = data?.severity || "Low";
 
       setResult(predictionText);
@@ -115,11 +112,7 @@ export default function DiseasePredictorPage() {
           qa: {
             allergies: allergy ? true : false,
             surgeries: pastSurgery ? true : false,
-            chronicConditions: chronicIllness
-              ? [chronicIllness]
-              : [],
-            duration: undefined,
-            medications: undefined,
+            chronicConditions: chronicIllness ? [chronicIllness] : [],
           },
           severity: severityLevel,
           prediction: predictionText,
@@ -148,19 +141,14 @@ export default function DiseasePredictorPage() {
 
       {/* 🧠 Input Card */}
       <div className="bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-2xl space-y-6">
-        <h2 className="text-2xl font-semibold">
-          Symptom Input (Hybrid Mode)
-        </h2>
+        <h2 className="text-2xl font-semibold">Symptom Input (Hybrid Mode)</h2>
 
         {/* Symptom Chips */}
         <div>
-          <p className="text-sm font-medium mb-3">
-            Select Symptoms
-          </p>
+          <p className="text-sm font-medium mb-3">Select Symptoms</p>
           <div className="flex flex-wrap gap-3">
             {SYMPTOM_CHIPS.map((symptom) => {
-              const active =
-                selectedSymptoms.includes(symptom);
+              const active = selectedSymptoms.includes(symptom);
               return (
                 <button
                   key={symptom}
@@ -186,9 +174,7 @@ export default function DiseasePredictorPage() {
           <textarea
             rows={3}
             value={customSymptoms}
-            onChange={(e) =>
-              setCustomSymptoms(e.target.value)
-            }
+            onChange={(e) => setCustomSymptoms(e.target.value)}
             placeholder="Type symptoms like: chills, loss of smell, mild fever..."
             className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
@@ -196,30 +182,22 @@ export default function DiseasePredictorPage() {
 
         {/* 🇮🇳 Location Dropdown (NEW UI ONLY) */}
         <div>
-          <p className="text-sm font-medium mb-2">
-            Your Location (India)
-          </p>
+          <p className="text-sm font-medium mb-2">Your Location (India)</p>
 
           {!useManualLocation ? (
             <>
               <select
                 value={location}
-                onChange={(e) =>
-                  setLocation(e.target.value)
-                }
+                onChange={(e) => setLocation(e.target.value)}
                 className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 rounded-2xl"
               >
-                <option value="">
-                  Select your city (optional)
-                </option>
+                <option value="">Select your city (optional)</option>
                 {INDIAN_CITIES.map((city) => (
                   <option key={city} value={`${city}, India`}>
                     {city}
                   </option>
                 ))}
-                <option value="manual">
-                  Other (Type manually)
-                </option>
+                <option value="manual">Other (Type manually)</option>
               </select>
 
               {location === "manual" && (
@@ -238,9 +216,7 @@ export default function DiseasePredictorPage() {
           ) : (
             <input
               value={location}
-              onChange={(e) =>
-                setLocation(e.target.value)
-              }
+              onChange={(e) => setLocation(e.target.value)}
               placeholder="Type your city (e.g., Siliguri, India)"
               className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 rounded-2xl"
             />
@@ -262,18 +238,14 @@ export default function DiseasePredictorPage() {
 
           <input
             value={pastSurgery}
-            onChange={(e) =>
-              setPastSurgery(e.target.value)
-            }
+            onChange={(e) => setPastSurgery(e.target.value)}
             placeholder="Any past surgeries? (optional)"
             className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 rounded-xl"
           />
 
           <input
             value={chronicIllness}
-            onChange={(e) =>
-              setChronicIllness(e.target.value)
-            }
+            onChange={(e) => setChronicIllness(e.target.value)}
             placeholder="Any chronic illness (optional)"
             className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 rounded-xl"
           />
@@ -284,9 +256,7 @@ export default function DiseasePredictorPage() {
           disabled={loading}
           className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 rounded-2xl font-semibold shadow-lg hover:opacity-90 transition disabled:opacity-50"
         >
-          {loading
-            ? "Analyzing Symptoms..."
-            : "Analyze Disease Risk"}
+          {loading ? "Analyzing Symptoms..." : "Analyze Disease Risk"}
         </button>
       </div>
     </div>
