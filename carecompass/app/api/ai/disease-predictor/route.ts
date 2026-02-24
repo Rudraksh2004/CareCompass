@@ -106,7 +106,7 @@ This is non-diagnostic AI guidance, not a medical diagnosis.
 
     // 🔥 FIX 1: Use stable Gemini model (no 404)
     const geminiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1/models/gemini-3-flash-preview:generateContent?key=${process.env.GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${process.env.GEMINI_API_KEY}`,
       {
         method: "POST",
         headers: {
