@@ -30,13 +30,15 @@ export default function DiseasePredictorPage() {
   const [chronicIllness, setChronicIllness] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState("");
-  const [severity, setSeverity] = useState<"Low" | "Moderate" | "High" | "">("");
+  const [severity, setSeverity] = useState<"Low" | "Moderate" | "High" | "">(
+    "",
+  );
 
   const toggleSymptom = (symptom: string) => {
     setSelectedSymptoms((prev) =>
       prev.includes(symptom)
         ? prev.filter((s) => s !== symptom)
-        : [...prev, symptom]
+        : [...prev, symptom],
     );
   };
 
@@ -61,11 +63,9 @@ export default function DiseasePredictorPage() {
           qa: {
             allergies: allergy ? true : false,
             surgeries: pastSurgery ? true : false,
-            chronicConditions: chronicIllness
-              ? [chronicIllness]
-              : [],
-            duration: undefined,
-            medications: undefined,
+            chronicConditions: chronicIllness ? [chronicIllness] : [],
+            duration: null,
+            medications: null,
           },
         }),
       });
@@ -74,8 +74,7 @@ export default function DiseasePredictorPage() {
 
       const predictionText =
         data?.prediction || data?.analysis || "No analysis generated.";
-      const severityLevel =
-        data?.severity || "Low";
+      const severityLevel = data?.severity || "Low";
 
       setResult(predictionText);
       setSeverity(severityLevel);
@@ -89,9 +88,7 @@ export default function DiseasePredictorPage() {
           qa: {
             allergies: allergy ? true : false,
             surgeries: pastSurgery ? true : false,
-            chronicConditions: chronicIllness
-              ? [chronicIllness]
-              : [],
+            chronicConditions: chronicIllness ? [chronicIllness] : [],
             duration: undefined,
             medications: undefined,
           },
@@ -122,15 +119,11 @@ export default function DiseasePredictorPage() {
 
       {/* 🧠 Input Card */}
       <div className="bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-2xl space-y-6">
-        <h2 className="text-2xl font-semibold">
-          Symptom Input (Hybrid Mode)
-        </h2>
+        <h2 className="text-2xl font-semibold">Symptom Input (Hybrid Mode)</h2>
 
         {/* Symptom Chips */}
         <div>
-          <p className="text-sm font-medium mb-3">
-            Select Symptoms
-          </p>
+          <p className="text-sm font-medium mb-3">Select Symptoms</p>
           <div className="flex flex-wrap gap-3">
             {SYMPTOM_CHIPS.map((symptom) => {
               const active = selectedSymptoms.includes(symptom);
@@ -219,9 +212,7 @@ export default function DiseasePredictorPage() {
       {result && (
         <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-xl">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl font-semibold">
-              AI Health Risk Analysis
-            </h2>
+            <h2 className="text-2xl font-semibold">AI Health Risk Analysis</h2>
 
             {severity && (
               <span
@@ -229,8 +220,8 @@ export default function DiseasePredictorPage() {
                   severity === "High"
                     ? "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300"
                     : severity === "Moderate"
-                    ? "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300"
-                    : "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300"
+                      ? "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300"
+                      : "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300"
                 }`}
               >
                 Severity: {severity}
@@ -239,7 +230,8 @@ export default function DiseasePredictorPage() {
           </div>
 
           <p className="text-sm text-gray-500 mb-4">
-            ⚠️ This is non-diagnostic AI guidance and does not replace professional medical advice.
+            ⚠️ This is non-diagnostic AI guidance and does not replace
+            professional medical advice.
           </p>
 
           <div className="text-sm leading-relaxed whitespace-pre-line">
