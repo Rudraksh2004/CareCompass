@@ -5,6 +5,17 @@ import { useAuth } from "@/context/AuthContext";
 import { logout } from "@/services/authService";
 import { useRouter, usePathname } from "next/navigation";
 import { useTheme } from "@/context/ThemeContext";
+import {
+  Home,
+  FileText,
+  Pill,
+  LineChart,
+  Clock,
+  FlaskConical,
+  Brain,
+  Bot,
+  User,
+} from "lucide-react";
 
 export default function DashboardLayout({
   children,
@@ -28,6 +39,8 @@ export default function DashboardLayout({
         : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
     }`;
 
+  const iconClasses = "w-5 h-5";
+
   return (
     <div className="min-h-screen flex bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-[#020617] dark:via-[#020617] dark:to-[#020617]">
       {/* 🌟 PREMIUM SIDEBAR */}
@@ -45,7 +58,7 @@ export default function DashboardLayout({
         {/* Navigation */}
         <nav className="flex flex-col gap-2">
           <Link href="/dashboard" className={linkClasses("/dashboard")}>
-            <span>🏠</span>
+            <Home className={iconClasses} />
             <span className="font-medium">Dashboard</span>
           </Link>
 
@@ -53,7 +66,7 @@ export default function DashboardLayout({
             href="/dashboard/report"
             className={linkClasses("/dashboard/report")}
           >
-            <span>📄</span>
+            <FileText className={iconClasses} />
             <span className="font-medium">Report Explainer</span>
           </Link>
 
@@ -61,7 +74,7 @@ export default function DashboardLayout({
             href="/dashboard/prescription"
             className={linkClasses("/dashboard/prescription")}
           >
-            <span>💊</span>
+            <Pill className={iconClasses} />
             <span className="font-medium">Simplify Prescription</span>
           </Link>
 
@@ -69,7 +82,7 @@ export default function DashboardLayout({
             href="/dashboard/health"
             className={linkClasses("/dashboard/health")}
           >
-            <span>📊</span>
+            <LineChart className={iconClasses} />
             <span className="font-medium">Health Tracking</span>
           </Link>
 
@@ -77,16 +90,15 @@ export default function DashboardLayout({
             href="/dashboard/reminders"
             className={linkClasses("/dashboard/reminders")}
           >
-            <span>⏰</span>
+            <Clock className={iconClasses} />
             <span className="font-medium">Medicine Reminders</span>
           </Link>
 
-          {/* 🔥 UPDATED: Icon added ONLY (no other changes) */}
           <Link
             href="/dashboard/medicine"
             className={linkClasses("/dashboard/medicine")}
           >
-            <span>🧪</span>
+            <FlaskConical className={iconClasses} />
             <span className="font-medium">Medicine Describer</span>
           </Link>
 
@@ -94,7 +106,7 @@ export default function DashboardLayout({
             href="/dashboard/disease-predictor"
             className={linkClasses("/dashboard/disease-predictor")}
           >
-            <span>🧠</span>
+            <Brain className={iconClasses} />
             <span className="font-medium">Disease Predictor</span>
           </Link>
 
@@ -102,7 +114,7 @@ export default function DashboardLayout({
             href="/dashboard/chat"
             className={linkClasses("/dashboard/chat")}
           >
-            <span>🤖</span>
+            <Bot className={iconClasses} />
             <span className="font-medium">AI Health Chat</span>
           </Link>
         </nav>
@@ -114,7 +126,7 @@ export default function DashboardLayout({
             href="/dashboard/profile"
             className={`${linkClasses("/dashboard/profile")} mb-2`}
           >
-            <span>👤</span>
+            <User className={iconClasses} />
             <span className="font-medium">Profile</span>
           </Link>
 
@@ -145,6 +157,7 @@ export default function DashboardLayout({
 
       {/* 🌟 MAIN CONTENT AREA */}
       <main className="flex-1 flex flex-col">
+        {/* Premium Top Bar */}
         <header className="h-16 px-8 flex items-center justify-between border-b border-gray-200 dark:border-gray-800 bg-white/60 dark:bg-[#020617]/60 backdrop-blur-xl">
           <div>
             <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
@@ -160,6 +173,7 @@ export default function DashboardLayout({
           </div>
         </header>
 
+        {/* Page Content */}
         <div className="flex-1 p-6 md:p-10 overflow-auto">{children}</div>
       </main>
     </div>
