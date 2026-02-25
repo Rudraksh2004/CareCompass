@@ -1,8 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
-import { saveDiseaseHistory } from "@/services/diseaseService";
+import {
+  saveDiseaseHistory,
+  getDiseaseHistory,
+  DiseaseHistory,
+} from "@/services/diseaseService";
 
 const SYMPTOM_CHIPS = [
   "Fever",
@@ -19,6 +23,7 @@ const SYMPTOM_CHIPS = [
   "Shortness of Breath",
 ];
 
+// 🇮🇳 Major Indian Cities
 const INDIAN_CITIES = [
   "Kolkata",
   "Delhi",
@@ -48,25 +53,36 @@ export default function DiseasePredictorPage() {
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
   const [customSymptoms, setCustomSymptoms] = useState("");
   const [location, setLocation] = useState("");
+  const [useManualLocation, setUseManualLocation] = useState(false);
 
-  // 🔥 Premium QA States
-  const [allergies, setAllergies] = useState<boolean | null>(null);
-  const [surgeries, setSurgeries] = useState<boolean | null>(null);
+  const [allergy, setAllergy] = useState("");
+  const [pastSurgery, setPastSurgery] = useState("");
   const [chronicIllness, setChronicIllness] = useState("");
-  const [duration, setDuration] = useState("");
-  const [medications, setMedications] = useState("");
 
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState("");
-  const [severity, setSeverity] = useState<"Low" | "Moderate" | "High" | "">(
-    "",
-  );
+  const [severity, setSeverity] = useState<
+    "Low" | "Moderate" | "High" | ""
+  >("");
+
+  // 🆕 History State
+  const [history, setHistory] = useState<DiseaseHistory[]>([]);
+
+  // 📥 Load Prediction History (NON-BREAKING)
+  useEffect(() => {
+    const loadHistory = async () => {
+      if (!user) return;
+      const data = await getDiseaseHistory(user.uid);
+      setHistory(data);
+    };
+    loadHistory();
+  }, [user]);
 
   const toggleSymptom = (symptom: string) => {
     setSelectedSymptoms((prev) =>
       prev.includes(symptom)
         ? prev.filter((s) => s !== symptom)
-        : [...prev, symptom],
+        : [...prev, symptom]
     );
   };
 
@@ -81,17 +97,21 @@ export default function DiseasePredictorPage() {
     try {
       const res = await fetch("/api/ai/disease-predictor", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
           symptoms: selectedSymptoms,
           customText: customSymptoms,
           location,
           qa: {
-            allergies: allergies ?? false,
-            surgeries: surgeries ?? false,
-            chronicConditions: chronicIllness ? [chronicIllness] : [],
-            duration: duration || null,
-            medications: medications || null,
+            allergies: allergy ? true : false,
+            surgeries: pastSurgery ? true : false,
+            chronicConditions: chronicIllness
+              ? [chronicIllness]
+              : [],
+            duration: null,
+            medications: null,
           },
         }),
       });
@@ -99,35 +119,34 @@ export default function DiseasePredictorPage() {
       const data = await res.json();
 
       const predictionText =
-        data?.prediction ||
-        "⚠️ AI could not generate analysis. Please try again.";
-
+        data?.prediction || "No analysis generated.";
       const severityLevel = data?.severity || "Low";
 
       setResult(predictionText);
       setSeverity(severityLevel);
 
-      if (user && predictionText) {
-        await saveDiseaseHistory(user.uid, {
-          symptoms: selectedSymptoms,
-          customText: customSymptoms,
-          location,
-          qa: {
-            allergies: allergies ?? false,
-            surgeries: surgeries ?? false,
-            chronicConditions: chronicIllness ? [chronicIllness] : [],
-            duration: duration || "",
-            medications: medications || "",
-          },
-          severity: severityLevel,
-          prediction: predictionText,
-        });
-      }
+      // 💾 Save History (already matches your service schema)
+      await saveDiseaseHistory(user.uid, {
+        symptoms: selectedSymptoms,
+        customText: customSymptoms,
+        location,
+        qa: {
+          allergies: allergy ? true : false,
+          surgeries: pastSurgery ? true : false,
+          chronicConditions: chronicIllness
+            ? [chronicIllness]
+            : [],
+        },
+        severity: severityLevel,
+        prediction: predictionText,
+      });
+
+      // 🔄 Refresh history instantly
+      const updatedHistory = await getDiseaseHistory(user.uid);
+      setHistory(updatedHistory);
     } catch (error) {
-      console.error("Prediction Error:", error);
-      setResult(
-        "⚠️ Failed to generate prediction. Please check your internet or API key.",
-      );
+      console.error(error);
+      setResult("Failed to generate prediction.");
     }
 
     setLoading(false);
@@ -135,148 +154,151 @@ export default function DiseasePredictorPage() {
 
   return (
     <div className="max-w-5xl mx-auto space-y-8 text-gray-900 dark:text-gray-100">
-      {/* Header */}
-      <div className="rounded-3xl border border-gray-200 dark:border-gray-800 bg-gradient-to-r from-indigo-600/10 via-purple-600/10 to-emerald-600/10 p-8 shadow-xl">
+      {/* 🌟 Header */}
+      <div className="relative overflow-hidden rounded-3xl border border-gray-200 dark:border-gray-800 bg-gradient-to-r from-indigo-600/10 via-purple-600/10 to-emerald-600/10 backdrop-blur-xl p-8 shadow-xl">
         <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
           AI Disease Risk Predictor
         </h1>
-        <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-          Smart hybrid AI analysis based on symptoms, location and optional
-          clinical background.
+        <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 max-w-2xl">
+          Hybrid AI + rule-based non-diagnostic disease risk analysis
+          based on symptoms, location, and health context.
         </p>
       </div>
 
-      {/* Input Card */}
-      <div className="bg-white/70 dark:bg-gray-900/60 border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-2xl space-y-6">
-        {/* Symptoms */}
-        <div className="flex flex-wrap gap-3">
-          {SYMPTOM_CHIPS.map((symptom) => {
-            const active = selectedSymptoms.includes(symptom);
-            return (
-              <button
-                key={symptom}
-                onClick={() => toggleSymptom(symptom)}
-                className={`px-4 py-2 rounded-full text-sm font-semibold transition ${
-                  active
-                    ? "bg-indigo-600 text-white"
-                    : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
-                }`}
-              >
-                {symptom}
-              </button>
-            );
-          })}
+      {/* 🧠 Input Card */}
+      <div className="bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-2xl space-y-6">
+        <h2 className="text-2xl font-semibold">
+          Symptom Input (Hybrid Mode)
+        </h2>
+
+        {/* Symptom Chips */}
+        <div>
+          <p className="text-sm font-medium mb-3">
+            Select Symptoms
+          </p>
+          <div className="flex flex-wrap gap-3">
+            {SYMPTOM_CHIPS.map((symptom) => {
+              const active =
+                selectedSymptoms.includes(symptom);
+              return (
+                <button
+                  key={symptom}
+                  onClick={() => toggleSymptom(symptom)}
+                  className={`px-4 py-2 rounded-full text-sm font-semibold transition ${
+                    active
+                      ? "bg-indigo-600 text-white shadow"
+                      : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+                  }`}
+                >
+                  {symptom}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
-        <textarea
-          rows={3}
-          value={customSymptoms}
-          onChange={(e) => setCustomSymptoms(e.target.value)}
-          placeholder="Additional symptoms (optional)"
-          className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 rounded-2xl"
-        />
+        {/* Custom Symptoms */}
+        <div>
+          <p className="text-sm font-medium mb-2">
+            Additional Symptoms (Optional)
+          </p>
+          <textarea
+            rows={3}
+            value={customSymptoms}
+            onChange={(e) =>
+              setCustomSymptoms(e.target.value)
+            }
+            placeholder="Type symptoms like: chills, loss of smell, mild fever..."
+            className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 rounded-2xl"
+          />
+        </div>
 
-        {/* Location */}
-        <select
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-          className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 rounded-2xl"
-        >
-          <option value="">Select your city (optional)</option>
-          {INDIAN_CITIES.map((city) => (
-            <option key={city} value={`${city}, India`}>
-              {city}
-            </option>
-          ))}
-        </select>
+        {/* 🇮🇳 Location Dropdown */}
+        <div>
+          <p className="text-sm font-medium mb-2">
+            Your Location (India)
+          </p>
 
-        {/* 🔥 PREMIUM QA SECTION */}
-        <div className="space-y-6 border-t pt-6">
-          <h3 className="text-xl font-semibold">
-            Optional Clinical Background
+          {!useManualLocation ? (
+            <>
+              <select
+                value={location}
+                onChange={(e) =>
+                  setLocation(e.target.value)
+                }
+                className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 rounded-2xl"
+              >
+                <option value="">
+                  Select your city (optional)
+                </option>
+                {INDIAN_CITIES.map((city) => (
+                  <option
+                    key={city}
+                    value={`${city}, India`}
+                  >
+                    {city}
+                  </option>
+                ))}
+                <option value="manual">
+                  Other (Type manually)
+                </option>
+              </select>
+
+              {location === "manual" && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setUseManualLocation(true);
+                    setLocation("");
+                  }}
+                  className="mt-2 text-sm text-indigo-600 font-semibold"
+                >
+                  Enter custom location
+                </button>
+              )}
+            </>
+          ) : (
+            <input
+              value={location}
+              onChange={(e) =>
+                setLocation(e.target.value)
+              }
+              placeholder="Type your city (e.g., Siliguri, India)"
+              className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 rounded-2xl"
+            />
+          )}
+        </div>
+
+        {/* 🩺 Optional QA Section (RESTORED & PRESERVED) */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">
+            Optional Health Questions
           </h3>
 
-          {/* Allergies Toggle */}
-          <div>
-            <p className="text-sm font-medium mb-2">
-              Do you have any allergies?
-            </p>
-            <div className="flex gap-4">
-              <button
-                onClick={() => setAllergies(true)}
-                className={`px-4 py-2 rounded-xl ${
-                  allergies === true
-                    ? "bg-green-600 text-white"
-                    : "bg-gray-200 dark:bg-gray-800"
-                }`}
-              >
-                Yes
-              </button>
-              <button
-                onClick={() => setAllergies(false)}
-                className={`px-4 py-2 rounded-xl ${
-                  allergies === false
-                    ? "bg-red-600 text-white"
-                    : "bg-gray-200 dark:bg-gray-800"
-                }`}
-              >
-                No
-              </button>
-            </div>
-          </div>
-
-          {/* Surgeries Toggle */}
-          <div>
-            <p className="text-sm font-medium mb-2">Any past surgeries?</p>
-            <div className="flex gap-4">
-              <button
-                onClick={() => setSurgeries(true)}
-                className={`px-4 py-2 rounded-xl ${
-                  surgeries === true
-                    ? "bg-green-600 text-white"
-                    : "bg-gray-200 dark:bg-gray-800"
-                }`}
-              >
-                Yes
-              </button>
-              <button
-                onClick={() => setSurgeries(false)}
-                className={`px-4 py-2 rounded-xl ${
-                  surgeries === false
-                    ? "bg-red-600 text-white"
-                    : "bg-gray-200 dark:bg-gray-800"
-                }`}
-              >
-                No
-              </button>
-            </div>
-          </div>
-
-          {/* Chronic Illness */}
           <input
-            value={chronicIllness}
-            onChange={(e) => setChronicIllness(e.target.value)}
-            placeholder="Chronic illness (e.g., Diabetes, Asthma)"
+            value={allergy}
+            onChange={(e) =>
+              setAllergy(e.target.value)
+            }
+            placeholder="Any allergies? (optional)"
             className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 rounded-xl"
           />
 
-          {/* Duration */}
-          <select
-            value={duration}
-            onChange={(e) => setDuration(e.target.value)}
-            className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 rounded-xl"
-          >
-            <option value="">Symptom duration (optional)</option>
-            <option value="1-2 days">1–2 days</option>
-            <option value="3-5 days">3–5 days</option>
-            <option value="1 week+">1 week+</option>
-          </select>
-
-          {/* Medications */}
           <input
-            value={medications}
-            onChange={(e) => setMedications(e.target.value)}
-            placeholder="Current medications (optional)"
+            value={pastSurgery}
+            onChange={(e) =>
+              setPastSurgery(e.target.value)
+            }
+            placeholder="Any past surgeries? (optional)"
+            className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 rounded-xl"
+          />
+
+          <input
+            value={chronicIllness}
+            onChange={(e) =>
+              setChronicIllness(e.target.value)
+            }
+            placeholder="Any chronic illness (diabetes, asthma, etc.) (optional)"
             className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 rounded-xl"
           />
         </div>
@@ -284,18 +306,21 @@ export default function DiseasePredictorPage() {
         <button
           onClick={handlePredict}
           disabled={loading}
-          className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 rounded-2xl font-semibold shadow-lg"
+          className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 rounded-2xl font-semibold shadow-lg disabled:opacity-50"
         >
-          {loading ? "Analyzing Symptoms..." : "Analyze Disease Risk"}
+          {loading
+            ? "Analyzing Symptoms..."
+            : "Analyze Disease Risk"}
         </button>
       </div>
 
-      {/* Result */}
-      {/* 📊 Result Card (RESTORED - UI ONLY) */}
+      {/* 📊 Result Card */}
       {result && (
         <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-xl">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl font-semibold">AI Health Risk Analysis</h2>
+            <h2 className="text-2xl font-semibold">
+              AI Health Risk Analysis
+            </h2>
 
             {severity && (
               <span
@@ -303,8 +328,8 @@ export default function DiseasePredictorPage() {
                   severity === "High"
                     ? "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300"
                     : severity === "Moderate"
-                      ? "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300"
-                      : "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300"
+                    ? "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300"
+                    : "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300"
                 }`}
               >
                 Severity: {severity}
@@ -313,12 +338,49 @@ export default function DiseasePredictorPage() {
           </div>
 
           <p className="text-sm text-gray-500 mb-4">
-            ⚠️ This is non-diagnostic AI guidance and does not replace
-            professional medical advice.
+            ⚠️ Non-diagnostic AI guidance only.
           </p>
 
           <div className="text-sm leading-relaxed whitespace-pre-line">
             {result}
+          </div>
+        </div>
+      )}
+
+      {/* 📜 Prediction History Panel (NEW PREMIUM FEATURE) */}
+      {history.length > 0 && (
+        <div className="bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-2xl">
+          <h2 className="text-2xl font-semibold mb-6">
+            🧾 Disease Prediction History
+          </h2>
+
+          <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
+            {history.map((item) => (
+              <div
+                key={item.id}
+                className="border border-gray-200 dark:border-gray-700 rounded-2xl p-4 bg-white dark:bg-gray-800"
+              >
+                <div className="flex justify-between items-center mb-2">
+                  <p className="font-semibold">
+                    Symptoms:{" "}
+                    {item.symptoms.join(", ") || "Custom"}
+                  </p>
+                  <span className="text-xs px-3 py-1 rounded-full bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300">
+                    {item.severity} Risk
+                  </span>
+                </div>
+
+                {item.location && (
+                  <p className="text-xs text-gray-500 mb-2">
+                    📍 {item.location}
+                  </p>
+                )}
+
+                <p className="text-sm text-gray-700 dark:text-gray-300 line-clamp-3 whitespace-pre-line">
+                  {item.prediction}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
       )}
