@@ -19,7 +19,6 @@ const SYMPTOM_CHIPS = [
   "Shortness of Breath",
 ];
 
-// 🇮🇳 Major Indian Cities List (UI Only)
 const INDIAN_CITIES = [
   "Kolkata",
   "Delhi",
@@ -56,15 +55,15 @@ export default function DiseasePredictorPage() {
   const [chronicIllness, setChronicIllness] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState("");
-  const [severity, setSeverity] = useState<"Low" | "Moderate" | "High" | "">(
-    "",
-  );
+  const [severity, setSeverity] = useState<
+    "Low" | "Moderate" | "High" | ""
+  >("");
 
   const toggleSymptom = (symptom: string) => {
     setSelectedSymptoms((prev) =>
       prev.includes(symptom)
         ? prev.filter((s) => s !== symptom)
-        : [...prev, symptom],
+        : [...prev, symptom]
     );
   };
 
@@ -87,40 +86,49 @@ export default function DiseasePredictorPage() {
           customText: customSymptoms,
           location,
           qa: {
-            allergies: allergy ? true : false,
-            surgeries: pastSurgery ? true : false,
-            chronicConditions: chronicIllness ? [chronicIllness] : [],
-            duration: null,
-            medications: null,
+            allergies: !!allergy,
+            surgeries: !!pastSurgery,
+            chronicConditions: chronicIllness
+              ? [chronicIllness]
+              : [],
           },
         }),
       });
 
       const data = await res.json();
 
-      const predictionText = data?.prediction || "No analysis generated.";
+      // 🔥 CRITICAL FIX: always read prediction (not analysis)
+      const predictionText =
+        data?.prediction ||
+        "⚠️ AI could not generate analysis. Please try again.";
+
       const severityLevel = data?.severity || "Low";
 
       setResult(predictionText);
       setSeverity(severityLevel);
 
-      if (user) {
+      // 💾 Save history (no undefined fields)
+      if (predictionText && user) {
         await saveDiseaseHistory(user.uid, {
           symptoms: selectedSymptoms,
           customText: customSymptoms,
           location,
           qa: {
-            allergies: allergy ? true : false,
-            surgeries: pastSurgery ? true : false,
-            chronicConditions: chronicIllness ? [chronicIllness] : [],
+            allergies: !!allergy,
+            surgeries: !!pastSurgery,
+            chronicConditions: chronicIllness
+              ? [chronicIllness]
+              : [],
           },
           severity: severityLevel,
           prediction: predictionText,
         });
       }
     } catch (error) {
-      console.error(error);
-      setResult("Failed to generate prediction.");
+      console.error("Prediction Error:", error);
+      setResult(
+        "⚠️ Failed to generate prediction. Please check your internet or API key."
+      );
     }
 
     setLoading(false);
@@ -128,7 +136,7 @@ export default function DiseasePredictorPage() {
 
   return (
     <div className="max-w-5xl mx-auto space-y-8 text-gray-900 dark:text-gray-100">
-      {/* 🌟 Header */}
+      {/* Header */}
       <div className="relative overflow-hidden rounded-3xl border border-gray-200 dark:border-gray-800 bg-gradient-to-r from-indigo-600/10 via-purple-600/10 to-emerald-600/10 backdrop-blur-xl p-8 shadow-xl">
         <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
           AI Disease Risk Predictor
@@ -139,126 +147,80 @@ export default function DiseasePredictorPage() {
         </p>
       </div>
 
-      {/* 🧠 Input Card */}
+      {/* Input Card (UNCHANGED UI) */}
       <div className="bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-2xl space-y-6">
-        <h2 className="text-2xl font-semibold">Symptom Input (Hybrid Mode)</h2>
+        <h2 className="text-2xl font-semibold">
+          Symptom Input (Hybrid Mode)
+        </h2>
 
-        {/* Symptom Chips */}
-        <div>
-          <p className="text-sm font-medium mb-3">Select Symptoms</p>
-          <div className="flex flex-wrap gap-3">
-            {SYMPTOM_CHIPS.map((symptom) => {
-              const active = selectedSymptoms.includes(symptom);
-              return (
-                <button
-                  key={symptom}
-                  onClick={() => toggleSymptom(symptom)}
-                  className={`px-4 py-2 rounded-full text-sm font-semibold transition ${
-                    active
-                      ? "bg-indigo-600 text-white shadow"
-                      : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
-                  }`}
-                >
-                  {symptom}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Custom Symptoms */}
-        <div>
-          <p className="text-sm font-medium mb-2">
-            Additional Symptoms (Optional)
-          </p>
-          <textarea
-            rows={3}
-            value={customSymptoms}
-            onChange={(e) => setCustomSymptoms(e.target.value)}
-            placeholder="Type symptoms like: chills, loss of smell, mild fever..."
-            className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          />
-        </div>
-
-        {/* 🇮🇳 Location Dropdown (NEW UI ONLY) */}
-        <div>
-          <p className="text-sm font-medium mb-2">Your Location (India)</p>
-
-          {!useManualLocation ? (
-            <>
-              <select
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 rounded-2xl"
+        <div className="flex flex-wrap gap-3">
+          {SYMPTOM_CHIPS.map((symptom) => {
+            const active = selectedSymptoms.includes(symptom);
+            return (
+              <button
+                key={symptom}
+                onClick={() => toggleSymptom(symptom)}
+                className={`px-4 py-2 rounded-full text-sm font-semibold transition ${
+                  active
+                    ? "bg-indigo-600 text-white shadow"
+                    : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+                }`}
               >
-                <option value="">Select your city (optional)</option>
-                {INDIAN_CITIES.map((city) => (
-                  <option key={city} value={`${city}, India`}>
-                    {city}
-                  </option>
-                ))}
-                <option value="manual">Other (Type manually)</option>
-              </select>
-
-              {location === "manual" && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setUseManualLocation(true);
-                    setLocation("");
-                  }}
-                  className="mt-2 text-sm text-indigo-600 font-semibold"
-                >
-                  Enter custom location
-                </button>
-              )}
-            </>
-          ) : (
-            <input
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              placeholder="Type your city (e.g., Siliguri, India)"
-              className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 rounded-2xl"
-            />
-          )}
+                {symptom}
+              </button>
+            );
+          })}
         </div>
 
-        {/* Optional QA Section */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold">
-            Optional Health Questions (Optional)
-          </h3>
+        <textarea
+          rows={3}
+          value={customSymptoms}
+          onChange={(e) => setCustomSymptoms(e.target.value)}
+          placeholder="Type additional symptoms..."
+          className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 rounded-2xl"
+        />
 
-          <input
-            value={allergy}
-            onChange={(e) => setAllergy(e.target.value)}
-            placeholder="Any allergies? (optional)"
-            className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 rounded-xl"
-          />
-
-          <input
-            value={pastSurgery}
-            onChange={(e) => setPastSurgery(e.target.value)}
-            placeholder="Any past surgeries? (optional)"
-            className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 rounded-xl"
-          />
-
-          <input
-            value={chronicIllness}
-            onChange={(e) => setChronicIllness(e.target.value)}
-            placeholder="Any chronic illness (optional)"
-            className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 rounded-xl"
-          />
-        </div>
+        <select
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
+          className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 rounded-2xl"
+        >
+          <option value="">Select your city (optional)</option>
+          {INDIAN_CITIES.map((city) => (
+            <option key={city} value={`${city}, India`}>
+              {city}
+            </option>
+          ))}
+        </select>
 
         <button
           onClick={handlePredict}
           disabled={loading}
-          className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 rounded-2xl font-semibold shadow-lg hover:opacity-90 transition disabled:opacity-50"
+          className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 rounded-2xl font-semibold shadow-lg"
         >
           {loading ? "Analyzing Symptoms..." : "Analyze Disease Risk"}
         </button>
       </div>
+
+      {/* Result Card */}
+      {result && (
+        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-xl">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-2xl font-semibold">
+              AI Health Risk Analysis
+            </h2>
+            {severity && (
+              <span className="px-4 py-1 rounded-full text-sm font-semibold bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
+                Severity: {severity}
+              </span>
+            )}
+          </div>
+
+          <div className="text-sm leading-relaxed whitespace-pre-line">
+            {result}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

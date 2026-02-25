@@ -10,7 +10,7 @@ const RED_FLAG_SYMPTOMS = [
   "persistent high fever",
 ];
 
-const normalize = (text: string) => (text || "").toLowerCase().trim();
+const normalize = (text: string) => text.toLowerCase().trim();
 
 const calculateSeverity = (
   symptoms: string[],
@@ -36,42 +36,32 @@ const calculateSeverity = (
   return "Low";
 };
 
-// 🔹 Smart fallback generator (if Gemini returns empty)
+// 🔒 Smart fallback analysis (if Gemini fails or returns empty)
 const generateFallbackAnalysis = (
   symptoms: string[],
   customText: string,
   location: string,
   severity: string
 ) => {
-  const combined = `${symptoms.join(", ")} ${customText}`.toLowerCase();
+  const combined = [...symptoms, customText].join(", ").toLowerCase();
 
   let conditions = [
-    { name: "Viral Fever", percent: 40 },
-    { name: "Seasonal Infection", percent: 35 },
-    { name: "Common Flu", percent: 25 },
+    { name: "Common Viral Infection", percent: 50 },
+    { name: "Seasonal Flu", percent: 30 },
+    { name: "Mild Respiratory Irritation", percent: 20 },
   ];
 
-  if (combined.includes("cough") || combined.includes("sore throat")) {
+  if (combined.includes("cough") && combined.includes("fever")) {
     conditions = [
-      { name: "Upper Respiratory Infection", percent: 45 },
-      { name: "Common Cold", percent: 35 },
-      { name: "Influenza (Flu)", percent: 20 },
+      { name: "Seasonal Viral Flu", percent: 55 },
+      { name: "Upper Respiratory Infection", percent: 30 },
+      { name: "Weather-related Viral Fever", percent: 15 },
     ];
-  }
-
-  if (combined.includes("diarrhea") || combined.includes("vomiting")) {
+  } else if (combined.includes("headache") && combined.includes("fatigue")) {
     conditions = [
-      { name: "Gastroenteritis", percent: 50 },
-      { name: "Food Infection", percent: 30 },
-      { name: "Viral Stomach Infection", percent: 20 },
-    ];
-  }
-
-  if (combined.includes("headache") && combined.includes("fatigue")) {
-    conditions = [
-      { name: "Viral Infection", percent: 40 },
-      { name: "Stress & Fatigue", percent: 35 },
-      { name: "Migraine (Mild)", percent: 25 },
+      { name: "Stress or Fatigue-related Illness", percent: 45 },
+      { name: "Mild Viral Infection", percent: 35 },
+      { name: "Dehydration or Sleep Deficiency", percent: 20 },
     ];
   }
 
@@ -81,23 +71,22 @@ const generateFallbackAnalysis = (
 3. ${conditions[2].name} — ${conditions[2].percent}%
 
 🧠 Reasoning:
-Based on the reported symptoms (${symptoms.join(", ") || "custom symptoms"})${
-    location ? ` and location (${location})` : ""
-  }, these conditions are commonly associated patterns. This is a probabilistic educational assessment, not a diagnosis.
+Based on the reported symptoms (${symptoms.join(", ") || customText}), the pattern suggests a mild to moderate health issue. Environmental factors ${
+    location ? `in ${location}` : "globally"
+  } and symptom combination influence this risk estimation.
 
 🩺 Recommended Next Steps:
-- Stay hydrated and rest properly
-- Monitor symptom progression for 24–48 hours
-- Avoid self-medication without guidance
-- Maintain a light and nutritious diet
+- Stay hydrated and rest adequately
+- Monitor temperature and symptom progression
+- Maintain a balanced diet and sleep schedule
 
 🚨 When to See a Doctor:
-- Symptoms worsen or persist beyond a few days
-- High fever, chest pain, or breathing difficulty occurs
-- Severe weakness, dizziness, or dehydration develops
+- If symptoms worsen
+- Persistent fever > 3 days
+- Breathing issues or chest discomfort
 
 ⚠️ Disclaimer:
-This is non-diagnostic AI guidance, not a medical diagnosis. Always consult a qualified healthcare professional for medical concerns.`;
+This is non-diagnostic AI guidance, not a medical diagnosis.`;
 };
 
 export async function POST(req: NextRequest) {
@@ -125,7 +114,7 @@ export async function POST(req: NextRequest) {
     );
 
     const locationContext = location
-      ? `User location: ${location}. Consider regional diseases, climate, pollution, and seasonal patterns common in this Indian region.`
+      ? `User location: ${location}. Consider regional diseases, pollution levels, climate, and seasonal patterns common in this area of India.`
       : `Location not provided. Perform general global medical analysis.`;
 
     const prompt = `
@@ -134,9 +123,9 @@ You are an AI health assistant inside CareCompass (a student health app).
 CRITICAL RULES:
 - Do NOT give a medical diagnosis
 - Provide risk-based educational insights only
-- Use simple, student-friendly language
-- MUST include illness likelihood in percentage
-- Keep response structured and clean
+- Use simple student-friendly language
+- MUST show illness likelihood in percentage
+- Structured clean output
 
 User Symptoms:
 ${symptoms.join(", ") || "None"}
@@ -148,21 +137,21 @@ ${locationContext}
 
 Pre-calculated Severity: ${severity}
 
-Return STRICT structured format:
+Return EXACT format:
 
 🔎 Possible Conditions (with likelihood %)
-1. Condition Name — XX%
-2. Condition Name — XX%
-3. Condition Name — XX%
+1. Condition — XX%
+2. Condition — XX%
+3. Condition — XX%
 
 🧠 Reasoning:
-Explain why these conditions match the symptoms.
+(short explanation)
 
 🩺 Recommended Next Steps:
-Simple actionable steps.
+(simple steps)
 
 🚨 When to See a Doctor:
-Clear red flag guidance.
+(red flags)
 
 ⚠️ Disclaimer:
 This is non-diagnostic AI guidance, not a medical diagnosis.
@@ -187,30 +176,27 @@ This is non-diagnostic AI guidance, not a medical diagnosis.
 
     const data = await geminiRes.json();
 
-    console.log("Gemini Disease Predictor Response:", JSON.stringify(data, null, 2));
-
     let aiText = "";
 
-    // 🔥 ULTRA ROBUST PARSING (fixes empty UI result issue)
-    if (data?.candidates?.length > 0) {
-      const candidate = data.candidates[0];
+    // ✅ Robust parsing (handles all Gemini structures)
+    if (
+      data?.candidates &&
+      Array.isArray(data.candidates) &&
+      data.candidates.length > 0
+    ) {
+      const parts = data.candidates[0]?.content?.parts;
 
-      if (candidate?.content?.parts?.length > 0) {
-        aiText = candidate.content.parts
-          .map((part: any) => part?.text || "")
+      if (Array.isArray(parts)) {
+        aiText = parts
+          .map((p: any) => p?.text || "")
           .join("\n")
           .trim();
       }
     }
 
-    // 🚨 If Gemini returned error
-    if (data?.error) {
-      console.error("Gemini API Error:", data.error);
-    }
-
-    // 🧠 SMART FALLBACK if AI text is empty (your current issue)
-    if (!aiText || aiText.length < 20) {
-      console.warn("Gemini returned empty content. Using fallback analysis.");
+    // 🔥 If Gemini fails or returns empty → fallback analysis
+    if (!aiText || aiText.length < 20 || data?.error) {
+      console.warn("Using fallback disease analysis");
       aiText = generateFallbackAnalysis(
         symptoms,
         customText,
@@ -225,13 +211,11 @@ This is non-diagnostic AI guidance, not a medical diagnosis.
     });
   } catch (error) {
     console.error("Disease Predictor API Error:", error);
-    return NextResponse.json(
-      {
-        prediction:
-          "⚠️ System temporarily unable to analyze symptoms. Please try again shortly.",
-        severity: "Low",
-      },
-      { status: 200 } // still return usable UI data
-    );
+
+    return NextResponse.json({
+      prediction:
+        "⚠️ Unable to generate AI analysis right now. Please try again later.",
+      severity: "Low",
+    });
   }
 }
