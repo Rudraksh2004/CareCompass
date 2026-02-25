@@ -58,15 +58,15 @@ export default function DiseasePredictorPage() {
 
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState("");
-  const [severity, setSeverity] = useState<
-    "Low" | "Moderate" | "High" | ""
-  >("");
+  const [severity, setSeverity] = useState<"Low" | "Moderate" | "High" | "">(
+    "",
+  );
 
   const toggleSymptom = (symptom: string) => {
     setSelectedSymptoms((prev) =>
       prev.includes(symptom)
         ? prev.filter((s) => s !== symptom)
-        : [...prev, symptom]
+        : [...prev, symptom],
     );
   };
 
@@ -89,9 +89,7 @@ export default function DiseasePredictorPage() {
           qa: {
             allergies: allergies ?? false,
             surgeries: surgeries ?? false,
-            chronicConditions: chronicIllness
-              ? [chronicIllness]
-              : [],
+            chronicConditions: chronicIllness ? [chronicIllness] : [],
             duration: duration || null,
             medications: medications || null,
           },
@@ -117,9 +115,7 @@ export default function DiseasePredictorPage() {
           qa: {
             allergies: allergies ?? false,
             surgeries: surgeries ?? false,
-            chronicConditions: chronicIllness
-              ? [chronicIllness]
-              : [],
+            chronicConditions: chronicIllness ? [chronicIllness] : [],
             duration: duration || "",
             medications: medications || "",
           },
@@ -130,7 +126,7 @@ export default function DiseasePredictorPage() {
     } catch (error) {
       console.error("Prediction Error:", error);
       setResult(
-        "⚠️ Failed to generate prediction. Please check your internet or API key."
+        "⚠️ Failed to generate prediction. Please check your internet or API key.",
       );
     }
 
@@ -145,13 +141,13 @@ export default function DiseasePredictorPage() {
           AI Disease Risk Predictor
         </h1>
         <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-          Smart hybrid AI analysis based on symptoms, location and optional clinical background.
+          Smart hybrid AI analysis based on symptoms, location and optional
+          clinical background.
         </p>
       </div>
 
       {/* Input Card */}
       <div className="bg-white/70 dark:bg-gray-900/60 border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-2xl space-y-6">
-
         {/* Symptoms */}
         <div className="flex flex-wrap gap-3">
           {SYMPTOM_CHIPS.map((symptom) => {
@@ -202,7 +198,9 @@ export default function DiseasePredictorPage() {
 
           {/* Allergies Toggle */}
           <div>
-            <p className="text-sm font-medium mb-2">Do you have any allergies?</p>
+            <p className="text-sm font-medium mb-2">
+              Do you have any allergies?
+            </p>
             <div className="flex gap-4">
               <button
                 onClick={() => setAllergies(true)}
@@ -293,20 +291,33 @@ export default function DiseasePredictorPage() {
       </div>
 
       {/* Result */}
+      {/* 📊 Result Card (RESTORED - UI ONLY) */}
       {result && (
         <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-xl">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-semibold">
-              AI Health Risk Analysis
-            </h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-2xl font-semibold">AI Health Risk Analysis</h2>
+
             {severity && (
-              <span className="px-4 py-1 rounded-full bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
+              <span
+                className={`px-4 py-1 rounded-full text-sm font-semibold ${
+                  severity === "High"
+                    ? "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300"
+                    : severity === "Moderate"
+                      ? "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300"
+                      : "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300"
+                }`}
+              >
                 Severity: {severity}
               </span>
             )}
           </div>
 
-          <div className="whitespace-pre-line text-sm leading-relaxed">
+          <p className="text-sm text-gray-500 mb-4">
+            ⚠️ This is non-diagnostic AI guidance and does not replace
+            professional medical advice.
+          </p>
+
+          <div className="text-sm leading-relaxed whitespace-pre-line">
             {result}
           </div>
         </div>
