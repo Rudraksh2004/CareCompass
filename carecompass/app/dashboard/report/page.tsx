@@ -24,9 +24,7 @@ export default function ReportPage() {
     }
   }, [user]);
 
-  const handleFileUpload = async (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -67,8 +65,7 @@ export default function ReportPage() {
       });
 
       const data = await res.json();
-      const explanation =
-        data.explanation || "No response generated.";
+      const explanation = data.explanation || "No response generated.";
 
       setResult(explanation);
 
@@ -104,9 +101,7 @@ export default function ReportPage() {
       {/* 🧠 Upload Card (Polished UI, Same Logic) */}
       <div className="bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-2xl">
         <div className="mb-4">
-          <h2 className="text-2xl font-semibold">
-            Upload Medical Report
-          </h2>
+          <h2 className="text-2xl font-semibold">Upload Medical Report</h2>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
             Supports PDFs, scanned reports, and images with OCR extraction
           </p>
@@ -159,9 +154,7 @@ export default function ReportPage() {
         <div className="space-y-5">
           <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-2xl">
             <div className="flex items-center justify-between mb-5">
-              <h2 className="text-2xl font-bold">
-                AI Report Explanation
-              </h2>
+              <h2 className="text-2xl font-bold">AI Report Explanation</h2>
               <span className="text-xs px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 font-semibold">
                 AI Generated
               </span>
@@ -180,11 +173,7 @@ export default function ReportPage() {
 
           <button
             onClick={() =>
-              exportMedicalPDF(
-                "Medical Report Explanation",
-                reportText,
-                result
-              )
+              exportMedicalPDF("Medical Report Explanation", reportText, result)
             }
             className="bg-purple-600 hover:bg-purple-700 transition text-white px-6 py-3 rounded-2xl font-semibold shadow-lg"
           >
@@ -210,19 +199,26 @@ export default function ReportPage() {
                   {item.createdAt?.toDate?.().toLocaleString?.() || ""}
                 </p>
 
-                <p className="text-sm font-semibold mb-1">
-                  🧾 Report Text:
-                </p>
+                <p className="text-sm font-semibold mb-1">🧾 Report Text:</p>
                 <p className="text-sm text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">
                   {item.originalText}
                 </p>
 
-                <p className="text-sm font-semibold mb-1">
-                  🧠 AI Explanation:
-                </p>
-                <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-3">
-                  {item.aiResponse}
-                </p>
+                <p className="text-sm font-semibold mb-1">🧠 AI Explanation:</p>
+                <div className="text-sm text-gray-600 dark:text-gray-300">
+                  <div className="line-clamp-3">{item.aiResponse}</div>
+
+                  <button
+                    onClick={() => {
+                      setReportText(item.originalText);
+                      setResult(item.aiResponse);
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
+                    className="mt-3 text-sm font-semibold text-emerald-600 hover:underline"
+                  >
+                    View Full Explanation
+                  </button>
+                </div>
               </div>
             ))}
           </div>
