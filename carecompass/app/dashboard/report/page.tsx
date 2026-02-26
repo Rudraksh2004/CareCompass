@@ -18,13 +18,18 @@ export default function ReportPage() {
   const [fileLoading, setFileLoading] = useState(false);
   const [history, setHistory] = useState<any[]>([]);
 
+  // 🔥 NEW: UI-only state for expandable history (NO LOGIC CHANGE)
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+
   useEffect(() => {
     if (user) {
       getHistory(user.uid, "reports").then(setHistory);
     }
   }, [user]);
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -65,7 +70,8 @@ export default function ReportPage() {
       });
 
       const data = await res.json();
-      const explanation = data.explanation || "No response generated.";
+      const explanation =
+        data.explanation || "No response generated.";
 
       setResult(explanation);
 
@@ -86,141 +92,162 @@ export default function ReportPage() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto space-y-10 text-gray-900 dark:text-gray-100">
-      {/* 🌟 Premium Header (UI ONLY) */}
-      <div className="relative overflow-hidden rounded-3xl border border-gray-200 dark:border-gray-800 bg-gradient-to-r from-emerald-600/10 via-teal-600/10 to-blue-600/10 backdrop-blur-xl p-10 shadow-xl">
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-emerald-600 to-blue-600 bg-clip-text text-transparent">
-          📄 Medical Report Explainer
+    <div className="max-w-5xl mx-auto space-y-8 text-gray-900 dark:text-gray-100">
+      {/* 🌟 Premium Header */}
+      <div className="relative overflow-hidden rounded-3xl border border-gray-200 dark:border-gray-800 bg-gradient-to-r from-emerald-600/10 via-blue-600/10 to-purple-600/10 backdrop-blur-xl p-8 shadow-xl">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-blue-600 bg-clip-text text-transparent">
+          AI Medical Report Explainer
         </h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-3 text-sm max-w-2xl">
-          Upload lab reports, scans, or medical documents to receive simplified,
-          AI-powered explanations in clear, student-friendly language.
+        <p className="text-gray-600 dark:text-gray-400 mt-2 text-sm max-w-2xl">
+          Upload medical reports (PDF, image, or text) and receive simplified,
+          structured clinical explanations powered by AI.
         </p>
       </div>
 
-      {/* 🧠 Upload Card (Polished UI, Same Logic) */}
-      <div className="bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-2xl">
-        <div className="mb-4">
-          <h2 className="text-2xl font-semibold">Upload Medical Report</h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            Supports PDFs, scanned reports, and images with OCR extraction
-          </p>
-        </div>
+      {/* 📤 Upload Card */}
+      <div className="bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-2xl transition">
+        <h2 className="text-xl font-semibold mb-4">
+          Upload Medical Report
+        </h2>
 
-        <div className="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-2xl p-6 text-center bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 transition hover:border-emerald-400">
-          <input
-            type="file"
-            accept="image/*,application/pdf"
-            onChange={handleFileUpload}
-            className="text-sm cursor-pointer"
-          />
-          <p className="text-xs text-gray-500 mt-2">
-            Drag & drop or upload your medical report file
-          </p>
+        <input
+          type="file"
+          accept="image/*,application/pdf"
+          onChange={handleFileUpload}
+          className="text-sm"
+        />
 
-          {fileLoading && (
-            <p className="text-sm text-emerald-600 font-medium mt-3 animate-pulse">
-              🔍 Extracting medical text using OCR...
-            </p>
-          )}
-        </div>
+        {fileLoading && (
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-3">
+            🔍 Extracting text from file using OCR...
+          </p>
+        )}
       </div>
 
-      {/* ✍️ Text Input (Enhanced UX ONLY) */}
-      <div className="bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-gray-200 dark:border-gray-800 p-6 rounded-3xl shadow-xl">
-        <label className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-2 block">
-          Or Paste Medical Report Text
-        </label>
+      {/* 📝 Text Input */}
+      <div className="bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-2xl">
+        <h2 className="text-xl font-semibold mb-4">
+          Paste Report Text (Optional)
+        </h2>
+
         <textarea
           rows={8}
-          className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500 transition text-gray-900 dark:text-gray-100 shadow-sm"
-          placeholder="Paste your blood test, MRI report, lab results, or any medical report here..."
+          className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"
+          placeholder="Paste your medical report here for AI explanation..."
           value={reportText}
           onChange={(e) => setReportText(e.target.value)}
         />
+
+        <button
+          onClick={explainReport}
+          className="mt-6 bg-gradient-to-r from-emerald-600 to-blue-600 hover:opacity-90 transition text-white px-8 py-3 rounded-xl font-semibold shadow-lg disabled:opacity-50"
+          disabled={loading}
+        >
+          {loading ? "Analyzing Report..." : "Explain Report"}
+        </button>
       </div>
 
-      {/* 🚀 Analyze Button (Premium Style, Same Logic) */}
-      <button
-        onClick={explainReport}
-        className="w-full bg-gradient-to-r from-emerald-600 to-teal-500 hover:opacity-90 transition text-white px-8 py-4 rounded-2xl font-semibold shadow-xl disabled:opacity-50 text-lg"
-        disabled={loading}
-      >
-        {loading ? "🧠 Analyzing Medical Report..." : "Explain Report"}
-      </button>
-
-      {/* 🧾 AI Result (Clinical Card UI ONLY) */}
+      {/* 🧠 AI Result Card */}
       {result && (
-        <div className="space-y-5">
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-2xl">
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="text-2xl font-bold">AI Report Explanation</h2>
-              <span className="text-xs px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 font-semibold">
-                AI Generated
-              </span>
-            </div>
+        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-xl">
+          <h2 className="text-2xl font-semibold mb-6">
+            Clinical AI Explanation
+          </h2>
 
-            <p className="text-xs text-gray-500 mb-4">
-              ⚠️ Educational explanation only. Not a medical diagnosis.
-            </p>
-
-            <div className="prose dark:prose-invert max-w-none text-sm leading-relaxed">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                {result}
-              </ReactMarkdown>
-            </div>
+          <div className="prose dark:prose-invert max-w-none text-sm leading-relaxed">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {result}
+            </ReactMarkdown>
           </div>
 
           <button
             onClick={() =>
-              exportMedicalPDF("Medical Report Explanation", reportText, result)
+              exportMedicalPDF(
+                "Medical Report Explanation",
+                reportText,
+                result
+              )
             }
-            className="bg-purple-600 hover:bg-purple-700 transition text-white px-6 py-3 rounded-2xl font-semibold shadow-lg"
+            className="mt-6 bg-purple-600 hover:bg-purple-700 transition text-white px-6 py-2 rounded-xl font-medium shadow"
           >
-            📄 Download Clinical PDF Report
+            Download PDF Report
           </button>
         </div>
       )}
 
-      {/* 📚 History (Modern Timeline UI ONLY) */}
+      {/* 📚 Premium History Section (WITH EXPAND/COLLAPSE) */}
       {history.length > 0 && (
         <div className="bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-2xl">
-          <h2 className="text-2xl font-bold mb-6">
-            📚 Previous Report Analyses
+          <h2 className="text-2xl font-semibold mb-6">
+            Previous Report Analyses
           </h2>
 
-          <div className="space-y-5 max-h-[450px] overflow-y-auto pr-2">
-            {history.map((item) => (
-              <div
-                key={item.id}
-                className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 border border-gray-200 dark:border-gray-700 p-6 rounded-2xl shadow-sm hover:shadow-lg transition-all"
-              >
-                <p className="text-xs text-gray-400 mb-3">
-                  {item.createdAt?.toDate?.().toLocaleString?.() || ""}
-                </p>
+          <div className="space-y-5 max-h-[500px] overflow-y-auto pr-2">
+            {history.map((item) => {
+              const isExpanded = expandedId === item.id;
 
-                <p className="text-sm font-semibold mb-1">🧾 Report Text:</p>
-                <p className="text-sm text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">
-                  {item.originalText}
-                </p>
+              return (
+                <div
+                  key={item.id}
+                  className="border border-gray-200 dark:border-gray-700 rounded-2xl p-6 bg-white dark:bg-gray-800 shadow-sm hover:shadow-lg transition"
+                >
+                  <p className="text-xs text-gray-400 mb-3">
+                    {item.createdAt?.toDate?.().toLocaleString?.() || ""}
+                  </p>
 
-                <p className="text-sm font-semibold mb-1">🧠 AI Explanation:</p>
-                <div className="text-sm text-gray-600 dark:text-gray-300">
-                  <div className="line-clamp-3">{item.aiResponse}</div>
+                  {/* Report Preview */}
+                  <p className="text-sm font-semibold mb-1">
+                    📄 Report Text:
+                  </p>
+                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">
+                    {item.originalText}
+                  </p>
 
-                  <button
-                    onClick={() => {
-                      setReportText(item.originalText);
-                      setResult(item.aiResponse);
-                      window.scrollTo({ top: 0, behavior: "smooth" });
-                    }}
-                    className="mt-3 text-sm font-semibold text-emerald-600 hover:underline"
+                  {/* AI Explanation */}
+                  <p className="text-sm font-semibold mb-2">
+                    🧠 AI Explanation:
+                  </p>
+
+                  <div
+                    className={`prose dark:prose-invert max-w-none text-sm text-gray-600 dark:text-gray-300 transition-all duration-300 ${
+                      isExpanded ? "" : "line-clamp-3"
+                    }`}
                   >
-                    View Full Explanation
-                  </button>
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                      {item.aiResponse}
+                    </ReactMarkdown>
+                  </div>
+
+                  {/* 🔥 Expand / Collapse Toggle (NEW PREMIUM UX) */}
+                  <div className="flex gap-4 mt-4">
+                    <button
+                      onClick={() =>
+                        setExpandedId(isExpanded ? null : item.id)
+                      }
+                      className="text-sm font-semibold text-emerald-600 hover:underline"
+                    >
+                      {isExpanded
+                        ? "Collapse Explanation ▲"
+                        : "Expand Explanation ▼"}
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        setReportText(item.originalText);
+                        setResult(item.aiResponse);
+                        window.scrollTo({
+                          top: 0,
+                          behavior: "smooth",
+                        });
+                      }}
+                      className="text-sm font-semibold text-blue-600 hover:underline"
+                    >
+                      View in Full Report
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}
