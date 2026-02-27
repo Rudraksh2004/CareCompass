@@ -8,6 +8,8 @@ import { saveHistory, getHistory } from "@/services/historyService";
 import { exportMedicalPDF } from "@/utils/pdfExporter";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { doc, deleteDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 export default function ReportPage() {
   const { user } = useAuth();
@@ -17,6 +19,7 @@ export default function ReportPage() {
   const [loading, setLoading] = useState(false);
   const [fileLoading, setFileLoading] = useState(false);
   const [history, setHistory] = useState<any[]>([]);
+  const [expandedId, setExpandedId] = useState<string | null>(null); // 🔥 NEW (history only)
 
   useEffect(() => {
     if (user) {
@@ -88,9 +91,20 @@ export default function ReportPage() {
     setLoading(false);
   };
 
+  // 🔥 NEW: Delete single report (HISTORY ONLY)
+  const deleteReport = async (id: string) => {
+    if (!user) return;
+    try {
+      await deleteDoc(doc(db, "users", user.uid, "reports", id));
+      setHistory((prev) => prev.filter((item) => item.id !== id));
+    } catch (err) {
+      console.error("Delete failed:", err);
+    }
+  };
+
   return (
     <div className="max-w-6xl mx-auto space-y-10 text-gray-900 dark:text-gray-100">
-      {/* 🌟 Premium Clinical Header (MATCHES MEDICINE PAGE STYLE) */}
+      {/* 🌟 Premium Clinical Header (UNCHANGED) */}
       <div className="relative overflow-hidden rounded-3xl border border-gray-200 dark:border-gray-800 bg-gradient-to-br from-emerald-600/10 via-blue-600/10 to-purple-600/10 backdrop-blur-xl p-10 shadow-2xl">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(16,185,129,0.15),_transparent_40%)]" />
         <div className="relative z-10">
@@ -104,7 +118,7 @@ export default function ReportPage() {
         </div>
       </div>
 
-      {/* 📤 Upload Card (GLASS + PREMIUM LIKE MEDICINE PAGE) */}
+      {/* 📤 Upload Card (UNCHANGED) */}
       <div className="bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-2xl space-y-6">
         <div>
           <h2 className="text-2xl font-semibold">
@@ -134,7 +148,7 @@ export default function ReportPage() {
         </div>
       </div>
 
-      {/* 📝 Text Input (UNCHANGED — RESTORED EXACTLY) */}
+      {/* 📝 Paste Text Section (UNCHANGED — NOT TOUCHED) */}
       <div className="bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-2xl">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-2xl font-semibold">
@@ -186,62 +200,84 @@ export default function ReportPage() {
         </div>
       )}
 
-      {/* 📚 History (ONLY FIXED: expand + viewer logic, NOTHING ELSE TOUCHED) */}
+      {/* 📚 HISTORY (ONLY SECTION UPDATED AS REQUESTED) */}
       {history.length > 0 && (
         <div className="bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-2xl">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold">
-              📚 Previous Report Analyses
-            </h2>
-            <span className="text-xs text-gray-500">
-              {history.length} records
-            </span>
-          </div>
+          <h2 className="text-2xl font-bold mb-6">
+            📚 Previous Report Analyses
+          </h2>
 
           <div className="space-y-5 max-h-[500px] overflow-y-auto pr-2">
-            {history.map((item) => (
-              <div
-                key={item.id}
-                className="border border-gray-200 dark:border-gray-700 rounded-2xl p-6 bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 shadow-sm hover:shadow-lg transition-all duration-300"
-              >
-                <p className="text-xs text-gray-400 mb-3">
-                  {item.createdAt?.toDate?.().toLocaleString?.() || ""}
-                </p>
+            {history.map((item) => {
+              const isExpanded = expandedId === item.id;
 
-                <p className="text-sm font-semibold mb-1">
-                  📄 Report Text
-                </p>
-                <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-3 whitespace-pre-line">
-                  {item.originalText}
-                </p>
-
-                <p className="text-sm font-semibold mt-4 mb-1">
-                  🧠 AI Explanation
-                </p>
-
-                {/* FIX: stable preview without breaking markdown */}
-                <div className="prose dark:prose-invert max-w-none text-sm text-gray-700 dark:text-gray-300 max-h-32 overflow-hidden">
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                    {item.aiResponse}
-                  </ReactMarkdown>
-                </div>
-
-                {/* EXPAND TO VIEWER (YOUR ORIGINAL BEHAVIOR — FIXED & SAFE) */}
-                <button
-                  onClick={() => {
-                    setReportText(item.originalText);
-                    setResult(item.aiResponse);
-                    window.scrollTo({
-                      top: 0,
-                      behavior: "smooth",
-                    });
-                  }}
-                  className="mt-4 text-sm font-semibold text-emerald-600 hover:text-emerald-700 hover:underline transition"
+              return (
+                <div
+                  key={item.id}
+                  className="border border-gray-200 dark:border-gray-700 rounded-2xl p-6 bg-white dark:bg-gray-800 shadow-sm"
                 >
-                  View Full Clinical Explanation →
-                </button>
-              </div>
-            ))}
+                  <p className="text-xs text-gray-400 mb-3">
+                    {item.createdAt?.toDate?.().toLocaleString?.() || ""}
+                  </p>
+
+                  <p className="text-sm font-semibold mb-1">
+                    📄 Report Text
+                  </p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-3">
+                    {item.originalText}
+                  </p>
+
+                  <p className="text-sm font-semibold mt-4 mb-1">
+                    🧠 AI Explanation
+                  </p>
+
+                  <div
+                    className={`prose dark:prose-invert max-w-none text-sm text-gray-700 dark:text-gray-300 ${
+                      isExpanded ? "" : "line-clamp-4"
+                    }`}
+                  >
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                      {item.aiResponse}
+                    </ReactMarkdown>
+                  </div>
+
+                  {/* 🔥 ACTION BUTTONS (EXPAND + VIEWER + DELETE) */}
+                  <div className="flex flex-wrap gap-4 mt-4">
+                    <button
+                      onClick={() =>
+                        setExpandedId(isExpanded ? null : item.id)
+                      }
+                      className="text-sm font-semibold text-blue-600 hover:underline"
+                    >
+                      {isExpanded
+                        ? "Collapse Explanation"
+                        : "Expand Full Explanation"}
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        setReportText(item.originalText);
+                        setResult(item.aiResponse);
+                        window.scrollTo({
+                          top: 0,
+                          behavior: "smooth",
+                        });
+                      }}
+                      className="text-sm font-semibold text-emerald-600 hover:underline"
+                    >
+                      Expand in Viewer
+                    </button>
+
+                    <button
+                      onClick={() => deleteReport(item.id)}
+                      className="text-sm font-semibold text-red-600 hover:underline"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
