@@ -30,7 +30,6 @@ export default function ChatPage() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [initializing, setInitializing] = useState(true);
 
-  // 🔥 Load sessions on mount
   useEffect(() => {
     if (!user) return;
     initializeChat();
@@ -43,7 +42,6 @@ export default function ChatPage() {
     const data = await getChatSessions(user.uid);
     setSessions(data);
 
-    // Auto open latest chat OR create new one
     if (data.length > 0) {
       const latest = data[0].id;
       setActiveSession(latest);
@@ -72,7 +70,6 @@ export default function ChatPage() {
     setActiveSession(sessionId);
   };
 
-  // Auto scroll (stable)
   useEffect(() => {
     const timeout = setTimeout(() => {
       bottomRef.current?.scrollIntoView({
@@ -84,7 +81,6 @@ export default function ChatPage() {
     return () => clearTimeout(timeout);
   }, [messages.length, loading]);
 
-  // ➕ New Chat
   const handleNewChat = async () => {
     if (!user) return;
 
@@ -94,7 +90,6 @@ export default function ChatPage() {
     await fetchSessions();
   };
 
-  // 🗑 Delete Chat
   const handleDeleteChat = async (sessionId: string) => {
     if (!user) return;
 
@@ -108,7 +103,6 @@ export default function ChatPage() {
     await fetchSessions();
   };
 
-  // 🧠 Smart Title Generator (first message only)
   const generateSmartTitle = async (
     firstMessage: string,
     sessionId: string
@@ -134,7 +128,6 @@ export default function ChatPage() {
     }
   };
 
-  // Typing animation (premium feel)
   const typeMessage = async (fullText: string) => {
     let currentText = "";
 
@@ -160,7 +153,6 @@ export default function ChatPage() {
     const userMessage = input.trim();
     const isFirstMessage = messages.length === 0;
 
-    // Optimistic UI
     setMessages((prev) => [
       ...prev,
       { role: "user", content: userMessage },
@@ -171,15 +163,12 @@ export default function ChatPage() {
     setLoading(true);
 
     try {
-      // Save user message to Firebase
       await saveMessage(user.uid, activeSession, "user", userMessage);
 
-      // Generate smart title for first message
       if (isFirstMessage) {
         generateSmartTitle(userMessage, activeSession);
       }
 
-      // 🔥 CRITICAL FIX: Send uid + sessionId for AI memory
       const res = await fetch("/api/ai/chat", {
         method: "POST",
         headers: {
@@ -196,10 +185,8 @@ export default function ChatPage() {
       const aiReply =
         data.reply || "I'm here to help with your health questions.";
 
-      // Typing effect
       await typeMessage(aiReply);
 
-      // Save AI reply
       await saveMessage(user.uid, activeSession, "assistant", aiReply);
     } catch (error) {
       console.error("Chat error:", error);
@@ -217,7 +204,6 @@ export default function ChatPage() {
     setLoading(false);
   };
 
-  // ⌨️ Enter to send (Shift+Enter = new line)
   const handleKeyDown = (
     e: React.KeyboardEvent<HTMLInputElement>
   ) => {
@@ -228,25 +214,27 @@ export default function ChatPage() {
   };
 
   return (
-    <div className="flex h-[88vh] max-w-7xl mx-auto rounded-3xl overflow-hidden border border-gray-200 dark:border-gray-800 bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl shadow-2xl">
-      {/* Sidebar */}
+    <div className="flex h-[88vh] max-w-7xl mx-auto rounded-3xl overflow-hidden border border-gray-200 dark:border-gray-800 bg-white/60 dark:bg-gray-900/60 backdrop-blur-2xl shadow-2xl">
+      {/* 🔷 SIDEBAR (UI POLISHED ONLY) */}
       {sidebarOpen && (
-        <div className="w-72 border-r border-gray-200 dark:border-gray-800 p-4 flex flex-col bg-white/80 dark:bg-gray-900/80">
-          <button
-            onClick={handleNewChat}
-            className="mb-4 w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-2.5 rounded-xl font-semibold shadow-md hover:opacity-90 transition"
-          >
-            + New Chat
-          </button>
+        <div className="w-72 border-r border-gray-200 dark:border-gray-800 p-5 flex flex-col bg-gradient-to-b from-white/90 to-white/70 dark:from-gray-900/90 dark:to-gray-900/70 backdrop-blur-xl">
+          <div className="mb-4">
+            <button
+              onClick={handleNewChat}
+              className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-2xl font-semibold shadow-lg hover:opacity-90 transition"
+            >
+              + New Health Chat
+            </button>
+          </div>
 
-          <div className="flex-1 overflow-y-auto space-y-2">
+          <div className="flex-1 overflow-y-auto space-y-2 pr-1">
             {sessions.map((session) => (
               <div
                 key={session.id}
                 onClick={() => loadMessages(session.id)}
-                className={`group flex items-center justify-between p-3 rounded-xl cursor-pointer transition ${
+                className={`group flex items-center justify-between p-3 rounded-xl cursor-pointer transition-all duration-200 ${
                   activeSession === session.id
-                    ? "bg-blue-100 dark:bg-blue-900/30"
+                    ? "bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border border-indigo-200 dark:border-indigo-900"
                     : "hover:bg-gray-100 dark:hover:bg-gray-800"
                 }`}
               >
@@ -269,40 +257,48 @@ export default function ChatPage() {
         </div>
       )}
 
-      {/* Chat Area */}
+      {/* 🧠 CHAT AREA */}
       <div className="flex-1 flex flex-col">
-        {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-800">
+        {/* 🌟 PREMIUM HEADER */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-800 bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl">
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="px-3 py-1 rounded-lg bg-gray-100 dark:bg-gray-800 text-sm"
+            className="px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-sm font-medium hover:scale-[1.03] transition"
           >
             ☰
           </button>
 
-          <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            CareCompass AI Assistant
-          </h1>
+          <div className="text-center">
+            <h1 className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              CareCompass AI Health Assistant
+            </h1>
+            <p className="text-xs text-gray-500">
+              Memory Enabled • Non-Diagnostic • Student Safe
+            </p>
+          </div>
 
-          <span className="text-xs text-gray-500">
-            Memory Enabled • Non-diagnostic
-          </span>
+          <div className="text-xs px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 font-semibold">
+            AI Active
+          </div>
         </div>
 
-        {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+        {/* 💬 MESSAGES (UI ENHANCED ONLY) */}
+        <div className="flex-1 overflow-y-auto p-8 space-y-6 bg-gradient-to-b from-transparent to-gray-50/40 dark:to-black/20">
           {initializing ? (
-            <div className="text-center mt-20 text-gray-500">
-              Initializing AI chat...
+            <div className="text-center mt-24 text-gray-500">
+              <div className="text-5xl mb-4 animate-pulse">🧠</div>
+              <p className="font-semibold">
+                Initializing CareCompass AI...
+              </p>
             </div>
           ) : messages.length === 0 ? (
-            <div className="text-center mt-20 text-gray-500">
-              <div className="text-5xl mb-4">🧠</div>
+            <div className="text-center mt-24 text-gray-500">
+              <div className="text-6xl mb-5">💬</div>
               <p className="font-semibold text-lg">
-                Start a new health conversation
+                Start your health conversation
               </p>
               <p className="text-sm mt-2">
-                Ask about reports, prescriptions, symptoms, or health trends.
+                Ask about symptoms, reports, medicines, or health advice.
               </p>
             </div>
           ) : (
@@ -316,10 +312,10 @@ export default function ChatPage() {
                 }`}
               >
                 <div
-                  className={`max-w-[75%] px-5 py-4 rounded-2xl text-sm shadow ${
+                  className={`max-w-[75%] px-5 py-4 rounded-2xl text-sm shadow-lg transition ${
                     msg.role === "user"
-                      ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white"
-                      : "bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-100"
+                      ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white"
+                      : "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-100"
                   }`}
                 >
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>
@@ -331,7 +327,8 @@ export default function ChatPage() {
           )}
 
           {loading && (
-            <div className="text-sm text-gray-500 animate-pulse">
+            <div className="flex items-center gap-2 text-sm text-gray-500 animate-pulse">
+              <span className="text-lg">🧠</span>
               CareCompass AI is analyzing your health query...
             </div>
           )}
@@ -339,20 +336,20 @@ export default function ChatPage() {
           <div ref={bottomRef} />
         </div>
 
-        {/* Input */}
-        <div className="p-4 border-t border-gray-200 dark:border-gray-800 flex gap-3 bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl">
+        {/* ✍️ INPUT BAR (PREMIUM GLASS UX) */}
+        <div className="p-5 border-t border-gray-200 dark:border-gray-800 flex gap-3 bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl">
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Ask about reports, symptoms, health trends..."
-            className="flex-1 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Ask about symptoms, reports, medicines, or health concerns..."
+            className="flex-1 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-5 py-3 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm"
           />
 
           <button
             onClick={sendMessage}
             disabled={loading || !activeSession}
-            className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-xl font-semibold disabled:opacity-50 hover:opacity-90 transition"
+            className="bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-600 text-white px-7 py-3 rounded-2xl font-semibold shadow-lg disabled:opacity-50 hover:opacity-90 transition"
           >
             Send
           </button>
