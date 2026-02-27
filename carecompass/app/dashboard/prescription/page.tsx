@@ -19,7 +19,7 @@ export default function PrescriptionPage() {
   const [loading, setLoading] = useState(false);
   const [fileLoading, setFileLoading] = useState(false);
   const [history, setHistory] = useState<any[]>([]);
-  const [expandedId, setExpandedId] = useState<string | null>(null); // 🔥 NEW (history expand only)
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -97,7 +97,6 @@ export default function PrescriptionPage() {
     setLoading(false);
   };
 
-  // 🔥 NEW: Delete single prescription history (ONLY history logic)
   const handleDelete = async (id: string) => {
     if (!user) return;
 
@@ -117,89 +116,156 @@ export default function PrescriptionPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 text-gray-900 dark:text-gray-100">
-      <h1 className="text-3xl font-bold">
-        Simplify Prescription
-      </h1>
+    <div className="max-w-6xl mx-auto space-y-10 text-gray-900 dark:text-gray-100">
+      {/* 🌟 Premium Gradient Header (MATCHES OTHER PAGES) */}
+      <div className="relative overflow-hidden rounded-3xl border border-gray-200 dark:border-gray-800 bg-gradient-to-br from-indigo-600/10 via-purple-600/10 to-emerald-600/10 backdrop-blur-xl p-10 shadow-2xl">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(99,102,241,0.15),_transparent_40%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,_rgba(16,185,129,0.12),_transparent_40%)]" />
 
-      {/* Upload Card */}
-      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-6 rounded-2xl shadow-sm transition-colors">
-        <p className="font-medium mb-3">
-          Upload Prescription (Image or PDF)
-        </p>
-        <input
-          type="file"
-          accept="image/*,application/pdf"
-          onChange={handleFileUpload}
-          className="text-sm"
-        />
-        {fileLoading && (
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-            Extracting text from file...
+        <div className="relative z-10">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-emerald-500 bg-clip-text text-transparent">
+            💊 Prescription Simplifier AI
+          </h1>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-3 max-w-2xl leading-relaxed">
+            Upload handwritten, scanned, or digital prescriptions and get
+            clear, easy-to-understand medication instructions powered by
+            CareCompass AI.
           </p>
-        )}
+        </div>
       </div>
 
-      {/* Text Area */}
-      <textarea
-        rows={8}
-        className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 p-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-900 dark:text-gray-100 transition-colors"
-        placeholder="Or paste prescription text here..."
-        value={prescriptionText}
-        onChange={(e) =>
-          setPrescriptionText(e.target.value)
-        }
-      />
+      {/* 📤 Upload Card (Polished Glass Style) */}
+      <div className="bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-2xl space-y-6">
+        <div>
+          <h2 className="text-2xl font-semibold">
+            Upload Prescription
+          </h2>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            Supports images, scanned prescriptions, and PDFs (OCR enabled)
+          </p>
+        </div>
 
-      <button
-        onClick={simplifyPrescription}
-        disabled={loading}
-        className="bg-indigo-600 hover:bg-indigo-700 transition text-white px-6 py-3 rounded-xl font-medium shadow-sm disabled:opacity-50"
-      >
-        {loading ? "Simplifying..." : "Simplify Prescription"}
-      </button>
+        <div className="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-2xl p-8 text-center bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 hover:border-indigo-400 transition">
+          <input
+            type="file"
+            accept="image/*,application/pdf"
+            onChange={handleFileUpload}
+            className="text-sm cursor-pointer"
+          />
+          <p className="text-xs text-gray-500 mt-2">
+            Upload prescription image or PDF for automatic AI text extraction
+          </p>
 
-      {/* AI Result */}
-      {result && (
-        <div className="space-y-4">
-          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-6 rounded-2xl shadow-sm transition-colors">
-            <div className="prose dark:prose-invert max-w-none text-sm">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                {result}
-              </ReactMarkdown>
+          {fileLoading && (
+            <div className="mt-4 text-sm text-indigo-600 font-medium animate-pulse">
+              🔍 Extracting prescription text using OCR...
             </div>
+          )}
+        </div>
+      </div>
+
+      {/* 📝 Text Input Card (Polished) */}
+      <div className="bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-2xl">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-2xl font-semibold">
+            Paste Prescription Text (Optional)
+          </h2>
+          <span className="text-xs text-gray-500">
+            Handwritten • Digital • Scanned
+          </span>
+        </div>
+
+        <textarea
+          rows={8}
+          className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition text-sm leading-relaxed shadow-sm"
+          placeholder="Paste prescription text here for AI simplification..."
+          value={prescriptionText}
+          onChange={(e) =>
+            setPrescriptionText(e.target.value)
+          }
+        />
+
+        <div className="flex flex-wrap gap-4 mt-6">
+          <button
+            onClick={simplifyPrescription}
+            disabled={loading}
+            className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:opacity-90 transition text-white px-8 py-3 rounded-2xl font-semibold shadow-lg disabled:opacity-50"
+          >
+            {loading
+              ? "🧠 Simplifying Prescription..."
+              : "Simplify Prescription"}
+          </button>
+
+          {prescriptionText && (
+            <button
+              onClick={() => setPrescriptionText("")}
+              className="px-6 py-3 rounded-2xl border border-gray-300 dark:border-gray-700 text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+            >
+              Clear Text
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* 🧠 AI Result (Clinical Card Style) */}
+      {result && (
+        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-10 rounded-3xl shadow-2xl">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-3xl font-bold">
+              Simplified Prescription Explanation
+            </h2>
+            <span className="text-xs px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300 font-semibold">
+              AI Generated
+            </span>
           </div>
 
-          <button
-            onClick={() =>
-              exportMedicalPDF(
-                "Simplified Prescription",
-                prescriptionText,
-                result
-              )
-            }
-            className="bg-purple-600 hover:bg-purple-700 transition text-white px-5 py-2 rounded-xl font-medium"
-          >
-            Download PDF
-          </button>
+          <p className="text-xs text-gray-500 mb-6">
+            ⚠️ Educational simplification only. Always follow your doctor’s instructions.
+          </p>
+
+          <div className="prose dark:prose-invert max-w-none text-sm leading-relaxed">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {result}
+            </ReactMarkdown>
+          </div>
+
+          <div className="mt-8 flex justify-end">
+            <button
+              onClick={() =>
+                exportMedicalPDF(
+                  "Simplified Prescription",
+                  prescriptionText,
+                  result
+                )
+              }
+              className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:opacity-90 transition text-white px-6 py-3 rounded-xl font-semibold shadow-lg"
+            >
+              Download Clinical PDF
+            </button>
+          </div>
         </div>
       )}
 
-      {/* 🔥 UPDATED History (MATCHES REPORT PAGE BEHAVIOUR ONLY) */}
+      {/* 📚 History (UNCHANGED LOGIC — ONLY POLISHED UI) */}
       {history.length > 0 && (
-        <div>
-          <h2 className="text-xl font-semibold mb-4">
-            Previous Prescriptions
-          </h2>
+        <div className="bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-2xl">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold">
+              📚 Previous Prescription Analyses
+            </h2>
+            <span className="text-xs text-gray-500">
+              {history.length} records
+            </span>
+          </div>
 
-          <div className="space-y-4">
+          <div className="space-y-5 max-h-[500px] overflow-y-auto pr-2">
             {history.map((item) => {
               const isExpanded = expandedId === item.id;
 
               return (
                 <div
                   key={item.id}
-                  className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-5 rounded-xl shadow-sm transition-colors"
+                  className="border border-gray-200 dark:border-gray-700 rounded-2xl p-6 bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 shadow-sm hover:shadow-lg transition-all duration-300"
                 >
                   <div className="flex items-center justify-between mb-2">
                     <p className="text-xs text-gray-400">
@@ -208,29 +274,28 @@ export default function PrescriptionPage() {
 
                     <button
                       onClick={() => handleDelete(item.id)}
-                      className="text-xs text-red-500 hover:text-red-600 font-medium"
+                      className="text-xs text-red-500 hover:text-red-600 font-semibold"
                     >
                       Delete
                     </button>
                   </div>
 
                   <p className="text-sm font-semibold mb-1">
-                    Prescription:
+                    📄 Prescription Text
                   </p>
                   <p
-                    className={`text-sm text-gray-600 dark:text-gray-300 mb-3 ${
+                    className={`text-sm text-gray-600 dark:text-gray-400 mb-3 ${
                       isExpanded ? "" : "line-clamp-3"
                     }`}
                   >
                     {item.originalText}
                   </p>
 
-                  <p className="text-sm font-semibold mb-1">
-                    AI Simplified:
+                  <p className="text-sm font-semibold mt-4 mb-1">
+                    🧠 AI Simplified
                   </p>
-
                   <div
-                    className={`prose dark:prose-invert max-w-none text-sm text-gray-600 dark:text-gray-300 ${
+                    className={`prose dark:prose-invert max-w-none text-sm text-gray-700 dark:text-gray-300 ${
                       isExpanded ? "" : "line-clamp-4"
                     }`}
                   >
@@ -240,7 +305,6 @@ export default function PrescriptionPage() {
                   </div>
 
                   <div className="flex gap-4 mt-4">
-                    {/* Expand Full */}
                     <button
                       onClick={() =>
                         setExpandedId(
@@ -249,12 +313,9 @@ export default function PrescriptionPage() {
                       }
                       className="text-sm font-semibold text-indigo-600 hover:underline"
                     >
-                      {isExpanded
-                        ? "Collapse"
-                        : "Expand Full"}
+                      {isExpanded ? "Collapse" : "Expand Full"}
                     </button>
 
-                    {/* Load to Viewer (like reports page) */}
                     <button
                       onClick={() => {
                         setPrescriptionText(item.originalText);
