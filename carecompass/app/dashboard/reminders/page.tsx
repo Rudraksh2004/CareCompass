@@ -223,101 +223,137 @@ export default function ReminderPage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto space-y-10 text-white">
-      {/* Header — UI ONLY */}
-      <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800 backdrop-blur-xl p-10 shadow-2xl">
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-          Smart Medicine Reminders
-        </h1>
+    <div className="max-w-6xl mx-auto space-y-10 text-gray-900 dark:text-gray-100">
+      {/* 🌟 Premium Header (UI ONLY) */}
+      <div className="relative overflow-hidden rounded-3xl border border-gray-200 dark:border-gray-800 bg-gradient-to-br from-blue-600/10 via-purple-600/10 to-emerald-600/10 backdrop-blur-xl p-10 shadow-2xl">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(59,130,246,0.15),_transparent_40%)]" />
+        <div className="relative z-10">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-emerald-500 bg-clip-text text-transparent">
+            ⏰ Smart Medicine Reminders
+          </h1>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-3 max-w-2xl">
+            Manage multi-dose schedules, track adherence, and never miss a
+            medication with intelligent daily reminder tracking.
+          </p>
+        </div>
       </div>
 
-      {/* Add Reminder Card — UI ONLY */}
-      <div className="bg-white/5 dark:bg-white/5 backdrop-blur-xl border border-white/10 p-8 rounded-3xl shadow-2xl">
-        <h2 className="text-2xl font-semibold mb-6 text-white">
-          Add New Reminder
+      {/* 💊 Add Reminder Card (POLISHED UI ONLY) */}
+      <div className="bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-2xl">
+        <h2 className="text-2xl font-semibold mb-6">
+          Add New Medicine Reminder
         </h2>
 
         <div className="grid gap-5">
           <input
-            className="w-full border border-white/10 bg-black/30 p-4 rounded-2xl text-white placeholder:text-slate-400"
-            placeholder="Medicine Name"
+            className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+            placeholder="Medicine Name (e.g., Paracetamol)"
             value={medicineName}
             onChange={(e) => setMedicineName(e.target.value)}
           />
 
           <input
-            className="w-full border border-white/10 bg-black/30 p-4 rounded-2xl text-white placeholder:text-slate-400"
-            placeholder="Dosage"
+            className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
+            placeholder="Dosage (e.g., 500mg after meal)"
             value={dosage}
             onChange={(e) => setDosage(e.target.value)}
           />
 
-          <div className="flex gap-3">
+          {/* Dose Time Section */}
+          <div className="flex flex-col md:flex-row gap-3">
             <input
               type="time"
-              className="border border-white/10 bg-black/30 p-4 rounded-2xl text-white"
+              className="border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"
               value={time}
               onChange={(e) => setTime(e.target.value)}
             />
             <button
               onClick={handleAddDoseTime}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 rounded-2xl font-semibold shadow-lg hover:opacity-90 transition"
+              className="bg-gradient-to-r from-emerald-600 to-blue-600 text-white px-6 py-3 rounded-2xl font-semibold shadow-lg hover:opacity-90 transition"
             >
-              Add Dose
+              Add Dose Time
             </button>
           </div>
 
+          {/* Dose Chips (UI only) */}
+          {doseTimes.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {doseTimes.map((t) => (
+                <span
+                  key={t}
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-sm font-semibold"
+                >
+                  ⏰ {t}
+                  <button
+                    onClick={() => removeDoseTime(t)}
+                    className="text-red-500 hover:text-red-600 text-xs"
+                  >
+                    ✕
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
+
           <button
             onClick={handleAddReminder}
-            className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-4 rounded-2xl font-semibold shadow-xl hover:opacity-90 transition"
+            className="bg-gradient-to-r from-blue-600 via-purple-600 to-emerald-600 text-white px-6 py-4 rounded-2xl font-semibold shadow-xl hover:opacity-90 transition text-lg"
           >
             + Create Smart Reminder
           </button>
         </div>
       </div>
 
-      {/* Reminders List — STRUCTURE UNCHANGED, UI POLISHED ONLY */}
+      {/* 🩺 Reminders List (UI POLISHED — LOGIC UNTOUCHED) */}
       <div className="space-y-6">
+        {reminders.length === 0 && (
+          <div className="text-center py-16 border border-dashed border-gray-300 dark:border-gray-700 rounded-3xl">
+            <p className="text-gray-500 dark:text-gray-400 text-sm">
+              No reminders added yet. Start by creating your first medicine schedule.
+            </p>
+          </div>
+        )}
+
         {reminders.map((reminder) => (
           <div
             key={reminder.id}
-            className="bg-white/5 dark:bg-white/5 border border-white/10 p-7 rounded-3xl shadow-xl backdrop-blur-xl"
+            className="bg-white/70 dark:bg-gray-900/60 border border-gray-200 dark:border-gray-800 p-7 rounded-3xl shadow-xl backdrop-blur-xl"
           >
             {/* TOP SECTION (UNCHANGED LOGIC) */}
-            <div className="flex justify-between items-start mb-5">
+            <div className="flex justify-between items-start mb-6">
               <div className="flex-1">
                 {editingId === reminder.id ? (
                   <div className="space-y-3">
                     <input
-                      className="w-full border border-white/10 bg-black/30 p-3 rounded-xl text-white"
+                      className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 rounded-xl"
                       value={editMedicine}
                       onChange={(e) => setEditMedicine(e.target.value)}
                     />
                     <input
-                      className="w-full border border-white/10 bg-black/30 p-3 rounded-xl text-white"
+                      className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 rounded-xl"
                       value={editDosage}
                       onChange={(e) => setEditDosage(e.target.value)}
                     />
                   </div>
                 ) : (
                   <>
-                    <h3 className="text-2xl font-bold text-white">
-                      {reminder.medicineName}
+                    <h3 className="text-2xl font-bold">
+                      💊 {reminder.medicineName}
                     </h3>
-                    <p className="text-slate-400">
+                    <p className="text-gray-500 dark:text-gray-400">
                       {reminder.dosage || "No dosage specified"}
                     </p>
                   </>
                 )}
               </div>
 
-              {/* BUTTONS — UNTOUCHED LOGIC */}
-              <div className="flex gap-2 ml-4">
+              {/* BUTTONS — LOGIC UNCHANGED */}
+              <div className="flex gap-2 ml-4 flex-wrap">
                 <button
                   onClick={() =>
                     handleDescribeMedicine(reminder.medicineName)
                   }
-                  className="px-4 py-1.5 bg-indigo-500/20 text-indigo-300 rounded-full text-xs font-semibold hover:bg-indigo-500/30 transition"
+                  className="px-4 py-1.5 bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-300 rounded-full text-xs font-semibold hover:opacity-90 transition"
                 >
                   Describe
                 </button>
@@ -325,14 +361,14 @@ export default function ReminderPage() {
                 {editingId === reminder.id ? (
                   <button
                     onClick={saveReminderEdit}
-                    className="px-4 py-1.5 bg-emerald-500 text-white rounded-full text-xs font-semibold shadow"
+                    className="px-4 py-1.5 bg-emerald-600 text-white rounded-full text-xs font-semibold shadow"
                   >
                     Save
                   </button>
                 ) : (
                   <button
                     onClick={() => startEditReminder(reminder)}
-                    className="px-4 py-1.5 bg-amber-500/20 text-amber-300 rounded-full text-xs font-semibold hover:bg-amber-500/30 transition"
+                    className="px-4 py-1.5 bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-300 rounded-full text-xs font-semibold"
                   >
                     Edit
                   </button>
@@ -340,14 +376,14 @@ export default function ReminderPage() {
 
                 <button
                   onClick={() => handleDelete(reminder.id)}
-                  className="px-4 py-1.5 bg-red-500/20 text-red-300 rounded-full text-xs font-semibold hover:bg-red-500/30 transition"
+                  className="px-4 py-1.5 bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-300 rounded-full text-xs font-semibold"
                 >
                   Delete
                 </button>
               </div>
             </div>
 
-            {/* DOSE TIMES — LOGIC UNCHANGED */}
+            {/* DOSE TIMES — LOGIC 100% UNCHANGED */}
             <div className="grid md:grid-cols-2 gap-4">
               {reminder.times.map((t) => {
                 const key = `${reminder.id}-${t}`;
@@ -357,35 +393,35 @@ export default function ReminderPage() {
                 return (
                   <div
                     key={key}
-                    className="bg-black/30 border border-white/10 p-5 rounded-2xl flex items-center justify-between backdrop-blur-lg"
+                    className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 border border-gray-200 dark:border-gray-700 p-5 rounded-2xl flex items-center justify-between shadow-sm"
                   >
                     <div>
-                      <p className="font-semibold text-lg text-white">
+                      <p className="font-semibold text-lg">
                         ⏰ {t}
                       </p>
 
                       {status === "missed" && (
-                        <p className="text-red-400 text-xs font-semibold">
+                        <p className="text-red-500 text-xs font-semibold">
                           🔴 Missed Dose
                         </p>
                       )}
                       {status === "upcoming" && (
-                        <p className="text-amber-400 text-xs">
+                        <p className="text-amber-500 text-xs">
                           ⏳ Upcoming
                         </p>
                       )}
                       {status === "taken" && (
-                        <p className="text-emerald-400 text-xs font-semibold">
+                        <p className="text-emerald-500 text-xs font-semibold">
                           ✅ Taken Today
                         </p>
                       )}
 
-                      <p className="text-xs text-slate-400">
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
                         Next dose in {countdowns[key] || "Calculating..."}
                       </p>
                     </div>
 
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 flex-wrap">
                       {editingTimeKey === key ? (
                         <>
                           <input
@@ -394,7 +430,7 @@ export default function ReminderPage() {
                             onChange={(e) =>
                               setEditTimeValue(e.target.value)
                             }
-                            className="border border-white/10 bg-black/30 p-2 rounded-lg text-white"
+                            className="border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-2 rounded-lg"
                           />
                           <button
                             onClick={() =>
@@ -417,7 +453,7 @@ export default function ReminderPage() {
                             onClick={() =>
                               startEditTime(reminder.id, t)
                             }
-                            className="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-xs font-semibold hover:bg-purple-500/30 transition"
+                            className="px-3 py-1 bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-300 rounded-full text-xs font-semibold"
                           >
                             Edit Time
                           </button>
@@ -429,8 +465,8 @@ export default function ReminderPage() {
                             disabled={isTaken}
                             className={`px-5 py-2 rounded-full text-sm font-semibold transition ${
                               isTaken
-                                ? "bg-emerald-500/20 text-emerald-300 cursor-not-allowed"
-                                : "bg-emerald-500 hover:bg-emerald-600 text-white shadow"
+                                ? "bg-emerald-100 dark:bg-emerald-900/40 text-emerald-500 cursor-not-allowed"
+                                : "bg-emerald-600 hover:bg-emerald-700 text-white shadow"
                             }`}
                           >
                             {isTaken ? "Taken ✓" : "Mark as Taken"}
