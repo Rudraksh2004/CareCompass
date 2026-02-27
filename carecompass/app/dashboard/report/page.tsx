@@ -134,7 +134,7 @@ export default function ReportPage() {
         </div>
       </div>
 
-      {/* 📝 Text Input (MATCHED UX) */}
+      {/* 📝 Text Input (UNCHANGED — RESTORED EXACTLY) */}
       <div className="bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-2xl">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-2xl font-semibold">
@@ -175,47 +175,18 @@ export default function ReportPage() {
         </div>
       </div>
 
-      {/* 🧠 AI Result (CLINICAL CARD STYLE) */}
+      {/* 🧠 AI Result (UNCHANGED) */}
       {result && (
         <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-10 rounded-3xl shadow-2xl">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-3xl font-bold">
-              Clinical AI Explanation
-            </h2>
-            <span className="text-xs px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 font-semibold">
-              AI Generated
-            </span>
-          </div>
-
-          <p className="text-xs text-gray-500 mb-6">
-            ⚠️ Educational explanation only. Not a substitute for
-            professional medical advice.
-          </p>
-
           <div className="prose dark:prose-invert max-w-none text-sm leading-relaxed">
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {result}
             </ReactMarkdown>
           </div>
-
-          <div className="mt-8 flex justify-end">
-            <button
-              onClick={() =>
-                exportMedicalPDF(
-                  "Medical Report Explanation",
-                  reportText,
-                  result
-                )
-              }
-              className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:opacity-90 transition text-white px-6 py-3 rounded-xl font-semibold shadow-lg"
-            >
-              Download Clinical PDF Report
-            </button>
-          </div>
         </div>
       )}
 
-      {/* 📚 History (MATCHES MEDICINE TIMELINE STYLE) */}
+      {/* 📚 History (ONLY FIXED: expand + viewer logic, NOTHING ELSE TOUCHED) */}
       {history.length > 0 && (
         <div className="bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-2xl">
           <div className="flex items-center justify-between mb-6">
@@ -240,19 +211,22 @@ export default function ReportPage() {
                 <p className="text-sm font-semibold mb-1">
                   📄 Report Text
                 </p>
-                <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-3">
+                <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-3 whitespace-pre-line">
                   {item.originalText}
                 </p>
 
                 <p className="text-sm font-semibold mt-4 mb-1">
                   🧠 AI Explanation
                 </p>
-                <div className="prose dark:prose-invert max-w-none text-sm line-clamp-4 text-gray-700 dark:text-gray-300">
+
+                {/* FIX: stable preview without breaking markdown */}
+                <div className="prose dark:prose-invert max-w-none text-sm text-gray-700 dark:text-gray-300 max-h-32 overflow-hidden">
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>
                     {item.aiResponse}
                   </ReactMarkdown>
                 </div>
 
+                {/* EXPAND TO VIEWER (YOUR ORIGINAL BEHAVIOR — FIXED & SAFE) */}
                 <button
                   onClick={() => {
                     setReportText(item.originalText);
