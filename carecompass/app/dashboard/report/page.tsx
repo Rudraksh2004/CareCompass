@@ -17,7 +17,6 @@ export default function ReportPage() {
   const [loading, setLoading] = useState(false);
   const [fileLoading, setFileLoading] = useState(false);
   const [history, setHistory] = useState<any[]>([]);
-  const [expandedId, setExpandedId] = useState<string | null>(null); // ⭐ UI ONLY (no logic change)
 
   useEffect(() => {
     if (user) {
@@ -91,64 +90,65 @@ export default function ReportPage() {
 
   return (
     <div className="max-w-6xl mx-auto space-y-10 text-gray-900 dark:text-gray-100">
-      {/* 🌟 Premium Gradient Header */}
+      {/* 🌟 Premium Clinical Header (MATCHES MEDICINE PAGE STYLE) */}
       <div className="relative overflow-hidden rounded-3xl border border-gray-200 dark:border-gray-800 bg-gradient-to-br from-emerald-600/10 via-blue-600/10 to-purple-600/10 backdrop-blur-xl p-10 shadow-2xl">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(16,185,129,0.15),_transparent_40%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,_rgba(59,130,246,0.15),_transparent_40%)]" />
-
         <div className="relative z-10">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-emerald-500 to-blue-500 bg-clip-text text-transparent">
-            AI Medical Report Explainer
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-emerald-500 via-blue-500 to-purple-500 bg-clip-text text-transparent">
+            📄 Medical Report Explainer AI
           </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-3 max-w-2xl text-sm leading-relaxed">
-            Upload medical reports (PDF or images) or paste your report text.
-            CareCompass AI converts complex clinical data into simple,
-            structured explanations for better understanding.
+          <p className="text-gray-600 dark:text-gray-400 mt-3 text-sm max-w-2xl leading-relaxed">
+            Upload lab reports, scans, or prescriptions and get simplified,
+            structured clinical explanations powered by CareCompass AI.
           </p>
         </div>
       </div>
 
-      {/* 📤 Upload Section */}
-      <div className="bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-2xl">
-        <h2 className="text-2xl font-semibold mb-4">
-          Upload Medical Report
-        </h2>
-
-        <div className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-2xl p-8 text-center hover:border-emerald-500 transition">
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
-            Drag & drop or upload Image / PDF report
+      {/* 📤 Upload Card (GLASS + PREMIUM LIKE MEDICINE PAGE) */}
+      <div className="bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-2xl space-y-6">
+        <div>
+          <h2 className="text-2xl font-semibold">
+            Upload Medical Report
+          </h2>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            Supports images, scanned reports, and PDFs (OCR enabled)
           </p>
+        </div>
 
+        <div className="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-2xl p-8 text-center bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 hover:border-emerald-400 transition">
           <input
             type="file"
             accept="image/*,application/pdf"
             onChange={handleFileUpload}
-            className="text-sm"
+            className="text-sm cursor-pointer"
           />
+          <p className="text-xs text-gray-500 mt-2">
+            Upload report image or PDF for automatic AI text extraction
+          </p>
 
           {fileLoading && (
-            <p className="text-sm text-emerald-500 mt-4 font-medium">
-              🔍 Extracting text using OCR & AI preprocessing...
-            </p>
+            <div className="mt-4 text-sm text-emerald-600 font-medium animate-pulse">
+              🔍 Extracting report text using OCR & preprocessing...
+            </div>
           )}
         </div>
       </div>
 
-      {/* 📝 Text Input Card */}
+      {/* 📝 Text Input (MATCHED UX) */}
       <div className="bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-2xl">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-2xl font-semibold">
             Paste Report Text (Optional)
           </h2>
           <span className="text-xs text-gray-500">
-            Supports lab reports, scans, prescriptions
+            Lab reports • Prescriptions • Scans
           </span>
         </div>
 
         <textarea
           rows={8}
-          className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500 transition text-sm leading-relaxed"
-          placeholder="Paste your medical report here for AI explanation..."
+          className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500 transition text-sm leading-relaxed shadow-sm"
+          placeholder="Paste your medical report here for AI clinical explanation..."
           value={reportText}
           onChange={(e) => setReportText(e.target.value)}
         />
@@ -157,9 +157,11 @@ export default function ReportPage() {
           <button
             onClick={explainReport}
             disabled={loading}
-            className="bg-gradient-to-r from-emerald-600 to-blue-600 hover:scale-[1.02] transition text-white px-8 py-3 rounded-2xl font-semibold shadow-lg disabled:opacity-50"
+            className="bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 hover:opacity-90 transition text-white px-8 py-3 rounded-2xl font-semibold shadow-xl disabled:opacity-50 text-lg"
           >
-            {loading ? "Analyzing Report with AI..." : "Explain Report"}
+            {loading
+              ? "🧠 Analyzing Report Clinically..."
+              : "Explain Medical Report"}
           </button>
 
           {reportText && (
@@ -173,12 +175,22 @@ export default function ReportPage() {
         </div>
       </div>
 
-      {/* 🧠 AI Result */}
+      {/* 🧠 AI Result (CLINICAL CARD STYLE) */}
       {result && (
         <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-10 rounded-3xl shadow-2xl">
-          <h2 className="text-3xl font-bold mb-6">
-            AI Clinical Explanation
-          </h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-3xl font-bold">
+              Clinical AI Explanation
+            </h2>
+            <span className="text-xs px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 font-semibold">
+              AI Generated
+            </span>
+          </div>
+
+          <p className="text-xs text-gray-500 mb-6">
+            ⚠️ Educational explanation only. Not a substitute for
+            professional medical advice.
+          </p>
 
           <div className="prose dark:prose-invert max-w-none text-sm leading-relaxed">
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
@@ -203,77 +215,59 @@ export default function ReportPage() {
         </div>
       )}
 
-      {/* 📚 History (FIXED + EXPANDABLE UX) */}
+      {/* 📚 History (MATCHES MEDICINE TIMELINE STYLE) */}
       {history.length > 0 && (
         <div className="bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-2xl">
-          <h2 className="text-2xl font-semibold mb-6">
-            Previous Report Analyses
-          </h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold">
+              📚 Previous Report Analyses
+            </h2>
+            <span className="text-xs text-gray-500">
+              {history.length} records
+            </span>
+          </div>
 
           <div className="space-y-5 max-h-[500px] overflow-y-auto pr-2">
-            {history.map((item) => {
-              const isExpanded = expandedId === item.id;
+            {history.map((item) => (
+              <div
+                key={item.id}
+                className="border border-gray-200 dark:border-gray-700 rounded-2xl p-6 bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 shadow-sm hover:shadow-lg transition-all duration-300"
+              >
+                <p className="text-xs text-gray-400 mb-3">
+                  {item.createdAt?.toDate?.().toLocaleString?.() || ""}
+                </p>
 
-              return (
-                <div
-                  key={item.id}
-                  className="border border-gray-200 dark:border-gray-700 rounded-2xl p-6 bg-white dark:bg-gray-800 shadow-sm hover:shadow-xl transition"
-                >
-                  <p className="text-xs text-gray-400 mb-3">
-                    {item.createdAt?.toDate?.().toLocaleString?.() || ""}
-                  </p>
+                <p className="text-sm font-semibold mb-1">
+                  📄 Report Text
+                </p>
+                <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-3">
+                  {item.originalText}
+                </p>
 
-                  <p className="text-sm font-semibold mb-1">
-                    📄 Report Text
-                  </p>
-                  <p
-                    className={`text-sm text-gray-600 dark:text-gray-400 ${
-                      isExpanded ? "" : "line-clamp-3"
-                    }`}
-                  >
-                    {item.originalText}
-                  </p>
-
-                  <p className="text-sm font-semibold mt-4 mb-1">
-                    🧠 AI Explanation
-                  </p>
-                  <div
-                    className={`prose dark:prose-invert max-w-none text-sm ${
-                      isExpanded ? "" : "line-clamp-3"
-                    }`}
-                  >
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                      {item.aiResponse}
-                    </ReactMarkdown>
-                  </div>
-
-                  <div className="flex gap-4 mt-4">
-                    <button
-                      onClick={() =>
-                        setExpandedId(isExpanded ? null : item.id)
-                      }
-                      className="text-sm font-semibold text-emerald-600 hover:underline"
-                    >
-                      {isExpanded ? "Show Less" : "Expand Full Explanation"}
-                    </button>
-
-                    <button
-                      onClick={() => {
-                        setReportText(item.originalText);
-                        setResult(item.aiResponse);
-                        window.scrollTo({
-                          top: 0,
-                          behavior: "smooth",
-                        });
-                      }}
-                      className="text-sm font-semibold text-blue-600 hover:underline"
-                    >
-                      Load to Viewer ↑
-                    </button>
-                  </div>
+                <p className="text-sm font-semibold mt-4 mb-1">
+                  🧠 AI Explanation
+                </p>
+                <div className="prose dark:prose-invert max-w-none text-sm line-clamp-4 text-gray-700 dark:text-gray-300">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {item.aiResponse}
+                  </ReactMarkdown>
                 </div>
-              );
-            })}
+
+                <button
+                  onClick={() => {
+                    setReportText(item.originalText);
+                    setResult(item.aiResponse);
+                    window.scrollTo({
+                      top: 0,
+                      behavior: "smooth",
+                    });
+                  }}
+                  className="mt-4 text-sm font-semibold text-emerald-600 hover:text-emerald-700 hover:underline transition"
+                >
+                  View Full Clinical Explanation →
+                </button>
+              </div>
+            ))}
           </div>
         </div>
       )}
