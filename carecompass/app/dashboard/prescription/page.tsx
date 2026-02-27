@@ -8,6 +8,8 @@ import { saveHistory, getHistory } from "@/services/historyService";
 import { exportMedicalPDF } from "@/utils/pdfExporter";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { doc, deleteDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 export default function PrescriptionPage() {
   const { user } = useAuth();
@@ -17,6 +19,7 @@ export default function PrescriptionPage() {
   const [loading, setLoading] = useState(false);
   const [fileLoading, setFileLoading] = useState(false);
   const [history, setHistory] = useState<any[]>([]);
+  const [expandedId, setExpandedId] = useState<string | null>(null); // 🔥 NEW (history expand only)
 
   useEffect(() => {
     if (user) {
@@ -94,6 +97,25 @@ export default function PrescriptionPage() {
     setLoading(false);
   };
 
+  // 🔥 NEW: Delete single prescription history (ONLY history logic)
+  const handleDelete = async (id: string) => {
+    if (!user) return;
+
+    try {
+      await deleteDoc(
+        doc(db, "users", user.uid, "prescriptions", id)
+      );
+
+      const updated = await getHistory(
+        user.uid,
+        "prescriptions"
+      );
+      setHistory(updated);
+    } catch (error) {
+      console.error("Delete failed:", error);
+    }
+  };
+
   return (
     <div className="max-w-4xl mx-auto space-y-8 text-gray-900 dark:text-gray-100">
       <h1 className="text-3xl font-bold">
@@ -163,7 +185,7 @@ export default function PrescriptionPage() {
         </div>
       )}
 
-      {/* History */}
+      {/* 🔥 UPDATED History (MATCHES REPORT PAGE BEHAVIOUR ONLY) */}
       {history.length > 0 && (
         <div>
           <h2 className="text-xl font-semibold mb-4">
@@ -171,30 +193,85 @@ export default function PrescriptionPage() {
           </h2>
 
           <div className="space-y-4">
-            {history.map((item) => (
-              <div
-                key={item.id}
-                className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 rounded-xl shadow-sm transition-colors"
-              >
-                <p className="text-xs text-gray-400 mb-2">
-                  {item.createdAt?.toDate?.().toLocaleString?.() || ""}
-                </p>
+            {history.map((item) => {
+              const isExpanded = expandedId === item.id;
 
-                <p className="text-sm font-semibold mb-1">
-                  Prescription:
-                </p>
-                <p className="text-sm text-gray-600 dark:text-gray-300 mb-3 line-clamp-3">
-                  {item.originalText}
-                </p>
+              return (
+                <div
+                  key={item.id}
+                  className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-5 rounded-xl shadow-sm transition-colors"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-xs text-gray-400">
+                      {item.createdAt?.toDate?.().toLocaleString?.() || ""}
+                    </p>
 
-                <p className="text-sm font-semibold mb-1">
-                  AI Simplified:
-                </p>
-                <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-3">
-                  {item.aiResponse}
-                </p>
-              </div>
-            ))}
+                    <button
+                      onClick={() => handleDelete(item.id)}
+                      className="text-xs text-red-500 hover:text-red-600 font-medium"
+                    >
+                      Delete
+                    </button>
+                  </div>
+
+                  <p className="text-sm font-semibold mb-1">
+                    Prescription:
+                  </p>
+                  <p
+                    className={`text-sm text-gray-600 dark:text-gray-300 mb-3 ${
+                      isExpanded ? "" : "line-clamp-3"
+                    }`}
+                  >
+                    {item.originalText}
+                  </p>
+
+                  <p className="text-sm font-semibold mb-1">
+                    AI Simplified:
+                  </p>
+
+                  <div
+                    className={`prose dark:prose-invert max-w-none text-sm text-gray-600 dark:text-gray-300 ${
+                      isExpanded ? "" : "line-clamp-4"
+                    }`}
+                  >
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                      {item.aiResponse}
+                    </ReactMarkdown>
+                  </div>
+
+                  <div className="flex gap-4 mt-4">
+                    {/* Expand Full */}
+                    <button
+                      onClick={() =>
+                        setExpandedId(
+                          isExpanded ? null : item.id
+                        )
+                      }
+                      className="text-sm font-semibold text-indigo-600 hover:underline"
+                    >
+                      {isExpanded
+                        ? "Collapse"
+                        : "Expand Full"}
+                    </button>
+
+                    {/* Load to Viewer (like reports page) */}
+                    <button
+                      onClick={() => {
+                        setPrescriptionText(item.originalText);
+                        setResult(item.aiResponse);
+                        window.scrollTo({
+                          top: 0,
+                          behavior: "smooth",
+                        });
+                      }}
+                      className="text-sm font-semibold text-emerald-600 hover:underline"
+                    >
+                      Load to Viewer →
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
