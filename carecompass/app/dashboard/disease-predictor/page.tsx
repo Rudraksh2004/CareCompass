@@ -158,10 +158,10 @@ export default function DiseasePredictorPage() {
 
   return (
     <div className="max-w-5xl mx-auto space-y-8 text-gray-900 dark:text-gray-100">
-      {/* 🌟 Header (UNCHANGED) */}
+      {/* 🌟 Header (ONLY CHANGE: ICON ADDED, NOTHING ELSE) */}
       <div className="relative overflow-hidden rounded-3xl border border-gray-200 dark:border-gray-800 bg-gradient-to-r from-indigo-600/10 via-purple-600/10 to-emerald-600/10 backdrop-blur-xl p-8 shadow-xl">
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-          AI Disease Risk Predictor
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent flex items-center gap-3">
+          🧬 AI Disease Risk Predictor
         </h1>
         <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 max-w-2xl">
           Hybrid AI + rule-based non-diagnostic disease risk analysis
@@ -318,7 +318,7 @@ export default function DiseasePredictorPage() {
         </button>
       </div>
 
-      {/* 📊 Result Card (UNCHANGED) */}
+      {/* 📊 Result Card (ALREADY COLOR-CODED — LEFT UNTOUCHED) */}
       {result && (
         <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-xl">
           <div className="flex items-center justify-between mb-4">
@@ -351,7 +351,7 @@ export default function DiseasePredictorPage() {
         </div>
       )}
 
-      {/* 🔥 HISTORY SECTION (ONLY PART UPDATED AS REQUESTED) */}
+      {/* 🔥 HISTORY SECTION (ONLY CHANGE: RISK COLOR BADGE) */}
       {history.length > 0 && (
         <div className="bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-2xl">
           <h2 className="text-2xl font-semibold mb-6">
@@ -369,7 +369,17 @@ export default function DiseasePredictorPage() {
                     Symptoms:{" "}
                     {item.symptoms?.join(", ") || "Custom"}
                   </p>
-                  <span className="text-xs px-3 py-1 rounded-full bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300">
+
+                  {/* ONLY CHANGE: COLOR-CODED RISK BADGE */}
+                  <span
+                    className={`text-xs px-3 py-1 rounded-full font-semibold ${
+                      item.severity === "High"
+                        ? "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300"
+                        : item.severity === "Moderate"
+                        ? "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300"
+                        : "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300"
+                    }`}
+                  >
                     {item.severity} Risk
                   </span>
                 </div>
@@ -384,7 +394,7 @@ export default function DiseasePredictorPage() {
                   {item.prediction}
                 </p>
 
-                {/* NEW ACTIONS (EXPAND + VIEW + DELETE) */}
+                {/* NEW ACTIONS (UNCHANGED) */}
                 <div className="flex flex-wrap gap-4 mt-3">
                   <button
                     onClick={() => {
@@ -431,7 +441,7 @@ export default function DiseasePredictorPage() {
         </div>
       )}
 
-      {/* 🔥 MODAL VIEWER (NEW — NON-BREAKING) */}
+      {/* 🔥 MODAL VIEWER (UNCHANGED) */}
       {expandedPrediction && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6">
           <div className="bg-white dark:bg-gray-900 max-w-3xl w-full max-h-[85vh] overflow-y-auto rounded-3xl shadow-2xl border border-gray-200 dark:border-gray-800 p-8 relative">
