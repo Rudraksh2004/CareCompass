@@ -61,9 +61,9 @@ export default function DiseasePredictorPage() {
 
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState("");
-  const [severity, setSeverity] = useState<
-    "Low" | "Moderate" | "High" | ""
-  >("");
+  const [severity, setSeverity] = useState<"Low" | "Moderate" | "High" | "">(
+    "",
+  );
 
   // 🆕 History State (UNCHANGED)
   const [history, setHistory] = useState<DiseaseHistory[]>([]);
@@ -82,7 +82,7 @@ export default function DiseasePredictorPage() {
     setSelectedSymptoms((prev) =>
       prev.includes(symptom)
         ? prev.filter((s) => s !== symptom)
-        : [...prev, symptom]
+        : [...prev, symptom],
     );
   };
 
@@ -107,9 +107,7 @@ export default function DiseasePredictorPage() {
           qa: {
             allergies: allergy ? true : false,
             surgeries: pastSurgery ? true : false,
-            chronicConditions: chronicIllness
-              ? [chronicIllness]
-              : [],
+            chronicConditions: chronicIllness ? [chronicIllness] : [],
             duration: null,
             medications: null,
           },
@@ -118,8 +116,7 @@ export default function DiseasePredictorPage() {
 
       const data = await res.json();
 
-      const predictionText =
-        data?.prediction || "No analysis generated.";
+      const predictionText = data?.prediction || "No analysis generated.";
       const severityLevel = data?.severity || "Low";
 
       setResult(predictionText);
@@ -132,9 +129,7 @@ export default function DiseasePredictorPage() {
         qa: {
           allergies: allergy ? true : false,
           surgeries: pastSurgery ? true : false,
-          chronicConditions: chronicIllness
-            ? [chronicIllness]
-            : [],
+          chronicConditions: chronicIllness ? [chronicIllness] : [],
         },
         severity: severityLevel,
         prediction: predictionText,
@@ -161,8 +156,8 @@ export default function DiseasePredictorPage() {
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-3 text-sm max-w-2xl leading-relaxed">
             Hybrid AI + rule-based non-diagnostic risk analysis based on
-            symptoms, location, and optional health context for smarter
-            health awareness.
+            symptoms, location, and optional health context for smarter health
+            awareness.
           </p>
         </div>
       </div>
@@ -180,13 +175,10 @@ export default function DiseasePredictorPage() {
 
         {/* Symptom Chips */}
         <div>
-          <p className="text-sm font-medium mb-3">
-            Select Symptoms
-          </p>
+          <p className="text-sm font-medium mb-3">Select Symptoms</p>
           <div className="flex flex-wrap gap-3">
             {SYMPTOM_CHIPS.map((symptom) => {
-              const active =
-                selectedSymptoms.includes(symptom);
+              const active = selectedSymptoms.includes(symptom);
               return (
                 <button
                   key={symptom}
@@ -206,15 +198,11 @@ export default function DiseasePredictorPage() {
 
         {/* Custom Symptoms */}
         <div className="space-y-2">
-          <p className="text-sm font-medium">
-            Additional Symptoms (Optional)
-          </p>
+          <p className="text-sm font-medium">Additional Symptoms (Optional)</p>
           <textarea
             rows={3}
             value={customSymptoms}
-            onChange={(e) =>
-              setCustomSymptoms(e.target.value)
-            }
+            onChange={(e) => setCustomSymptoms(e.target.value)}
             placeholder="e.g., chills, loss of smell, mild fever..."
             className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition shadow-sm"
           />
@@ -222,33 +210,22 @@ export default function DiseasePredictorPage() {
 
         {/* Location */}
         <div className="space-y-2">
-          <p className="text-sm font-medium">
-            Your Location (India)
-          </p>
+          <p className="text-sm font-medium">Your Location (India)</p>
 
           {!useManualLocation ? (
             <>
               <select
                 value={location}
-                onChange={(e) =>
-                  setLocation(e.target.value)
-                }
+                onChange={(e) => setLocation(e.target.value)}
                 className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm focus:ring-2 focus:ring-indigo-500"
               >
-                <option value="">
-                  Select your city (optional)
-                </option>
+                <option value="">Select your city (optional)</option>
                 {INDIAN_CITIES.map((city) => (
-                  <option
-                    key={city}
-                    value={`${city}, India`}
-                  >
+                  <option key={city} value={`${city}, India`}>
                     {city}
                   </option>
                 ))}
-                <option value="manual">
-                  Other (Type manually)
-                </option>
+                <option value="manual">Other (Type manually)</option>
               </select>
 
               {location === "manual" && (
@@ -267,9 +244,7 @@ export default function DiseasePredictorPage() {
           ) : (
             <input
               value={location}
-              onChange={(e) =>
-                setLocation(e.target.value)
-              }
+              onChange={(e) => setLocation(e.target.value)}
               placeholder="e.g., Siliguri, India"
               className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm focus:ring-2 focus:ring-indigo-500"
             />
@@ -284,27 +259,21 @@ export default function DiseasePredictorPage() {
 
           <input
             value={allergy}
-            onChange={(e) =>
-              setAllergy(e.target.value)
-            }
+            onChange={(e) => setAllergy(e.target.value)}
             placeholder="Any allergies? (optional)"
             className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 rounded-xl"
           />
 
           <input
             value={pastSurgery}
-            onChange={(e) =>
-              setPastSurgery(e.target.value)
-            }
+            onChange={(e) => setPastSurgery(e.target.value)}
             placeholder="Any past surgeries? (optional)"
             className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 rounded-xl"
           />
 
           <input
             value={chronicIllness}
-            onChange={(e) =>
-              setChronicIllness(e.target.value)
-            }
+            onChange={(e) => setChronicIllness(e.target.value)}
             placeholder="Any chronic illness (diabetes, asthma, etc.) (optional)"
             className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 rounded-xl"
           />
@@ -325,9 +294,7 @@ export default function DiseasePredictorPage() {
       {result && (
         <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-10 rounded-3xl shadow-2xl">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-3xl font-bold">
-              AI Health Risk Analysis
-            </h2>
+            <h2 className="text-3xl font-bold">AI Health Risk Analysis</h2>
 
             {severity && (
               <span
@@ -335,8 +302,8 @@ export default function DiseasePredictorPage() {
                   severity === "High"
                     ? "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300"
                     : severity === "Moderate"
-                    ? "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300"
-                    : "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300"
+                      ? "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300"
+                      : "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300"
                 }`}
               >
                 Severity: {severity}
@@ -355,11 +322,17 @@ export default function DiseasePredictorPage() {
       )}
 
       {/* 📜 History Panel (UI POLISH ONLY) */}
+      {/* 📜 Prediction History Panel (ENHANCED — LOAD TO VIEWER LIKE REPORTS) */}
       {history.length > 0 && (
         <div className="bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-2xl">
-          <h2 className="text-2xl font-semibold mb-6">
-            🧾 Disease Prediction History
-          </h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-semibold">
+              🧾 Disease Prediction History
+            </h2>
+            <span className="text-xs text-gray-500">
+              {history.length} records
+            </span>
+          </div>
 
           <div className="space-y-4 max-h-[450px] overflow-y-auto pr-2">
             {history.map((item) => (
@@ -367,26 +340,61 @@ export default function DiseasePredictorPage() {
                 key={item.id}
                 className="border border-gray-200 dark:border-gray-700 rounded-2xl p-5 bg-white dark:bg-gray-800 shadow-sm hover:shadow-lg transition"
               >
-                <div className="flex justify-between items-start mb-2">
+                {/* Top Row */}
+                <div className="flex justify-between items-start mb-3">
                   <p className="font-semibold text-sm">
                     Symptoms:{" "}
-                    {item.symptoms.join(", ") ||
-                      "Custom Input"}
+                    {item.symptoms?.length
+                      ? item.symptoms.join(", ")
+                      : "Custom Input"}
                   </p>
-                  <span className="text-xs px-3 py-1 rounded-full bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 font-semibold">
+
+                  <span
+                    className={`text-xs px-3 py-1 rounded-full font-semibold ${
+                      item.severity === "High"
+                        ? "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300"
+                        : item.severity === "Moderate"
+                          ? "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300"
+                          : "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300"
+                    }`}
+                  >
                     {item.severity} Risk
                   </span>
                 </div>
 
+                {/* Location */}
                 {item.location && (
                   <p className="text-xs text-gray-500 mb-2">
                     📍 {item.location}
                   </p>
                 )}
 
+                {/* Custom Symptoms (if any) */}
+                {item.customText && (
+                  <p className="text-xs text-gray-500 mb-2">
+                    🧠 Extra: {item.customText}
+                  </p>
+                )}
+
+                {/* Prediction Preview */}
                 <p className="text-sm text-gray-700 dark:text-gray-300 line-clamp-3 whitespace-pre-line">
                   {item.prediction}
                 </p>
+
+                {/* 🔥 LOAD TO MAIN VIEWER (LIKE REPORT PAGE) */}
+                <button
+                  onClick={() => {
+                    setResult(item.prediction);
+                    setSeverity(item.severity || "");
+                    window.scrollTo({
+                      top: 0,
+                      behavior: "smooth",
+                    });
+                  }}
+                  className="mt-4 text-sm font-semibold text-indigo-600 hover:text-indigo-700 hover:underline transition"
+                >
+                  View Full Analysis →
+                </button>
               </div>
             ))}
           </div>
