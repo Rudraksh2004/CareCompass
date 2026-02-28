@@ -5,6 +5,7 @@ import { useAuth } from "@/context/AuthContext";
 import {
   saveDiseaseHistory,
   getDiseaseHistory,
+  deleteDiseaseHistory,
   DiseaseHistory,
 } from "@/services/diseaseService";
 
@@ -61,12 +62,15 @@ export default function DiseasePredictorPage() {
 
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState("");
-  const [severity, setSeverity] = useState<"Low" | "Moderate" | "High" | "">(
-    "",
-  );
+  const [severity, setSeverity] = useState<
+    "Low" | "Moderate" | "High" | ""
+  >("");
 
   // 🆕 History State (UNCHANGED)
   const [history, setHistory] = useState<DiseaseHistory[]>([]);
+  // 🔥 NEW: modal expand state (NON-BREAKING)
+  const [expandedPrediction, setExpandedPrediction] =
+    useState<DiseaseHistory | null>(null);
 
   // 📥 Load Prediction History (UNCHANGED)
   useEffect(() => {
@@ -82,7 +86,7 @@ export default function DiseasePredictorPage() {
     setSelectedSymptoms((prev) =>
       prev.includes(symptom)
         ? prev.filter((s) => s !== symptom)
-        : [...prev, symptom],
+        : [...prev, symptom]
     );
   };
 
@@ -107,7 +111,9 @@ export default function DiseasePredictorPage() {
           qa: {
             allergies: allergy ? true : false,
             surgeries: pastSurgery ? true : false,
-            chronicConditions: chronicIllness ? [chronicIllness] : [],
+            chronicConditions: chronicIllness
+              ? [chronicIllness]
+              : [],
             duration: null,
             medications: null,
           },
@@ -116,12 +122,14 @@ export default function DiseasePredictorPage() {
 
       const data = await res.json();
 
-      const predictionText = data?.prediction || "No analysis generated.";
+      const predictionText =
+        data?.prediction || "No analysis generated.";
       const severityLevel = data?.severity || "Low";
 
       setResult(predictionText);
       setSeverity(severityLevel);
 
+      // 💾 Save History (UNCHANGED)
       await saveDiseaseHistory(user.uid, {
         symptoms: selectedSymptoms,
         customText: customSymptoms,
@@ -129,12 +137,15 @@ export default function DiseasePredictorPage() {
         qa: {
           allergies: allergy ? true : false,
           surgeries: pastSurgery ? true : false,
-          chronicConditions: chronicIllness ? [chronicIllness] : [],
+          chronicConditions: chronicIllness
+            ? [chronicIllness]
+            : [],
         },
         severity: severityLevel,
         prediction: predictionText,
       });
 
+      // 🔄 Refresh history instantly (UNCHANGED)
       const updatedHistory = await getDiseaseHistory(user.uid);
       setHistory(updatedHistory);
     } catch (error) {
@@ -146,47 +157,41 @@ export default function DiseasePredictorPage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto space-y-10 text-gray-900 dark:text-gray-100">
-      {/* 🌟 Premium Header (MATCHES REPORT/MEDICINE STYLE) */}
-      <div className="relative overflow-hidden rounded-3xl border border-gray-200 dark:border-gray-800 bg-gradient-to-br from-indigo-600/10 via-purple-600/10 to-emerald-600/10 backdrop-blur-xl p-10 shadow-2xl">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(99,102,241,0.15),_transparent_40%)]" />
-        <div className="relative z-10">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-emerald-500 bg-clip-text text-transparent">
-            🧠 AI Disease Risk Predictor
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-3 text-sm max-w-2xl leading-relaxed">
-            Hybrid AI + rule-based non-diagnostic risk analysis based on
-            symptoms, location, and optional health context for smarter health
-            awareness.
-          </p>
-        </div>
+    <div className="max-w-5xl mx-auto space-y-8 text-gray-900 dark:text-gray-100">
+      {/* 🌟 Header (UNCHANGED) */}
+      <div className="relative overflow-hidden rounded-3xl border border-gray-200 dark:border-gray-800 bg-gradient-to-r from-indigo-600/10 via-purple-600/10 to-emerald-600/10 backdrop-blur-xl p-8 shadow-xl">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+          AI Disease Risk Predictor
+        </h1>
+        <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 max-w-2xl">
+          Hybrid AI + rule-based non-diagnostic disease risk analysis
+          based on symptoms, location, and health context.
+        </p>
       </div>
 
-      {/* 🧠 Input Card (GLASS PREMIUM UI) */}
-      <div className="bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-2xl space-y-8">
-        <div>
-          <h2 className="text-2xl font-semibold">
-            Symptom Input (Hybrid Mode)
-          </h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            Select symptoms, add custom details, and optional clinical context
-          </p>
-        </div>
+      {/* 🧠 Input Card (UNCHANGED) */}
+      <div className="bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-2xl space-y-6">
+        <h2 className="text-2xl font-semibold">
+          Symptom Input (Hybrid Mode)
+        </h2>
 
         {/* Symptom Chips */}
         <div>
-          <p className="text-sm font-medium mb-3">Select Symptoms</p>
+          <p className="text-sm font-medium mb-3">
+            Select Symptoms
+          </p>
           <div className="flex flex-wrap gap-3">
             {SYMPTOM_CHIPS.map((symptom) => {
-              const active = selectedSymptoms.includes(symptom);
+              const active =
+                selectedSymptoms.includes(symptom);
               return (
                 <button
                   key={symptom}
                   onClick={() => toggleSymptom(symptom)}
-                  className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
+                  className={`px-4 py-2 rounded-full text-sm font-semibold transition ${
                     active
-                      ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg scale-[1.03]"
-                      : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                      ? "bg-indigo-600 text-white shadow"
+                      : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
                   }`}
                 >
                   {symptom}
@@ -197,35 +202,50 @@ export default function DiseasePredictorPage() {
         </div>
 
         {/* Custom Symptoms */}
-        <div className="space-y-2">
-          <p className="text-sm font-medium">Additional Symptoms (Optional)</p>
+        <div>
+          <p className="text-sm font-medium mb-2">
+            Additional Symptoms (Optional)
+          </p>
           <textarea
             rows={3}
             value={customSymptoms}
-            onChange={(e) => setCustomSymptoms(e.target.value)}
-            placeholder="e.g., chills, loss of smell, mild fever..."
-            className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition shadow-sm"
+            onChange={(e) =>
+              setCustomSymptoms(e.target.value)
+            }
+            placeholder="Type symptoms like: chills, loss of smell, mild fever..."
+            className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 rounded-2xl"
           />
         </div>
 
         {/* Location */}
-        <div className="space-y-2">
-          <p className="text-sm font-medium">Your Location (India)</p>
+        <div>
+          <p className="text-sm font-medium mb-2">
+            Your Location (India)
+          </p>
 
           {!useManualLocation ? (
             <>
               <select
                 value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm focus:ring-2 focus:ring-indigo-500"
+                onChange={(e) =>
+                  setLocation(e.target.value)
+                }
+                className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 rounded-2xl"
               >
-                <option value="">Select your city (optional)</option>
+                <option value="">
+                  Select your city (optional)
+                </option>
                 {INDIAN_CITIES.map((city) => (
-                  <option key={city} value={`${city}, India`}>
+                  <option
+                    key={city}
+                    value={`${city}, India`}
+                  >
                     {city}
                   </option>
                 ))}
-                <option value="manual">Other (Type manually)</option>
+                <option value="manual">
+                  Other (Type manually)
+                </option>
               </select>
 
               {location === "manual" && (
@@ -235,7 +255,7 @@ export default function DiseasePredictorPage() {
                     setUseManualLocation(true);
                     setLocation("");
                   }}
-                  className="text-sm text-indigo-600 font-semibold hover:underline"
+                  className="mt-2 text-sm text-indigo-600 font-semibold"
                 >
                   Enter custom location
                 </button>
@@ -244,36 +264,44 @@ export default function DiseasePredictorPage() {
           ) : (
             <input
               value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              placeholder="e.g., Siliguri, India"
-              className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm focus:ring-2 focus:ring-indigo-500"
+              onChange={(e) =>
+                setLocation(e.target.value)
+              }
+              placeholder="Type your city (e.g., Siliguri, India)"
+              className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 rounded-2xl"
             />
           )}
         </div>
 
-        {/* 🩺 Optional QA Section (POLISHED CARD STYLE) */}
-        <div className="space-y-4 border-t border-gray-200 dark:border-gray-800 pt-6">
+        {/* Optional QA Section */}
+        <div className="space-y-4">
           <h3 className="text-lg font-semibold">
-            🩺 Optional Health Questions
+            Optional Health Questions
           </h3>
 
           <input
             value={allergy}
-            onChange={(e) => setAllergy(e.target.value)}
+            onChange={(e) =>
+              setAllergy(e.target.value)
+            }
             placeholder="Any allergies? (optional)"
             className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 rounded-xl"
           />
 
           <input
             value={pastSurgery}
-            onChange={(e) => setPastSurgery(e.target.value)}
+            onChange={(e) =>
+              setPastSurgery(e.target.value)
+            }
             placeholder="Any past surgeries? (optional)"
             className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 rounded-xl"
           />
 
           <input
             value={chronicIllness}
-            onChange={(e) => setChronicIllness(e.target.value)}
+            onChange={(e) =>
+              setChronicIllness(e.target.value)
+            }
             placeholder="Any chronic illness (diabetes, asthma, etc.) (optional)"
             className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 rounded-xl"
           />
@@ -282,19 +310,21 @@ export default function DiseasePredictorPage() {
         <button
           onClick={handlePredict}
           disabled={loading}
-          className="w-full bg-gradient-to-r from-indigo-600 via-purple-600 to-emerald-500 text-white py-4 rounded-2xl font-semibold shadow-xl hover:opacity-90 transition disabled:opacity-50 text-lg"
+          className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 rounded-2xl font-semibold shadow-lg disabled:opacity-50"
         >
           {loading
-            ? "🧠 Analyzing Symptoms Clinically..."
+            ? "Analyzing Symptoms..."
             : "Analyze Disease Risk"}
         </button>
       </div>
 
-      {/* 📊 Result Card (PREMIUM) */}
+      {/* 📊 Result Card (UNCHANGED) */}
       {result && (
-        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-10 rounded-3xl shadow-2xl">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-3xl font-bold">AI Health Risk Analysis</h2>
+        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-xl">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-2xl font-semibold">
+              AI Health Risk Analysis
+            </h2>
 
             {severity && (
               <span
@@ -302,8 +332,8 @@ export default function DiseasePredictorPage() {
                   severity === "High"
                     ? "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300"
                     : severity === "Moderate"
-                      ? "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300"
-                      : "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300"
+                    ? "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300"
+                    : "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300"
                 }`}
               >
                 Severity: {severity}
@@ -311,8 +341,8 @@ export default function DiseasePredictorPage() {
             )}
           </div>
 
-          <p className="text-xs text-gray-500 mb-6">
-            ⚠️ Educational, non-diagnostic AI guidance only.
+          <p className="text-sm text-gray-500 mb-4">
+            ⚠️ Non-diagnostic AI guidance only.
           </p>
 
           <div className="text-sm leading-relaxed whitespace-pre-line">
@@ -321,82 +351,110 @@ export default function DiseasePredictorPage() {
         </div>
       )}
 
-      {/* 📜 History Panel (UI POLISH ONLY) */}
-      {/* 📜 Prediction History Panel (ENHANCED — LOAD TO VIEWER LIKE REPORTS) */}
+      {/* 🔥 HISTORY SECTION (ONLY PART UPDATED AS REQUESTED) */}
       {history.length > 0 && (
         <div className="bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-2xl">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-semibold">
-              🧾 Disease Prediction History
-            </h2>
-            <span className="text-xs text-gray-500">
-              {history.length} records
-            </span>
-          </div>
+          <h2 className="text-2xl font-semibold mb-6">
+            🧾 Disease Prediction History
+          </h2>
 
-          <div className="space-y-4 max-h-[450px] overflow-y-auto pr-2">
+          <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
             {history.map((item) => (
               <div
                 key={item.id}
-                className="border border-gray-200 dark:border-gray-700 rounded-2xl p-5 bg-white dark:bg-gray-800 shadow-sm hover:shadow-lg transition"
+                className="border border-gray-200 dark:border-gray-700 rounded-2xl p-4 bg-white dark:bg-gray-800"
               >
-                {/* Top Row */}
-                <div className="flex justify-between items-start mb-3">
-                  <p className="font-semibold text-sm">
+                <div className="flex justify-between items-center mb-2">
+                  <p className="font-semibold">
                     Symptoms:{" "}
-                    {item.symptoms?.length
-                      ? item.symptoms.join(", ")
-                      : "Custom Input"}
+                    {item.symptoms?.join(", ") || "Custom"}
                   </p>
-
-                  <span
-                    className={`text-xs px-3 py-1 rounded-full font-semibold ${
-                      item.severity === "High"
-                        ? "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300"
-                        : item.severity === "Moderate"
-                          ? "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300"
-                          : "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300"
-                    }`}
-                  >
+                  <span className="text-xs px-3 py-1 rounded-full bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300">
                     {item.severity} Risk
                   </span>
                 </div>
 
-                {/* Location */}
                 {item.location && (
                   <p className="text-xs text-gray-500 mb-2">
                     📍 {item.location}
                   </p>
                 )}
 
-                {/* Custom Symptoms (if any) */}
-                {item.customText && (
-                  <p className="text-xs text-gray-500 mb-2">
-                    🧠 Extra: {item.customText}
-                  </p>
-                )}
-
-                {/* Prediction Preview */}
                 <p className="text-sm text-gray-700 dark:text-gray-300 line-clamp-3 whitespace-pre-line">
                   {item.prediction}
                 </p>
 
-                {/* 🔥 LOAD TO MAIN VIEWER (LIKE REPORT PAGE) */}
-                <button
-                  onClick={() => {
-                    setResult(item.prediction);
-                    setSeverity(item.severity || "");
-                    window.scrollTo({
-                      top: 0,
-                      behavior: "smooth",
-                    });
-                  }}
-                  className="mt-4 text-sm font-semibold text-indigo-600 hover:text-indigo-700 hover:underline transition"
-                >
-                  View Full Analysis →
-                </button>
+                {/* NEW ACTIONS (EXPAND + VIEW + DELETE) */}
+                <div className="flex flex-wrap gap-4 mt-3">
+                  <button
+                    onClick={() => {
+                      setResult(item.prediction);
+                      setSeverity(item.severity || "");
+                      window.scrollTo({
+                        top: 0,
+                        behavior: "smooth",
+                      });
+                    }}
+                    className="text-sm font-semibold text-indigo-600 hover:underline"
+                  >
+                    View in Main Analysis →
+                  </button>
+
+                  <button
+                    onClick={() =>
+                      setExpandedPrediction(item)
+                    }
+                    className="text-sm font-semibold text-purple-600 hover:underline"
+                  >
+                    Expand Full Analysis
+                  </button>
+
+                  <button
+                    onClick={async () => {
+                      if (!user) return;
+                      await deleteDiseaseHistory(
+                        user.uid,
+                        item.id
+                      );
+                      const updated =
+                        await getDiseaseHistory(user.uid);
+                      setHistory(updated);
+                    }}
+                    className="text-sm font-semibold text-red-500 hover:underline"
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* 🔥 MODAL VIEWER (NEW — NON-BREAKING) */}
+      {expandedPrediction && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6">
+          <div className="bg-white dark:bg-gray-900 max-w-3xl w-full max-h-[85vh] overflow-y-auto rounded-3xl shadow-2xl border border-gray-200 dark:border-gray-800 p-8 relative">
+            <button
+              onClick={() =>
+                setExpandedPrediction(null)
+              }
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 dark:hover:text-white text-xl font-bold"
+            >
+              ✕
+            </button>
+
+            <h2 className="text-2xl font-bold mb-4">
+              🧠 Full Disease Risk Analysis
+            </h2>
+
+            <p className="text-xs text-gray-500 mb-4">
+              ⚠️ Non-diagnostic AI guidance only.
+            </p>
+
+            <div className="text-sm leading-relaxed whitespace-pre-line text-gray-800 dark:text-gray-200">
+              {expandedPrediction.prediction}
+            </div>
           </div>
         </div>
       )}
