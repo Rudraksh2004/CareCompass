@@ -67,39 +67,60 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="text-gray-500 dark:text-gray-400">
+      <div className="max-w-4xl mx-auto text-gray-500 dark:text-gray-400 p-6">
         Loading profile...
       </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 text-gray-900 dark:text-gray-100">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-indigo-600 to-blue-600 text-white p-6 rounded-2xl shadow-sm">
-        <h1 className="text-3xl font-bold">
-          Your Profile
-        </h1>
-        <p className="text-indigo-100 text-sm mt-1">
-          Update your personal health information for better AI insights.
-        </p>
+    <div className="max-w-5xl mx-auto space-y-10 text-gray-900 dark:text-gray-100">
+      {/* 🌟 Premium Clinical Header (UI ONLY) */}
+      <div className="relative overflow-hidden rounded-3xl border border-gray-200 dark:border-gray-800 bg-gradient-to-br from-indigo-600/10 via-blue-600/10 to-emerald-600/10 backdrop-blur-xl p-10 shadow-2xl">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(99,102,241,0.15),_transparent_40%)]" />
+        <div className="relative z-10">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-600 via-blue-600 to-emerald-500 bg-clip-text text-transparent">
+            👤 Your Health Profile
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-3 text-sm max-w-2xl leading-relaxed">
+            Manage your personal health details to help CareCompass AI generate
+            more accurate and contextual health insights tailored specifically
+            to you.
+          </p>
+
+          {/* User Identity Badge */}
+          <div className="mt-5 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/60 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 text-xs font-medium text-gray-700 dark:text-gray-300 backdrop-blur">
+            ✨ Logged in as {user?.email}
+          </div>
+        </div>
       </div>
 
-      {/* Editable Profile Card */}
-      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-6 rounded-2xl shadow-sm transition-colors">
-        <h2 className="text-xl font-semibold mb-6">
-          Personal Information
-        </h2>
+      {/* 🧠 Editable Profile Card (Glass + Premium UX) */}
+      <div className="bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-2xl transition">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h2 className="text-2xl font-semibold">
+              Personal Information
+            </h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              Used to personalize AI health analysis and summaries
+            </p>
+          </div>
+
+          <span className="text-xs px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 font-semibold">
+            Secure & Private
+          </span>
+        </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           {/* Full Name */}
-          <div>
-            <label className="block text-sm text-gray-500 dark:text-gray-400 mb-2">
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-600 dark:text-gray-300">
               Full Name *
             </label>
             <input
               type="text"
-              className="w-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 p-3 rounded-xl text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 rounded-2xl text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition shadow-sm"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Enter your full name"
@@ -107,27 +128,27 @@ export default function ProfilePage() {
           </div>
 
           {/* Email (Read Only) */}
-          <div>
-            <label className="block text-sm text-gray-500 dark:text-gray-400 mb-2">
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-600 dark:text-gray-300">
               Email (Read Only)
             </label>
             <input
               type="text"
               disabled
               value={user?.email || ""}
-              className="w-full border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 p-3 rounded-xl text-gray-500 dark:text-gray-400 cursor-not-allowed"
+              className="w-full border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 p-4 rounded-2xl text-gray-500 dark:text-gray-400 cursor-not-allowed shadow-sm"
             />
           </div>
 
           {/* Age */}
-          <div>
-            <label className="block text-sm text-gray-500 dark:text-gray-400 mb-2">
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-600 dark:text-gray-300">
               Age *
             </label>
             <input
               type="number"
               min="1"
-              className="w-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 p-3 rounded-xl text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 rounded-2xl text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition shadow-sm"
               value={age}
               onChange={(e) => setAge(e.target.value)}
               placeholder="Enter your age"
@@ -135,12 +156,12 @@ export default function ProfilePage() {
           </div>
 
           {/* Blood Group */}
-          <div>
-            <label className="block text-sm text-gray-500 dark:text-gray-400 mb-2">
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-600 dark:text-gray-300">
               Blood Group *
             </label>
             <select
-              className="w-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 p-3 rounded-xl text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 rounded-2xl text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition shadow-sm"
               value={bloodGroup}
               onChange={(e) => setBloodGroup(e.target.value)}
             >
@@ -158,39 +179,40 @@ export default function ProfilePage() {
         </div>
 
         {/* Save Button */}
-        <div className="mt-8 flex justify-end">
+        <div className="mt-10 flex justify-end">
           <button
             onClick={handleSave}
             disabled={saving}
-            className="bg-blue-600 hover:bg-blue-700 transition text-white px-6 py-3 rounded-xl font-medium shadow-sm disabled:opacity-50"
+            className="bg-gradient-to-r from-indigo-600 via-blue-600 to-emerald-600 hover:opacity-90 transition text-white px-8 py-3 rounded-2xl font-semibold shadow-xl disabled:opacity-50"
           >
-            {saving ? "Saving Changes..." : "Save Changes"}
+            {saving ? "Saving Changes..." : "Save Profile Changes"}
           </button>
         </div>
       </div>
 
-      {/* AI Health Summary Info Card */}
-      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-6 rounded-2xl shadow-sm transition-colors">
-        <h2 className="text-xl font-semibold mb-4">
-          AI Health Summary
+      {/* 📊 AI Health Summary Card (Polished UI Only) */}
+      <div className="bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-2xl transition">
+        <h2 className="text-2xl font-semibold mb-4">
+          🧠 AI Health Summary
         </h2>
 
         <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
-          CareCompass generates a personalized AI health summary using
-          your profile details, health logs, medical reports, and
-          prescription history. This helps the AI provide more relevant
-          and contextual (non-diagnostic) health insights tailored to you.
+          CareCompass generates a personalized AI health summary using your
+          profile details, health logs, medical reports, and prescription
+          history. This enables the AI to provide more relevant, contextual,
+          and student-friendly (non-diagnostic) health insights tailored to
+          your profile.
         </p>
 
-        <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-xl text-sm text-gray-700 dark:text-gray-200">
-          💡 Tip: Go to the Dashboard and click "Generate Summary" to
-          analyze your complete health data with AI.
+        <div className="mt-5 p-5 bg-gradient-to-r from-indigo-50 to-emerald-50 dark:from-indigo-900/20 dark:to-emerald-900/20 border border-indigo-100 dark:border-indigo-800 rounded-2xl text-sm text-gray-700 dark:text-gray-200">
+          💡 Tip: Go to the Dashboard and click "Generate Summary" to analyze
+          your complete health data with CareCompass AI.
         </div>
 
-        <p className="text-xs text-gray-400 dark:text-gray-500 mt-4">
+        <p className="text-xs text-gray-400 dark:text-gray-500 mt-6 leading-relaxed">
           Disclaimer: CareCompass is an AI health companion designed for
-          informational purposes only and does not provide medical
-          diagnosis or treatment advice.
+          informational and educational purposes only. It does not provide
+          medical diagnosis, treatment, or professional medical advice.
         </p>
       </div>
     </div>
