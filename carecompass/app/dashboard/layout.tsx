@@ -5,6 +5,7 @@ import { useAuth } from "@/context/AuthContext";
 import { logout } from "@/services/authService";
 import { useRouter, usePathname } from "next/navigation";
 import { useTheme } from "@/context/ThemeContext";
+import { useState } from "react"; // ⭐ NEW (safe)
 import {
   Home,
   FileText,
@@ -15,6 +16,8 @@ import {
   Brain,
   Bot,
   User,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 
 export default function DashboardLayout({
@@ -25,14 +28,16 @@ export default function DashboardLayout({
   const { user } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
-  const { theme, toggleTheme } = useTheme(); // NO LOGIC CHANGE
+  const { theme, toggleTheme } = useTheme();
+
+  // ⭐ ONLY NEW STATE (NON-BREAKING)
+  const [collapsed, setCollapsed] = useState(false);
 
   const handleLogout = async () => {
     await logout();
     router.push("/auth/login");
   };
 
-  // 🔥 PREMIUM ACTIVE LINK STYLING (UI ONLY)
   const linkClasses = (path: string) => {
     const isActive = pathname === path;
 
@@ -54,139 +59,133 @@ export default function DashboardLayout({
 
   return (
     <div className="min-h-screen flex bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-[#020617] dark:via-[#020617] dark:to-[#020617]">
-      {/* 🌟 PREMIUM SIDEBAR */}
-      <aside className="w-72 p-6 border-r border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-[#020617]/80 backdrop-blur-xl shadow-xl flex flex-col">
+      {/* 🌟 COLLAPSIBLE PREMIUM SIDEBAR (ONLY UI CHANGE) */}
+      <aside
+        className={`${
+          collapsed ? "w-20" : "w-72"
+        } p-6 border-r border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-[#020617]/80 backdrop-blur-xl shadow-xl flex flex-col transition-all duration-300`}
+      >
+        {/* Toggle Button (NEW) */}
+        <button
+          onClick={() => setCollapsed(!collapsed)}
+          className="mb-6 flex items-center justify-center w-full py-2 rounded-xl bg-gray-100 dark:bg-gray-800 hover:scale-[1.02] transition"
+        >
+          {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+        </button>
+
         {/* Brand */}
         <div className="mb-10">
           <h1 className="text-2xl font-extrabold bg-gradient-to-r from-blue-600 to-emerald-500 bg-clip-text text-transparent">
-            CareCompass
+            {collapsed ? "CC" : "CareCompass"}
           </h1>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-            AI Health Companion
-          </p>
+          {!collapsed && (
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              AI Health Companion
+            </p>
+          )}
         </div>
 
         {/* Navigation */}
         <nav className="flex flex-col gap-2">
-          <Link href="/dashboard" className={linkClasses("/dashboard")}>
-            {pathname === "/dashboard" && (
-              <span className="absolute left-0 top-2 bottom-2 w-1 rounded-full bg-gradient-to-b from-blue-500 to-emerald-400 shadow-lg" />
-            )}
-            <Home className={iconClasses("/dashboard")} />
-            <span className="font-medium">Dashboard</span>
-          </Link>
-
-          <Link
+          <NavItem
+            href="/dashboard"
+            icon={<Home className={iconClasses("/dashboard")} />}
+            label="Dashboard"
+            collapsed={collapsed}
+            pathname={pathname}
+          />
+          <NavItem
             href="/dashboard/report"
-            className={linkClasses("/dashboard/report")}
-          >
-            {pathname === "/dashboard/report" && (
-              <span className="absolute left-0 top-2 bottom-2 w-1 rounded-full bg-gradient-to-b from-blue-500 to-emerald-400 shadow-lg" />
-            )}
-            <FileText className={iconClasses("/dashboard/report")} />
-            <span className="font-medium">Report Explainer</span>
-          </Link>
-
-          <Link
+            icon={<FileText className={iconClasses("/dashboard/report")} />}
+            label="Report Explainer"
+            collapsed={collapsed}
+            pathname={pathname}
+          />
+          <NavItem
             href="/dashboard/prescription"
-            className={linkClasses("/dashboard/prescription")}
-          >
-            {pathname === "/dashboard/prescription" && (
-              <span className="absolute left-0 top-2 bottom-2 w-1 rounded-full bg-gradient-to-b from-blue-500 to-emerald-400 shadow-lg" />
-            )}
-            <Pill className={iconClasses("/dashboard/prescription")} />
-            <span className="font-medium">Simplify Prescription</span>
-          </Link>
-
-          <Link
+            icon={<Pill className={iconClasses("/dashboard/prescription")} />}
+            label="Simplify Prescription"
+            collapsed={collapsed}
+            pathname={pathname}
+          />
+          <NavItem
             href="/dashboard/health"
-            className={linkClasses("/dashboard/health")}
-          >
-            {pathname === "/dashboard/health" && (
-              <span className="absolute left-0 top-2 bottom-2 w-1 rounded-full bg-gradient-to-b from-blue-500 to-emerald-400 shadow-lg" />
-            )}
-            <LineChart className={iconClasses("/dashboard/health")} />
-            <span className="font-medium">Health Tracking</span>
-          </Link>
-
-          <Link
+            icon={<LineChart className={iconClasses("/dashboard/health")} />}
+            label="Health Tracking"
+            collapsed={collapsed}
+            pathname={pathname}
+          />
+          <NavItem
             href="/dashboard/reminders"
-            className={linkClasses("/dashboard/reminders")}
-          >
-            {pathname === "/dashboard/reminders" && (
-              <span className="absolute left-0 top-2 bottom-2 w-1 rounded-full bg-gradient-to-b from-blue-500 to-emerald-400 shadow-lg" />
-            )}
-            <Clock className={iconClasses("/dashboard/reminders")} />
-            <span className="font-medium">Medicine Reminders</span>
-          </Link>
-
-          <Link
+            icon={<Clock className={iconClasses("/dashboard/reminders")} />}
+            label="Medicine Reminders"
+            collapsed={collapsed}
+            pathname={pathname}
+          />
+          <NavItem
             href="/dashboard/medicine"
-            className={linkClasses("/dashboard/medicine")}
-          >
-            {pathname === "/dashboard/medicine" && (
-              <span className="absolute left-0 top-2 bottom-2 w-1 rounded-full bg-gradient-to-b from-blue-500 to-emerald-400 shadow-lg" />
-            )}
-            <FlaskConical className={iconClasses("/dashboard/medicine")} />
-            <span className="font-medium">Medicine Describer</span>
-          </Link>
-
-          <Link
+            icon={
+              <FlaskConical className={iconClasses("/dashboard/medicine")} />
+            }
+            label="Medicine Describer"
+            collapsed={collapsed}
+            pathname={pathname}
+          />
+          <NavItem
             href="/dashboard/disease-predictor"
-            className={linkClasses("/dashboard/disease-predictor")}
-          >
-            {pathname === "/dashboard/disease-predictor" && (
-              <span className="absolute left-0 top-2 bottom-2 w-1 rounded-full bg-gradient-to-b from-blue-500 to-emerald-400 shadow-lg" />
-            )}
-            <Brain className={iconClasses("/dashboard/disease-predictor")} />
-            <span className="font-medium">Disease Predictor</span>
-          </Link>
-
-          <Link
+            icon={
+              <Brain className={iconClasses("/dashboard/disease-predictor")} />
+            }
+            label="Disease Predictor"
+            collapsed={collapsed}
+            pathname={pathname}
+          />
+          <NavItem
             href="/dashboard/chat"
-            className={linkClasses("/dashboard/chat")}
-          >
-            {pathname === "/dashboard/chat" && (
-              <span className="absolute left-0 top-2 bottom-2 w-1 rounded-full bg-gradient-to-b from-blue-500 to-emerald-400 shadow-lg" />
-            )}
-            <Bot className={iconClasses("/dashboard/chat")} />
-            <span className="font-medium">AI Health Chat</span>
-          </Link>
+            icon={<Bot className={iconClasses("/dashboard/chat")} />}
+            label="AI Health Chat"
+            collapsed={collapsed}
+            pathname={pathname}
+          />
         </nav>
 
         {/* Bottom Section (UNCHANGED LOGIC) */}
         <div className="mt-auto pt-6 border-t border-gray-200 dark:border-gray-800 space-y-3">
-          <Link
+          <NavItem
             href="/dashboard/profile"
-            className={linkClasses("/dashboard/profile")}
-          >
-            <User className={iconClasses("/dashboard/profile")} />
-            <span className="font-medium">Profile</span>
-          </Link>
+            icon={<User className={iconClasses("/dashboard/profile")} />}
+            label="Profile"
+            collapsed={collapsed}
+            pathname={pathname}
+          />
 
-          <button
-            onClick={toggleTheme}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-gray-100 dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-300 hover:scale-[1.02] transition"
-          >
-            {theme === "dark" ? "☀️ Light Mode" : "🌙 Dark Mode"}
-          </button>
+          {!collapsed && (
+            <>
+              <button
+                onClick={toggleTheme}
+                className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-gray-100 dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-300 hover:scale-[1.02] transition"
+              >
+                {theme === "dark" ? "☀️ Light Mode" : "🌙 Dark Mode"}
+              </button>
 
-          <button
-            onClick={handleLogout}
-            className="w-full text-red-500 text-sm font-semibold hover:text-red-600 transition py-2 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20"
-          >
-            Logout
-          </button>
+              <button
+                onClick={handleLogout}
+                className="w-full text-red-500 text-sm font-semibold hover:text-red-600 transition py-2 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20"
+              >
+                Logout
+              </button>
 
-          {user && (
-            <div className="mt-3 text-xs text-gray-400 text-center truncate">
-              Logged in as {user.email}
-            </div>
+              {user && (
+                <div className="mt-3 text-xs text-gray-400 text-center truncate">
+                  Logged in as {user.email}
+                </div>
+              )}
+            </>
           )}
         </div>
       </aside>
 
-      {/* 🌟 MAIN CONTENT AREA (UNCHANGED) */}
+      {/* MAIN CONTENT (UNCHANGED) */}
       <main className="flex-1 flex flex-col">
         <header className="h-16 px-8 flex items-center justify-between border-b border-gray-200 dark:border-gray-800 bg-white/60 dark:bg-[#020617]/60 backdrop-blur-xl">
           <div>
@@ -206,5 +205,35 @@ export default function DashboardLayout({
         <div className="flex-1 p-6 md:p-10 overflow-auto">{children}</div>
       </main>
     </div>
+  );
+}
+
+function NavItem({
+  href,
+  icon,
+  label,
+  collapsed,
+  pathname,
+}: {
+  href: string;
+  icon: React.ReactNode;
+  label: string;
+  collapsed: boolean;
+  pathname: string;
+}) {
+  const isActive = pathname === href;
+
+  return (
+    <Link
+      href={href}
+      className={`group relative flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${
+        isActive
+          ? "bg-gradient-to-r from-blue-500/10 to-emerald-500/10 text-blue-600 dark:text-emerald-400"
+          : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60"
+      }`}
+    >
+      {icon}
+      {!collapsed && <span className="font-medium">{label}</span>}
+    </Link>
   );
 }
