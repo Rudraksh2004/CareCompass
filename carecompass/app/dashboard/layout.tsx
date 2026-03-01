@@ -226,14 +226,25 @@ function NavItem({
   return (
     <Link
       href={href}
-      className={`group relative flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${
+      className={`group relative flex items-center ${
+        collapsed ? "justify-center" : "gap-3"
+      } px-4 py-3 rounded-xl transition-all duration-300 ${
         isActive
           ? "bg-gradient-to-r from-blue-500/10 to-emerald-500/10 text-blue-600 dark:text-emerald-400"
           : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60"
       }`}
     >
-      {icon}
-      {!collapsed && <span className="font-medium">{label}</span>}
+      {/* 🔥 FIX: Fixed icon container (prevents disappearing icons) */}
+      <div className="flex items-center justify-center w-6 h-6 shrink-0">
+        {icon}
+      </div>
+
+      {/* Label only when expanded (UNCHANGED behavior) */}
+      {!collapsed && (
+        <span className="font-medium whitespace-nowrap">
+          {label}
+        </span>
+      )}
     </Link>
   );
 }
