@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import Link from "next/link"; // ✅ NEW (safe import)
+import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { getUserReminders } from "@/services/reminderService";
 import { getHealthLogs } from "@/services/healthService";
@@ -14,7 +14,6 @@ interface Reminder {
   takenTimes?: string[];
 }
 
-// 🔒 Local date key (IST-safe & daily reset accurate)
 const getTodayKey = () => {
   const now = new Date();
   const year = now.getFullYear();
@@ -50,7 +49,6 @@ export default function DashboardPage() {
     loadData();
   }, [user]);
 
-  // 💊 NEW: Calculate today's adherence (SAFE - uses existing schema)
   const adherenceData = useMemo(() => {
     const today = getTodayKey();
     let totalDoses = 0;
@@ -79,7 +77,6 @@ export default function DashboardPage() {
     };
   }, [reminders]);
 
-  // ⏰ Countdown for upcoming doses (Dashboard Widget)
   useEffect(() => {
     const calculateCountdowns = () => {
       const updated: Record<string, string> = {};
@@ -115,33 +112,39 @@ export default function DashboardPage() {
   }, [reminders]);
 
   return (
-    <div className="space-y-8">
-      {/* 🌟 Welcome Header */}
-      <div className="relative overflow-hidden rounded-3xl border border-slate-800 bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800 p-8 shadow-2xl">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(59,130,246,0.15),_transparent_40%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,_rgba(16,185,129,0.12),_transparent_40%)]" />
+    <div className="space-y-8 relative">
+      {/* Ambient AI Glow Background (UI ONLY) */}
+      <div className="pointer-events-none absolute inset-0 -z-10">
+        <div className="absolute top-[-120px] left-[-80px] w-[400px] h-[400px] bg-blue-500/10 blur-[120px] rounded-full" />
+        <div className="absolute bottom-[-120px] right-[-80px] w-[400px] h-[400px] bg-purple-500/10 blur-[120px] rounded-full" />
+      </div>
+
+      {/* 🌟 Welcome Header (FUTURISTIC POLISH ONLY) */}
+      <div className="relative overflow-hidden rounded-3xl border border-slate-800 bg-gradient-to-br from-slate-900 via-[#020617] to-slate-900 p-10 shadow-[0_0_60px_rgba(59,130,246,0.15)]">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(59,130,246,0.18),_transparent_45%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,_rgba(168,85,247,0.15),_transparent_45%)]" />
 
         <div className="relative z-10">
-          <h1 className="text-3xl font-bold text-white">
+          <h1 className="text-4xl font-extrabold text-white tracking-tight">
             Welcome to CareCompass 🧭
           </h1>
-          <p className="text-slate-400 mt-2 max-w-2xl">
-            Your all-in-one health companion to manage reports, prescriptions,
-            health tracking, reminders, and clinical summaries in one secure
-            platform.
+          <p className="text-slate-400 mt-3 max-w-2xl text-sm leading-relaxed">
+            Your all-in-one AI health companion to manage reports, prescriptions,
+            disease risk, health tracking, reminders, and clinical summaries in one
+            intelligent dashboard.
           </p>
         </div>
       </div>
 
-      {/* 📊 Premium Stat Cards */}
+      {/* 📊 Premium Stat Cards (ENHANCED GLOW ONLY) */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Reminders Card */}
-        <div className="relative group overflow-hidden rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-6 shadow-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_35px_rgba(59,130,246,0.2)]">
+        <div className="relative group overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-xl p-6 shadow-xl transition-all duration-300 hover:scale-[1.03] hover:shadow-[0_0_45px_rgba(59,130,246,0.25)]">
+          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition bg-gradient-to-r from-blue-500/10 to-transparent" />
           <p className="text-sm text-slate-400">
             Active Medicine Reminders
           </p>
 
-          <h2 className="text-4xl font-bold text-white mt-2">
+          <h2 className="text-4xl font-extrabold text-white mt-2">
             {reminderCount}
           </h2>
 
@@ -150,8 +153,8 @@ export default function DashboardPage() {
           </p>
         </div>
 
-        {/* Platform Features Card */}
-        <div className="relative group overflow-hidden rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-6 shadow-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_35px_rgba(168,85,247,0.2)]">
+        <div className="relative group overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-xl p-6 shadow-xl transition-all duration-300 hover:scale-[1.03] hover:shadow-[0_0_45px_rgba(168,85,247,0.25)]">
+          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition bg-gradient-to-r from-purple-500/10 to-transparent" />
           <p className="text-sm text-slate-400">
             Platform Features
           </p>
@@ -161,59 +164,60 @@ export default function DashboardPage() {
           </h2>
 
           <p className="text-xs text-slate-500 mt-2">
-            Complete health companion toolkit
+            Complete AI health toolkit
           </p>
         </div>
 
-        {/* Health Monitoring Card */}
-        <div className="relative group overflow-hidden rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-6 shadow-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_35px_rgba(16,185,129,0.2)]">
+        <div className="relative group overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-xl p-6 shadow-xl transition-all duration-300 hover:scale-[1.03] hover:shadow-[0_0_45px_rgba(16,185,129,0.25)]">
+          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition bg-gradient-to-r from-emerald-500/10 to-transparent" />
           <p className="text-sm text-slate-400">
             Health Monitoring
           </p>
 
-          <h2 className="text-3xl font-bold mt-2 text-emerald-400">
+          <h2 className="text-3xl font-extrabold mt-2 text-emerald-400">
             {healthActive ? "Active" : "Inactive"}
           </h2>
 
           <p className="text-xs text-slate-500 mt-2">
-            Tracking logs & health insights enabled
+            Tracking logs & AI insights enabled
           </p>
         </div>
       </div>
 
-      {/* 🧠 NEW: Disease Predictor Card (OPTION B - NON-BREAKING ADDITION) */}
-      <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl p-8 shadow-2xl">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(168,85,247,0.12),_transparent_40%)]" />
+      {/* 🧠 AI Disease Predictor Card (UI GLOW ONLY) */}
+      <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-xl p-8 shadow-2xl hover:shadow-[0_0_50px_rgba(168,85,247,0.25)] transition">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(168,85,247,0.18),_transparent_45%)]" />
 
         <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
           <div>
-            <h3 className="text-2xl font-bold text-white">
+            <h3 className="text-2xl font-extrabold text-white">
               🧠 AI Disease Predictor
             </h3>
-            <p className="text-slate-400 text-sm mt-2 max-w-xl">
-              Analyze symptoms using hybrid AI, clinical logic, and location-aware
-              insights with optional medical Q&A for smarter non-diagnostic guidance.
+            <p className="text-slate-400 text-sm mt-2 max-w-xl leading-relaxed">
+              Analyze symptoms using hybrid AI, clinical logic, and
+              location-aware intelligence for advanced non-diagnostic
+              health risk insights.
             </p>
           </div>
 
           <Link
             href="/dashboard/disease-predictor"
-            className="inline-flex items-center justify-center bg-gradient-to-r from-purple-600 to-blue-600 hover:opacity-90 transition text-white px-8 py-4 rounded-2xl font-semibold shadow-lg"
+            className="inline-flex items-center justify-center bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 hover:opacity-90 transition text-white px-8 py-4 rounded-2xl font-semibold shadow-xl"
           >
             🧠 Start Analysis →
           </Link>
         </div>
       </div>
 
-      {/* 💊 NEW: Daily Adherence Widget (NON-BREAKING ADDITION) */}
-      <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl p-8 shadow-2xl">
+      {/* 💊 Daily Adherence Widget (UI ENHANCED ONLY) */}
+      <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-xl p-8 shadow-2xl hover:shadow-[0_0_45px_rgba(16,185,129,0.2)] transition">
         <p className="text-sm text-slate-400">
           Today’s Medication Adherence
         </p>
 
         <div className="mt-4 flex items-center justify-between">
           <div>
-            <h2 className="text-3xl font-bold text-white">
+            <h2 className="text-3xl font-extrabold text-white">
               {adherenceData.takenToday} / {adherenceData.totalDoses}
             </h2>
             <p className="text-xs text-slate-500 mt-1">
@@ -222,7 +226,7 @@ export default function DashboardPage() {
           </div>
 
           <div className="text-right">
-            <p className="text-2xl font-bold text-emerald-400">
+            <p className="text-2xl font-extrabold text-emerald-400">
               {adherenceData.progressPercent}%
             </p>
             <p className="text-xs text-slate-500">
@@ -233,7 +237,7 @@ export default function DashboardPage() {
 
         <div className="mt-5 w-full bg-white/10 rounded-full h-3 overflow-hidden">
           <div
-            className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-500"
+            className="h-full bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-400 transition-all duration-700"
             style={{
               width: `${adherenceData.progressPercent}%`,
             }}
@@ -241,12 +245,12 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* 💊 Smart Reminders Widget (UNCHANGED) */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800 border border-slate-800 p-8 rounded-3xl shadow-2xl">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(245,158,11,0.12),_transparent_40%)]" />
+      {/* 💊 Smart Reminders Widget (LOGIC UNCHANGED, UI POLISH ONLY) */}
+      <div className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-[#020617] to-slate-900 border border-slate-800 p-8 rounded-3xl shadow-[0_0_60px_rgba(245,158,11,0.12)]">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(245,158,11,0.15),_transparent_45%)]" />
 
         <div className="relative z-10">
-          <h3 className="text-2xl font-bold text-white mb-2">
+          <h3 className="text-2xl font-extrabold text-white mb-2">
             Upcoming Medication Schedule ⏰
           </h3>
           <p className="text-slate-400 text-sm mb-6">
@@ -266,7 +270,7 @@ export default function DashboardPage() {
                   return (
                     <div
                       key={key}
-                      className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl p-5 hover:shadow-[0_0_25px_rgba(245,158,11,0.15)] transition"
+                      className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl p-5 hover:shadow-[0_0_30px_rgba(245,158,11,0.2)] transition"
                     >
                       <p className="text-white font-semibold text-lg">
                         💊 {reminder.medicineName}
@@ -293,20 +297,20 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* 💎 Capabilities Section (UNCHANGED) */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800 border border-slate-800 p-8 rounded-3xl shadow-2xl backdrop-blur-xl">
-        <h3 className="text-2xl font-bold text-white mb-2">
+      {/* 💎 Capabilities Section (UNCHANGED STRUCTURE, UI GLOW ONLY) */}
+      <div className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-[#020617] to-slate-900 border border-slate-800 p-8 rounded-3xl shadow-[0_0_70px_rgba(99,102,241,0.12)] backdrop-blur-xl">
+        <h3 className="text-2xl font-extrabold text-white mb-2">
           CareCompass Capabilities
         </h3>
         <p className="text-slate-400 text-sm mb-8">
-          Explore the core features designed to simplify your health management.
+          Explore the core AI-powered features designed to simplify your health management.
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <FeatureCard icon="📄" title="Medical Report Explainer" desc="Understand complex medical reports in simple language" />
           <FeatureCard icon="💊" title="Prescription Simplifier" desc="Supports image, PDF and handwritten prescriptions" />
           <FeatureCard icon="📊" title="Health Tracking & Trend Detection" desc="Track weight, sugar & health metrics over time" />
-          <FeatureCard icon="🤖" title="Health Assistant Chat" desc="Conversational support for health queries" />
+          <FeatureCard icon="🤖" title="Health Assistant Chat" desc="Conversational AI support for health queries" />
           <FeatureCard icon="⏰" title="Smart Medicine Reminders" desc="Never miss your medication schedule" />
           <FeatureCard icon="🧠" title="PDF Health Report Export" desc="Download professional clinical-style reports" />
         </div>
@@ -325,9 +329,9 @@ function FeatureCard({
   desc: string;
 }) {
   return (
-    <div className="bg-white/5 border border-white/10 rounded-2xl p-5 backdrop-blur-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-xl">
+    <div className="bg-gradient-to-br from-white/5 to-white/[0.02] border border-white/10 rounded-2xl p-5 backdrop-blur-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(99,102,241,0.2)]">
       <div className="flex items-start gap-4">
-        <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center text-xl">
+        <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center text-xl shadow-inner">
           {icon}
         </div>
         <div>
