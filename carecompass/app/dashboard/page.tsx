@@ -62,15 +62,11 @@ export default function DashboardPage() {
 
       totalDoses += times.length;
 
-      takenToday += takenTimes.filter((t) =>
-        t.startsWith(today)
-      ).length;
+      takenToday += takenTimes.filter((t) => t.startsWith(today)).length;
     });
 
     const progressPercent =
-      totalDoses === 0
-        ? 0
-        : Math.round((takenToday / totalDoses) * 100);
+      totalDoses === 0 ? 0 : Math.round((takenToday / totalDoses) * 100);
 
     return {
       totalDoses,
@@ -98,9 +94,7 @@ export default function DashboardPage() {
 
           const diff = nextDose.getTime() - now.getTime();
           const hours = Math.floor(diff / (1000 * 60 * 60));
-          const minutes = Math.floor(
-            (diff % (1000 * 60 * 60)) / (1000 * 60)
-          );
+          const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
 
           updated[`${reminder.id}-${t}`] = `${hours}h ${minutes}m`;
         });
@@ -137,9 +131,7 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Reminders Card */}
         <div className="relative group overflow-hidden rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-6 shadow-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_35px_rgba(59,130,246,0.2)]">
-          <p className="text-sm text-slate-400">
-            Active Medicine Reminders
-          </p>
+          <p className="text-sm text-slate-400">Active Medicine Reminders</p>
 
           <h2 className="text-4xl font-bold text-white mt-2">
             {reminderCount}
@@ -152,9 +144,7 @@ export default function DashboardPage() {
 
         {/* Platform Features Card */}
         <div className="relative group overflow-hidden rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-6 shadow-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_35px_rgba(168,85,247,0.2)]">
-          <p className="text-sm text-slate-400">
-            Platform Features
-          </p>
+          <p className="text-sm text-slate-400">Platform Features</p>
 
           <h2 className="text-lg font-semibold text-white mt-2 leading-relaxed">
             Reports • Prescriptions • Chat • Tracking
@@ -167,9 +157,7 @@ export default function DashboardPage() {
 
         {/* Health Monitoring Card */}
         <div className="relative group overflow-hidden rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-6 shadow-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_35px_rgba(16,185,129,0.2)]">
-          <p className="text-sm text-slate-400">
-            Health Monitoring
-          </p>
+          <p className="text-sm text-slate-400">Health Monitoring</p>
 
           <h2 className="text-3xl font-bold mt-2 text-emerald-400">
             {healthActive ? "Active" : "Inactive"}
@@ -191,8 +179,9 @@ export default function DashboardPage() {
               🧠 AI Disease Predictor
             </h3>
             <p className="text-slate-400 text-sm mt-2 max-w-xl">
-              Analyze symptoms using hybrid AI, clinical logic, and location-aware
-              insights with optional medical Q&A for smarter non-diagnostic guidance.
+              Analyze symptoms using hybrid AI, clinical logic, and
+              location-aware insights with optional medical Q&A for smarter
+              non-diagnostic guidance.
             </p>
           </div>
 
@@ -207,27 +196,21 @@ export default function DashboardPage() {
 
       {/* 💊 NEW: Daily Adherence Widget (NON-BREAKING ADDITION) */}
       <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl p-8 shadow-2xl">
-        <p className="text-sm text-slate-400">
-          Today’s Medication Adherence
-        </p>
+        <p className="text-sm text-slate-400">Today’s Medication Adherence</p>
 
         <div className="mt-4 flex items-center justify-between">
           <div>
             <h2 className="text-3xl font-bold text-white">
               {adherenceData.takenToday} / {adherenceData.totalDoses}
             </h2>
-            <p className="text-xs text-slate-500 mt-1">
-              Doses taken today
-            </p>
+            <p className="text-xs text-slate-500 mt-1">Doses taken today</p>
           </div>
 
           <div className="text-right">
             <p className="text-2xl font-bold text-emerald-400">
               {adherenceData.progressPercent}%
             </p>
-            <p className="text-xs text-slate-500">
-              Daily consistency
-            </p>
+            <p className="text-xs text-slate-500">Daily consistency</p>
           </div>
         </div>
 
@@ -286,7 +269,7 @@ export default function DashboardPage() {
                       </div>
                     </div>
                   );
-                })
+                }),
               )}
             </div>
           )}
@@ -303,12 +286,36 @@ export default function DashboardPage() {
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <FeatureCard icon="📄" title="Medical Report Explainer" desc="Understand complex medical reports in simple language" />
-          <FeatureCard icon="💊" title="Prescription Simplifier" desc="Supports image, PDF and handwritten prescriptions" />
-          <FeatureCard icon="📊" title="Health Tracking & Trend Detection" desc="Track weight, sugar & health metrics over time" />
-          <FeatureCard icon="🤖" title="Health Assistant Chat" desc="Conversational support for health queries" />
-          <FeatureCard icon="⏰" title="Smart Medicine Reminders" desc="Never miss your medication schedule" />
-          <FeatureCard icon="🧠" title="PDF Health Report Export" desc="Download professional clinical-style reports" />
+          <FeatureCard
+            icon="📄"
+            title="Medical Report Explainer"
+            desc="Understand complex medical reports in simple language"
+          />
+          <FeatureCard
+            icon="💊"
+            title="Prescription Simplifier"
+            desc="Supports image, PDF and handwritten prescriptions"
+          />
+          <FeatureCard
+            icon="📊"
+            title="Health Tracking & Trend Detection"
+            desc="Track weight, sugar & health metrics over time"
+          />
+          <FeatureCard
+            icon="🤖"
+            title="Health Assistant Chat"
+            desc="Conversational support for health queries"
+          />
+          <FeatureCard
+            icon="⏰"
+            title="Smart Medicine Reminders"
+            desc="Never miss your medication schedule"
+          />
+          <FeatureCard
+            icon="💊"
+            title="Medicine Describer"
+            desc="Get AI explanation of medicines, usage, and side effects"
+          />
         </div>
       </div>
     </div>
@@ -330,7 +337,7 @@ function FeatureCard({
     if (title.includes("Tracking")) return "/dashboard/health";
     if (title.includes("Chat")) return "/dashboard/chat";
     if (title.includes("Reminders")) return "/dashboard/reminders";
-    if (title.includes("PDF")) return "/dashboard/health";
+    if (title.includes("Medicine")) return "/dashboard/medicine";
     return "/dashboard";
   };
 
@@ -344,12 +351,8 @@ function FeatureCard({
             {icon}
           </div>
           <div>
-            <p className="font-semibold text-white">
-              {title}
-            </p>
-            <p className="text-xs text-slate-400 mt-1">
-              {desc}
-            </p>
+            <p className="font-semibold text-white">{title}</p>
+            <p className="text-xs text-slate-400 mt-1">{desc}</p>
           </div>
         </div>
       </div>
