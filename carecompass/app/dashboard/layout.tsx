@@ -18,6 +18,8 @@ import {
   User,
   ChevronLeft,
   ChevronRight,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from "lucide-react";
 
 export default function DashboardLayout({
@@ -68,9 +70,15 @@ export default function DashboardLayout({
         {/* Toggle Button (NEW) */}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="mb-6 flex items-center justify-center w-full py-2 rounded-xl bg-gray-100 dark:bg-gray-800 hover:scale-[1.02] transition"
+          className="mb-6 mx-auto flex items-center justify-center w-10 h-10 
+  rounded-xl bg-white/10 dark:bg-white/5 border border-white/10 
+  hover:bg-white/20 transition-all duration-300 backdrop-blur-lg shadow-lg"
         >
-          {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+          {collapsed ? (
+            <PanelLeftOpen className="w-5 h-5 text-white" />
+          ) : (
+            <PanelLeftClose className="w-5 h-5 text-white" />
+          )}
         </button>
 
         {/* Brand */}
@@ -241,9 +249,7 @@ function NavItem({
 
       {/* Label only when expanded (UNCHANGED behavior) */}
       {!collapsed && (
-        <span className="font-medium whitespace-nowrap">
-          {label}
-        </span>
+        <span className="font-medium whitespace-nowrap">{label}</span>
       )}
     </Link>
   );
