@@ -58,7 +58,7 @@ export default function DashboardPage() {
 
   // 🧠 Generate AI Health Summary
   const generateAISummary = async () => {
-    if (!user) return;
+    if (!user || loadingSummary) return; // prevents double clicks
 
     setLoadingSummary(true);
     setAiSummary("");
@@ -246,10 +246,12 @@ export default function DashboardPage() {
 
           <button
             onClick={generateAISummary}
-            disabled={loadingSummary}
-            className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:opacity-90 transition text-white px-8 py-4 rounded-2xl font-semibold shadow-lg disabled:opacity-50"
+            disabled={loadingSummary || !user}
+            className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:opacity-90 transition text-white px-8 py-4 rounded-2xl font-semibold shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loadingSummary ? "Generating Summary..." : "Generate AI Summary"}
+            {loadingSummary
+              ? "Generating Clinical Summary..."
+              : "Generate AI Summary"}
           </button>
         </div>
 
