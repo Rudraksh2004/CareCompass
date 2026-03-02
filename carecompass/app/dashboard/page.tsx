@@ -230,7 +230,7 @@ export default function DashboardPage() {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             <div>
               <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-                🧠 AI Global Health Summary
+                🧠 AI Health Summary
               </h2>
               <p className="text-slate-400 text-sm mt-2 max-w-2xl">
                 Generate a personalized AI-powered clinical overview based on
