@@ -56,9 +56,10 @@ export default function Home() {
           </h2>
 
           <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-12 leading-relaxed">
-            CareCompass helps you simplify medical reports, decode prescriptions,
-            track health trends, and generate professional AI health insights —
-            all in one secure, intelligent, and privacy-first platform.
+            CareCompass helps you simplify medical reports, decode
+            prescriptions, track health trends, and generate professional AI
+            health insights — all in one secure, intelligent, and privacy-first
+            platform.
           </p>
 
           <div className="flex flex-wrap justify-center gap-4">
@@ -80,8 +81,12 @@ export default function Home() {
           {/* Trust Badges */}
           <div className="flex flex-wrap justify-center gap-8 mt-14 text-sm text-gray-500 font-medium">
             <span className="flex items-center gap-2">🔒 Secure & Private</span>
-            <span className="flex items-center gap-2">🧠 AI-Powered Analysis</span>
-            <span className="flex items-center gap-2">⚕️ Non-Diagnostic Guidance</span>
+            <span className="flex items-center gap-2">
+              🧠 AI-Powered Analysis
+            </span>
+            <span className="flex items-center gap-2">
+              ⚕️ Non-Diagnostic Guidance
+            </span>
           </div>
         </div>
       </section>
@@ -109,9 +114,7 @@ export default function Home() {
 
               <div className="relative z-10">
                 <div className="text-4xl mb-5">{feature.icon}</div>
-                <h4 className="text-xl font-semibold mb-3">
-                  {feature.title}
-                </h4>
+                <h4 className="text-xl font-semibold mb-3">{feature.title}</h4>
                 <p className="text-gray-600 leading-relaxed">
                   {feature.description}
                 </p>
@@ -137,9 +140,7 @@ export default function Home() {
                 <div className="w-16 h-16 mx-auto mb-6 flex items-center justify-center rounded-2xl bg-gradient-to-br from-blue-100 to-emerald-100 text-2xl group-hover:scale-110 transition">
                   {step.icon}
                 </div>
-                <h4 className="text-xl font-semibold mb-3">
-                  {step.title}
-                </h4>
+                <h4 className="text-xl font-semibold mb-3">{step.title}</h4>
                 <p className="text-gray-600">{step.description}</p>
               </div>
             ))}
@@ -160,7 +161,8 @@ export default function Home() {
 
             <p className="text-blue-100 text-lg mb-10 max-w-2xl mx-auto">
               Generate clinical AI reports, detect health trends, and understand
-              your medical data with intelligent, secure, non-diagnostic insights.
+              your medical data with intelligent, secure, non-diagnostic
+              insights.
             </p>
 
             <Link
@@ -183,9 +185,7 @@ export default function Home() {
         <p className="font-medium">
           © {new Date().getFullYear()} CareCompass AI
         </p>
-        <p className="mt-1">
-          Built with Next.js, Firebase & Gemini AI
-        </p>
+        <p className="mt-1">Built with Next.js, Firebase & Gemini AI</p>
       </footer>
     </div>
   );
@@ -223,10 +223,10 @@ const features = [
       "Manage medicine schedules and never miss a dose with intelligent reminder tracking.",
   },
   {
-    icon: "📄",
-    title: "Clinical PDF Reports",
+    icon: "🧬",
+    title: "Disease Predictor",
     description:
-      "Generate professional multi-page AI health reports with insights, trends, and risk overview.",
+      "Analyze symptoms using hybrid AI and clinical logic to get non-diagnostic disease risk insights.",
   },
 ];
 

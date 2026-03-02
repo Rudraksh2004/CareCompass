@@ -381,7 +381,7 @@ export default function DashboardPage() {
             desc="Never miss your medication schedule"
           />
           <FeatureCard
-            icon="💊"
+            icon="🧪"
             title="Medicine Describer"
             desc="Get AI explanation of medicines, usage, and side effects"
           />
