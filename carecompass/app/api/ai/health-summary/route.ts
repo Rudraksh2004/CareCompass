@@ -14,7 +14,7 @@ export async function POST(req: Request) {
 
     if (!uid) {
       return NextResponse.json(
-        { summary: "User not authenticated." },
+        { summary: "User not authenticated.", healthScore: 0, riskLevel: "Unknown" },
         { status: 400 }
       );
     }
@@ -68,9 +68,13 @@ export async function POST(req: Request) {
     const diseases = diseaseSnap.docs.map((d) => d.data());
 
     const prompt = `
-You are a clinical AI health assistant for a platform called CareCompass.
+You are an advanced clinical AI health assistant.
 
-Generate a personalized NON-DIAGNOSTIC health summary based on the user data below.
+Analyze the user's health data and generate:
+
+1. A personalized NON-DIAGNOSTIC health summary
+2. A Health Score (0-100)
+3. A Risk Level (Low, Moderate, High)
 
 User Profile:
 ${JSON.stringify(profile)}
@@ -78,28 +82,30 @@ ${JSON.stringify(profile)}
 Health Logs:
 ${JSON.stringify(healthLogs)}
 
-Reports History Count:
+Reports Count:
 ${reports.length}
 
-Prescriptions History Count:
+Prescriptions Count:
 ${prescriptions.length}
 
 Disease Risk Analyses:
 ${JSON.stringify(diseases)}
 
-Required Output Format:
-1. Overall Health Overview
-2. Key Observations
-3. Risk Signals (if any)
-4. Lifestyle Suggestions
-5. Preventive Tips
+Rules:
+- Be professional and simple
+- Non-diagnostic guidance only
+- If limited data, give conservative insights
+- Health Score must be realistic (not always high)
 
-Tone: Clinical, professional, simple, reassuring.
-IMPORTANT: This is NON-DIAGNOSTIC AI guidance only.
+Respond ONLY in JSON format:
+{
+  "summary": "...",
+  "healthScore": number,
+  "riskLevel": "Low" | "Moderate" | "High"
+}
 `;
 
-    // 🔥 GEMINI API CALL (gemini-3-flash-preview)
-    const aiRes = await fetch(
+    const geminiRes = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${process.env.GEMINI_API_KEY}`,
       {
         method: "POST",
@@ -109,29 +115,41 @@ IMPORTANT: This is NON-DIAGNOSTIC AI guidance only.
         body: JSON.stringify({
           contents: [
             {
-              role: "user",
               parts: [{ text: prompt }],
             },
           ],
-          generationConfig: {
-            temperature: 0.4,
-            maxOutputTokens: 800,
-          },
         }),
       }
     );
 
-    const data = await aiRes.json();
+    const geminiData = await geminiRes.json();
+    const text =
+      geminiData?.candidates?.[0]?.content?.parts?.[0]?.text ||
+      "";
 
-    const summary =
-      data?.candidates?.[0]?.content?.parts?.[0]?.text ||
-      "No AI health summary generated.";
+    let parsed = {
+      summary: "No summary generated.",
+      healthScore: 50,
+      riskLevel: "Low",
+    };
 
-    return NextResponse.json({ summary });
+    try {
+      parsed = JSON.parse(text);
+    } catch {
+      parsed.summary = text || "AI summary generated.";
+    }
+
+    return NextResponse.json({
+      summary: parsed.summary,
+      healthScore: parsed.healthScore ?? 50,
+      riskLevel: parsed.riskLevel ?? "Low",
+    });
   } catch (error) {
     console.error("AI Summary Error:", error);
     return NextResponse.json({
       summary: "Failed to generate AI health summary.",
+      healthScore: 0,
+      riskLevel: "Unknown",
     });
   }
 }
