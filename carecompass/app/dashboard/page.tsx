@@ -33,6 +33,10 @@ export default function DashboardPage() {
   const [aiSummary, setAiSummary] = useState("");
   const [loadingSummary, setLoadingSummary] = useState(false);
 
+  // 🧠 AI Health Summary (NEW - SAFE)
+  const [healthScore, setHealthScore] = useState<number | null>(null);
+  const [riskLevel, setRiskLevel] = useState("");
+
   useEffect(() => {
     const loadData = async () => {
       if (!user) return;
@@ -52,7 +56,7 @@ export default function DashboardPage() {
     loadData();
   }, [user]);
 
-  // 🧠 NEW: AI Summary Generator
+  // 🧠 Generate AI Health Summary
   const generateAISummary = async () => {
     if (!user) return;
 
@@ -69,10 +73,15 @@ export default function DashboardPage() {
       });
 
       const data = await res.json();
+
       setAiSummary(data.summary || "No summary generated.");
+      setHealthScore(
+        typeof data.healthScore === "number" ? data.healthScore : null,
+      );
+      setRiskLevel(data.riskLevel || "");
     } catch (error) {
-      console.error(error);
-      setAiSummary("Failed to generate AI summary.");
+      console.error("AI Summary Error:", error);
+      setAiSummary("Failed to generate AI health summary.");
     }
 
     setLoadingSummary(false);
@@ -222,45 +231,65 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* 🧠 AI GLOBAL HEALTH SUMMARY (NON-BREAKING ADDITION) */}
-      <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-indigo-900/40 via-purple-900/30 to-emerald-900/30 backdrop-blur-xl p-8 shadow-2xl">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(99,102,241,0.15),_transparent_40%)]" />
-
-        <div className="relative z-10">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-            <div>
-              <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-                🧠 AI Health Summary
-              </h2>
-              <p className="text-slate-400 text-sm mt-2 max-w-2xl">
-                Generate a personalized AI-powered clinical overview based on
-                your reports, prescriptions, health logs, disease analysis, and
-                profile data.
-              </p>
-            </div>
-
-            <button
-              onClick={generateAISummary}
-              disabled={loadingSummary}
-              className="bg-gradient-to-r from-indigo-600 via-purple-600 to-emerald-500 hover:opacity-90 transition text-white px-8 py-4 rounded-2xl font-semibold shadow-xl disabled:opacity-50"
-            >
-              {loadingSummary
-                ? "🧠 Generating Clinical Summary..."
-                : "Generate AI Health Summary"}
-            </button>
+      {/* 🧠 AI Health Summary Card (NEW - NON BREAKING) */}
+      <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl p-8 shadow-2xl">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+          <div>
+            <h3 className="text-2xl font-bold text-white">
+              🧠 AI Health Summary
+            </h3>
+            <p className="text-slate-400 text-sm mt-2 max-w-xl">
+              Generate a personalized AI overview using your reports,
+              prescriptions, disease analysis, and health logs.
+            </p>
           </div>
 
-          {aiSummary && (
-            <div className="mt-8 bg-black/30 border border-white/10 rounded-2xl p-6">
-              <p className="text-xs text-slate-400 mb-3">
-                ⚠️ Non-diagnostic AI summary. For informational purposes only.
-              </p>
-              <div className="text-sm text-slate-200 leading-relaxed whitespace-pre-line">
-                {aiSummary}
-              </div>
-            </div>
-          )}
+          <button
+            onClick={generateAISummary}
+            disabled={loadingSummary}
+            className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:opacity-90 transition text-white px-8 py-4 rounded-2xl font-semibold shadow-lg disabled:opacity-50"
+          >
+            {loadingSummary ? "Generating Summary..." : "Generate AI Summary"}
+          </button>
         </div>
+
+        {/* Summary Result */}
+        {aiSummary && (
+          <div className="mt-8 space-y-6">
+            {/* Score + Risk */}
+            {(healthScore !== null || riskLevel) && (
+              <div className="flex flex-wrap gap-4">
+                {healthScore !== null && (
+                  <div className="px-5 py-3 rounded-2xl bg-blue-500/10 border border-blue-400/20 text-blue-300 font-semibold">
+                    Health Score: {healthScore}/100
+                  </div>
+                )}
+
+                {riskLevel && (
+                  <div
+                    className={`px-5 py-3 rounded-2xl font-semibold border ${
+                      riskLevel === "High"
+                        ? "bg-red-500/10 border-red-400/20 text-red-400"
+                        : riskLevel === "Moderate"
+                          ? "bg-amber-500/10 border-amber-400/20 text-amber-400"
+                          : "bg-emerald-500/10 border-emerald-400/20 text-emerald-400"
+                    }`}
+                  >
+                    Risk Level: {riskLevel}
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="bg-black/30 border border-white/10 rounded-2xl p-6 text-sm leading-relaxed text-slate-300 whitespace-pre-line">
+              {aiSummary}
+            </div>
+
+            <p className="text-xs text-slate-500">
+              ⚠️ Non-diagnostic AI guidance. Not a medical diagnosis.
+            </p>
+          </div>
+        )}
       </div>
 
       {/* 💊 NEW: Daily Adherence Widget (NON-BREAKING ADDITION) */}
