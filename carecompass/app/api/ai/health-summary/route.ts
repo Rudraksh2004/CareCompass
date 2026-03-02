@@ -1,44 +1,106 @@
 import { NextResponse } from "next/server";
+import { db } from "@/lib/firebase";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  limit,
+} from "firebase/firestore";
 
 export async function POST(req: Request) {
   try {
-    const { profile, healthLogs, reports, prescriptions } =
-      await req.json();
+    const { uid } = await req.json();
+
+    if (!uid) {
+      return NextResponse.json(
+        { summary: "User not authenticated." },
+        { status: 400 }
+      );
+    }
+
+    // 🔹 Fetch Profile
+    const profileSnap = await getDocs(
+      query(collection(db, "users"), where("__name__", "==", uid))
+    );
+    const profile = profileSnap.docs[0]?.data() || {};
+
+    // 🔹 Health Logs (latest 20)
+    const healthSnap = await getDocs(
+      query(
+        collection(db, "health_logs"),
+        where("userId", "==", uid),
+        limit(20)
+      )
+    );
+    const healthLogs = healthSnap.docs.map((d) => d.data());
+
+    // 🔹 Reports History
+    const reportsSnap = await getDocs(
+      query(
+        collection(db, "history"),
+        where("userId", "==", uid),
+        where("type", "==", "reports"),
+        limit(10)
+      )
+    );
+    const reports = reportsSnap.docs.map((d) => d.data());
+
+    // 🔹 Prescriptions
+    const prescriptionSnap = await getDocs(
+      query(
+        collection(db, "history"),
+        where("userId", "==", uid),
+        where("type", "==", "prescriptions"),
+        limit(10)
+      )
+    );
+    const prescriptions = prescriptionSnap.docs.map((d) => d.data());
+
+    // 🔹 Disease Predictions
+    const diseaseSnap = await getDocs(
+      query(
+        collection(db, "disease_history"),
+        where("userId", "==", uid),
+        limit(10)
+      )
+    );
+    const diseases = diseaseSnap.docs.map((d) => d.data());
 
     const prompt = `
-You are CareCompass, a non-diagnostic AI health companion.
+You are a clinical AI health assistant for a platform called CareCompass.
+
+Generate a personalized NON-DIAGNOSTIC health summary based on the user data below.
 
 User Profile:
-- Name: ${profile?.name || "Unknown"}
-- Age: ${profile?.age || "Unknown"}
-- Blood Group: ${profile?.bloodGroup || "Unknown"}
+${JSON.stringify(profile)}
 
 Health Logs:
-${JSON.stringify(healthLogs, null, 2)}
+${JSON.stringify(healthLogs)}
 
-Medical Reports History:
-${JSON.stringify(reports, null, 2)}
+Reports History Count:
+${reports.length}
 
-Prescription History:
-${JSON.stringify(prescriptions, null, 2)}
+Prescriptions History Count:
+${prescriptions.length}
 
-TASK:
-Generate a clear, simple, NON-DIAGNOSTIC health summary including:
-1. Overall trend analysis
-2. Possible lifestyle observations
-3. Gentle health suggestions (non-medical)
-4. Risk flags (if any abnormal patterns)
-5. Encouraging tone
+Disease Risk Analyses:
+${JSON.stringify(diseases)}
 
-IMPORTANT:
-- Do NOT give medical diagnosis
-- Do NOT prescribe treatment
-- Keep language simple for non-medical users
-- Add a disclaimer at the end
+Required Output Format:
+1. Overall Health Overview
+2. Key Observations
+3. Risk Signals (if any)
+4. Lifestyle Suggestions
+5. Preventive Tips
+
+Tone: Clinical, professional, simple, reassuring.
+IMPORTANT: This is NON-DIAGNOSTIC AI guidance only.
 `;
 
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1/models/gemini-3-flash-preview:generateContent?key=${process.env.GEMINI_API_KEY}`,
+    // 🔥 GEMINI API CALL (gemini-3-flash-preview)
+    const aiRes = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${process.env.GEMINI_API_KEY}`,
       {
         method: "POST",
         headers: {
@@ -47,25 +109,29 @@ IMPORTANT:
         body: JSON.stringify({
           contents: [
             {
+              role: "user",
               parts: [{ text: prompt }],
             },
           ],
+          generationConfig: {
+            temperature: 0.4,
+            maxOutputTokens: 800,
+          },
         }),
       }
     );
 
-    const data = await response.json();
+    const data = await aiRes.json();
 
     const summary =
       data?.candidates?.[0]?.content?.parts?.[0]?.text ||
-      "Unable to generate health summary.";
+      "No AI health summary generated.";
 
     return NextResponse.json({ summary });
   } catch (error) {
-    console.error("Health Summary API Error:", error);
-    return NextResponse.json(
-      { error: "Failed to generate health summary" },
-      { status: 500 }
-    );
+    console.error("AI Summary Error:", error);
+    return NextResponse.json({
+      summary: "Failed to generate AI health summary.",
+    });
   }
 }
