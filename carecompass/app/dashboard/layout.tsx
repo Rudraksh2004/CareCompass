@@ -16,8 +16,6 @@ import {
   Brain,
   Bot,
   User,
-  ChevronLeft,
-  ChevronRight,
   PanelLeftClose,
   PanelLeftOpen,
 } from "lucide-react";
@@ -83,14 +81,28 @@ export default function DashboardLayout({
 
         {/* Brand */}
         <div className="mb-10">
-          <h1 className="text-2xl font-extrabold bg-gradient-to-r from-blue-600 to-emerald-500 bg-clip-text text-transparent">
-            {collapsed ? "CC" : "CareCompass"}
-          </h1>
-          {!collapsed && (
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              AI Health Companion
-            </p>
-          )}
+          <div
+            className={`flex items-center ${collapsed ? "justify-center" : "gap-3"}`}
+          >
+            {/* Logo Always Visible */}
+            <img
+              src="/logo.png"
+              alt="CareCompass Logo"
+              className="w-10 h-10 object-contain"
+            />
+
+            {/* Show Text Only When NOT Collapsed */}
+            {!collapsed && (
+              <div>
+                <h1 className="text-2xl font-extrabold bg-gradient-to-r from-blue-600 to-emerald-500 bg-clip-text text-transparent">
+                  CareCompass
+                </h1>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  AI Health Companion
+                </p>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Navigation */}

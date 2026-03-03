@@ -15,9 +15,16 @@ export default function Home() {
       {/* NAVBAR (GLASS + PREMIUM) */}
       <header className="w-full border-b border-white/40 backdrop-blur-xl bg-white/60 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-8 py-5 flex items-center justify-between">
-          <h1 className="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-blue-600 to-emerald-500 bg-clip-text text-transparent">
-            CareCompass
-          </h1>
+          <div className="flex items-center gap-3">
+            <img
+              src="/logo.png"
+              alt="CareCompass Logo"
+              className="w-9 h-9 object-contain"
+            />
+            <span className="text-2xl font-bold tracking-tight text-blue-600">
+              CareCompass
+            </span>
+          </div>
 
           <div className="flex items-center gap-4">
             <Link
