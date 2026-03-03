@@ -17,9 +17,6 @@ const geistMono = Geist_Mono({
 export const metadata = {
   title: "CareCompass – AI Health Companion",
   description: "AI-powered non-diagnostic health insights platform",
-  icons: {
-    icon: "/favicon.ico",
-  },
 };
 
 export default function RootLayout({
