@@ -167,6 +167,12 @@ export default function DashboardLayout({
             collapsed={collapsed}
             pathname={pathname}
           />
+          <Link
+            href="/dashboard/emergency"
+            className={linkClasses("/dashboard/emergency")}
+          >
+            <span className="font-medium">Emergency Card</span>
+          </Link>
         </nav>
 
         {/* Bottom Section (UNCHANGED LOGIC) */}
