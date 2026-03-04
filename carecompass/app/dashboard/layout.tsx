@@ -14,6 +14,7 @@ import {
   Clock,
   FlaskConical,
   Brain,
+  HeartPulse,
   Bot,
   User,
   PanelLeftClose,
@@ -167,12 +168,15 @@ export default function DashboardLayout({
             collapsed={collapsed}
             pathname={pathname}
           />
-          <Link
+          <NavItem
             href="/dashboard/emergency"
-            className={linkClasses("/dashboard/emergency")}
-          >
-            <span className="font-medium">Emergency Card</span>
-          </Link>
+            icon={
+              <HeartPulse className={iconClasses("/dashboard/emergency")} />
+            }
+            label="Emergency Card"
+            collapsed={collapsed}
+            pathname={pathname}
+          />
         </nav>
 
         {/* Bottom Section (UNCHANGED LOGIC) */}
