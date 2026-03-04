@@ -19,6 +19,7 @@ export default function EmergencyPage() {
   const [contact, setContact] = useState("");
 
   const [saving, setSaving] = useState(false);
+  const [showQR, setShowQR] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -58,18 +59,27 @@ export default function EmergencyPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 text-gray-900 dark:text-gray-100">
+    <div className="max-w-5xl mx-auto space-y-8 text-gray-900 dark:text-gray-100">
+
       {/* Header */}
       <div className="bg-gradient-to-r from-red-600 to-pink-600 text-white p-6 rounded-2xl shadow-sm">
-        <h1 className="text-3xl font-bold">🚑 Emergency Health Card</h1>
+        <h1 className="text-3xl font-bold">
+          🚑 Emergency Health Card
+        </h1>
         <p className="text-red-100 text-sm mt-1">
           Store critical medical information for emergencies.
         </p>
       </div>
 
-      {/* Form */}
+      {/* Emergency Form */}
       <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-6 rounded-2xl shadow-sm">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+
+        <h2 className="text-lg font-semibold mb-6">
+          Emergency Information
+        </h2>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
           <Input label="Full Name" value={name} setValue={setName} />
 
           <div>
@@ -79,7 +89,7 @@ export default function EmergencyPage() {
             <select
               value={bloodGroup}
               onChange={(e) => setBloodGroup(e.target.value)}
-              className="w-full border p-3 rounded-xl bg-gray-50 dark:bg-gray-700"
+              className="w-full border dark:border-gray-600 p-3 rounded-xl bg-gray-50 dark:bg-gray-700"
             >
               <option value="">Select Blood Group</option>
               <option>A+</option>
@@ -112,63 +122,83 @@ export default function EmergencyPage() {
             value={contact}
             setValue={setContact}
           />
+
         </div>
 
         <div className="mt-8 flex justify-end">
           <button
             onClick={handleSave}
             disabled={saving}
-            className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl font-medium"
+            className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl font-medium transition disabled:opacity-50"
           >
             {saving ? "Saving..." : "Save Emergency Info"}
           </button>
         </div>
+
       </div>
 
       {/* Emergency Card Preview */}
       <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-6 rounded-2xl">
-        <h2 className="text-xl font-semibold mb-4">Emergency Card Preview</h2>
+
+        <h2 className="text-xl font-semibold mb-4">
+          Emergency Card Preview
+        </h2>
 
         <div className="space-y-2 text-sm">
-          <p>
-            <b>Name:</b> {name || "-"}
-          </p>
-          <p>
-            <b>Blood Group:</b> {bloodGroup || "-"}
-          </p>
-          <p>
-            <b>Allergies:</b> {allergies || "-"}
-          </p>
-          <p>
-            <b>Conditions:</b> {conditions || "-"}
-          </p>
-          <p>
-            <b>Medications:</b> {medications || "-"}
-          </p>
-          <p>
-            <b>Emergency Contact:</b> {contact || "-"}
-          </p>
+
+          <p><b>Name:</b> {name || "-"}</p>
+          <p><b>Blood Group:</b> {bloodGroup || "-"}</p>
+          <p><b>Allergies:</b> {allergies || "-"}</p>
+          <p><b>Conditions:</b> {conditions || "-"}</p>
+          <p><b>Medications:</b> {medications || "-"}</p>
+          <p><b>Emergency Contact:</b> {contact || "-"}</p>
+
         </div>
+
       </div>
+
+      {/* QR Code Section */}
       <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-6 rounded-2xl shadow-sm text-center">
-        <h2 className="text-xl font-semibold mb-4">Emergency QR Card</h2>
+
+        <h2 className="text-xl font-semibold mb-4">
+          Emergency QR Card
+        </h2>
 
         <p className="text-sm text-gray-500 mb-6">
-          Anyone can scan this QR code to access your emergency health
-          information.
+          Generate a QR code so doctors or emergency responders can access your emergency health information.
         </p>
 
-        {user && (
-          <div className="flex justify-center">
-            <div className="bg-white p-4 rounded-xl">
+        {!showQR && (
+          <button
+            onClick={() => setShowQR(true)}
+            className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl font-medium transition"
+          >
+            Generate QR Code
+          </button>
+        )}
+
+        {showQR && user && (
+          <div className="flex flex-col items-center gap-4">
+
+            <div className="bg-white p-4 rounded-xl shadow">
               <QRCode
                 value={`${window.location.origin}/emergency/${user.uid}`}
                 size={180}
               />
             </div>
+
+            <button
+              onClick={() => setShowQR(false)}
+              className="text-sm text-gray-500 hover:text-gray-700"
+            >
+              Hide QR Code
+            </button>
+
           </div>
         )}
+
       </div>
+
     </div>
   );
 }
@@ -176,12 +206,14 @@ export default function EmergencyPage() {
 function Input({ label, value, setValue }: any) {
   return (
     <div>
-      <label className="text-sm text-gray-500 mb-2 block">{label}</label>
+      <label className="text-sm text-gray-500 mb-2 block">
+        {label}
+      </label>
 
       <input
         value={value}
         onChange={(e) => setValue(e.target.value)}
-        className="w-full border p-3 rounded-xl bg-gray-50 dark:bg-gray-700"
+        className="w-full border dark:border-gray-600 p-3 rounded-xl bg-gray-50 dark:bg-gray-700"
       />
     </div>
   );
