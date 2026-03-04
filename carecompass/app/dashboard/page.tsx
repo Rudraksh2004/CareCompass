@@ -58,7 +58,7 @@ export default function DashboardPage() {
 
   // 🧠 Generate AI Health Summary
   const generateAISummary = async () => {
-    if (!user || loadingSummary) return; // prevents double clicks
+    if (!user) return;
 
     setLoadingSummary(true);
     setAiSummary("");
@@ -73,15 +73,10 @@ export default function DashboardPage() {
       });
 
       const data = await res.json();
-
-      setAiSummary(data.summary || "No summary generated.");
-      setHealthScore(
-        typeof data.healthScore === "number" ? data.healthScore : null,
-      );
-      setRiskLevel(data.riskLevel || "");
+      setAiSummary(data.summary);
     } catch (error) {
-      console.error("AI Summary Error:", error);
-      setAiSummary("Failed to generate AI health summary.");
+      console.error("AI summary error:", error);
+      setAiSummary("Failed to generate summary.");
     }
 
     setLoadingSummary(false);
