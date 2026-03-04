@@ -14,7 +14,11 @@ export async function POST(req: Request) {
 
     if (!uid) {
       return NextResponse.json(
-        { summary: "User not authenticated.", healthScore: 0, riskLevel: "Unknown" },
+        {
+          summary: "User not authenticated.",
+          healthScore: 0,
+          riskLevel: "Unknown",
+        },
         { status: 400 }
       );
     }
@@ -25,7 +29,7 @@ export async function POST(req: Request) {
     );
     const profile = profileSnap.docs[0]?.data() || {};
 
-    // 🔹 Health Logs (latest 20)
+    // 🔹 Health Logs
     const healthSnap = await getDocs(
       query(
         collection(db, "health_logs"),
@@ -35,7 +39,7 @@ export async function POST(req: Request) {
     );
     const healthLogs = healthSnap.docs.map((d) => d.data());
 
-    // 🔹 Reports History
+    // 🔹 Reports
     const reportsSnap = await getDocs(
       query(
         collection(db, "history"),
@@ -123,9 +127,15 @@ Respond ONLY in JSON format:
     );
 
     const geminiData = await geminiRes.json();
-    const text =
-      geminiData?.candidates?.[0]?.content?.parts?.[0]?.text ||
-      "";
+
+    let text =
+      geminiData?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+
+    // 🔧 CLEAN GEMINI RESPONSE (important)
+    text = text
+      .replace(/```json/g, "")
+      .replace(/```/g, "")
+      .trim();
 
     let parsed = {
       summary: "No summary generated.",
@@ -146,6 +156,7 @@ Respond ONLY in JSON format:
     });
   } catch (error) {
     console.error("AI Summary Error:", error);
+
     return NextResponse.json({
       summary: "Failed to generate AI health summary.",
       healthScore: 0,
