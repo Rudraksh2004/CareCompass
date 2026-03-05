@@ -5,6 +5,7 @@ import Link from "next/link"; // ✅ NEW (safe import)
 import { useAuth } from "@/context/AuthContext";
 import { getUserReminders } from "@/services/reminderService";
 import { getHealthLogs } from "@/services/healthService";
+import { getEmergencyProfile } from "@/services/emergencyService";
 
 interface Reminder {
   id: string;
@@ -32,6 +33,7 @@ export default function DashboardPage() {
   const [countdowns, setCountdowns] = useState<Record<string, string>>({});
   const [aiSummary, setAiSummary] = useState("");
   const [loadingSummary, setLoadingSummary] = useState(false);
+  const [emergencyProfile, setEmergencyProfile] = useState<any>(null);
 
   // 🧠 AI Health Summary (NEW - SAFE)
   const [healthScore, setHealthScore] = useState<number | null>(null);
@@ -48,6 +50,9 @@ export default function DashboardPage() {
 
         const logs = await getHealthLogs(user.uid, "weight");
         setHealthActive((logs?.length || 0) > 0);
+
+        const emergency = await getEmergencyProfile(user.uid);
+        setEmergencyProfile(emergency);
       } catch (err) {
         console.error("Dashboard load error:", err);
       }
@@ -200,6 +205,40 @@ export default function DashboardPage() {
           </p>
         </div>
       </div>
+
+      {/* 🚑 Emergency Card Widget */}
+      {emergencyProfile && (
+        <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl p-8 shadow-2xl">
+          <div className="flex items-center justify-between flex-wrap gap-6">
+            <div>
+              <h3 className="text-2xl font-bold text-white">
+                🚑 Emergency Medical Card
+              </h3>
+
+              <p className="text-slate-400 text-sm mt-2 max-w-xl">
+                Quick access to your emergency medical information.
+              </p>
+
+              <div className="flex flex-wrap gap-4 mt-4 text-sm">
+                <span className="px-4 py-2 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20">
+                  Blood Group: {emergencyProfile.bloodGroup || "-"}
+                </span>
+
+                <span className="px-4 py-2 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                  Contact: {emergencyProfile.contact || "-"}
+                </span>
+              </div>
+            </div>
+
+            <Link
+              href="/dashboard/emergency"
+              className="inline-flex items-center justify-center bg-gradient-to-r from-red-600 to-pink-600 hover:opacity-90 transition text-white px-8 py-4 rounded-2xl font-semibold shadow-lg"
+            >
+              View Emergency Card →
+            </Link>
+          </div>
+        </div>
+      )}
 
       {/* 🧠 NEW: Disease Predictor Card (OPTION B - NON-BREAKING ADDITION) */}
       <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl p-8 shadow-2xl">
