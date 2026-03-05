@@ -13,10 +13,10 @@ export default async function EmergencyPublicPage({ params }: Props) {
 
   if (!snap.exists()) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 text-gray-800">
+      <div className="min-h-screen flex items-center justify-center bg-black text-white px-6">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-2">Emergency Info Not Found</h1>
-          <p className="text-gray-500">No emergency profile available.</p>
+          <p className="text-gray-400">No emergency profile available.</p>
         </div>
       </div>
     );
@@ -25,56 +25,54 @@ export default async function EmergencyPublicPage({ params }: Props) {
   const data = snap.data();
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-6">
-      <div className="max-w-md w-full bg-white border border-gray-200 rounded-2xl shadow-xl p-8">
+    <div className="min-h-screen bg-black flex items-center justify-center px-4">
+      <div className="w-full max-w-md bg-red-600 text-white rounded-3xl shadow-2xl p-8">
         {/* Header */}
         <div className="text-center mb-6">
-          <h1 className="text-xl font-bold text-red-600">
-            🚑 Emergency Medical Info
-          </h1>
+          <h1 className="text-2xl font-bold">🚑 Emergency Medical ID</h1>
 
-          <p className="text-sm text-gray-500">CareCompass Emergency Card</p>
+          <p className="text-red-100 text-sm mt-1">
+            CareCompass Emergency Card
+          </p>
         </div>
 
-        {/* Info */}
-        <div className="space-y-3 text-sm text-gray-800">
-          <p>
-            <b>Name:</b> {data.name || "-"}
-          </p>
+        {/* Blood Group Badge */}
+        <div className="flex justify-center mb-6">
+          <div className="bg-white text-red-600 font-bold text-xl px-6 py-2 rounded-full shadow">
+            {data.bloodGroup || "Unknown"}
+          </div>
+        </div>
 
-          <p>
-            <b>Blood Group:</b> {data.bloodGroup || "-"}
-          </p>
-
-          <p>
-            <b>Allergies:</b> {data.allergies || "-"}
-          </p>
-
-          <p>
-            <b>Medical Conditions:</b> {data.conditions || "-"}
-          </p>
-
-          <p>
-            <b>Medications:</b> {data.medications || "-"}
-          </p>
-
-          <p>
-            <b>Emergency Contact:</b> {data.contact || "-"}
-          </p>
+        {/* Medical Info */}
+        <div className="space-y-4 text-sm">
+          <Info label="Name" value={data.name} />
+          <Info label="Allergies" value={data.allergies} />
+          <Info label="Medical Conditions" value={data.conditions} />
+          <Info label="Medications" value={data.medications} />
+          <Info label="Emergency Contact" value={data.contact} />
         </div>
 
         {/* Call Button */}
         {data.contact && (
-          <div className="mt-6 text-center">
+          <div className="mt-8 text-center">
             <a
               href={`tel:${data.contact}`}
-              className="inline-block bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl font-medium"
+              className="inline-block bg-white text-red-600 font-semibold px-6 py-3 rounded-xl shadow hover:scale-105 transition"
             >
-              Call Emergency Contact
+              📞 Call Emergency Contact
             </a>
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+function Info({ label, value }: any) {
+  return (
+    <div className="bg-white/20 rounded-xl p-3">
+      <p className="text-xs opacity-80">{label}</p>
+      <p className="font-semibold">{value || "-"}</p>
     </div>
   );
 }
