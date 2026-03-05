@@ -138,51 +138,63 @@ export default function EmergencyPage() {
         </div>
       </div>
 
-      {/* Emergency Card Preview */}
-      <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-6 rounded-2xl">
-        <h2 className="text-xl font-semibold mb-4">Emergency Card Preview</h2>
-
-        <div className="space-y-2 text-sm">
-          <p>
-            <b>Name:</b> {name || "-"}
-          </p>
-          <p>
-            <b>Blood Group:</b> {bloodGroup || "-"}
-          </p>
-          <p>
-            <b>Allergies:</b> {allergies || "-"}
-          </p>
-          <p>
-            <b>Conditions:</b> {conditions || "-"}
-          </p>
-          <p>
-            <b>Medications:</b> {medications || "-"}
-          </p>
-          <p>
-            <b>Emergency Contact:</b> {contact || "-"}
-          </p>
-        </div>
-      </div>
-
-      {/* QR Code Display */}
+      {/* Emergency Card */}
       {showQR && user && (
-        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-6 rounded-2xl shadow-sm text-center">
-          <h2 className="text-xl font-semibold mb-4">Emergency QR Card</h2>
-
-          <div className="flex flex-col items-center gap-4">
-            <div className="bg-white p-4 rounded-xl shadow">
-              <QRCode
-                value={`${window.location.origin}/emergency/${user.uid}`}
-                size={180}
-              />
+        <div className="flex justify-center">
+          <div className="relative bg-gradient-to-br from-red-600 to-pink-600 text-white rounded-2xl p-6 shadow-xl w-full max-w-md">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold">🚑 Emergency Card</h3>
+              <span className="text-sm opacity-80">CareCompass</span>
             </div>
 
-            <button
-              onClick={() => setShowQR(false)}
-              className="text-sm text-gray-500 hover:text-gray-700"
-            >
-              Hide QR Code
-            </button>
+            {/* Info */}
+            <div className="space-y-2 text-sm">
+              <p>
+                <span className="opacity-80">Name:</span>{" "}
+                <span className="font-semibold">{name || "-"}</span>
+              </p>
+
+              <p>
+                <span className="opacity-80">Blood Group:</span>{" "}
+                <span className="font-semibold">{bloodGroup || "-"}</span>
+              </p>
+
+              <p>
+                <span className="opacity-80">Allergies:</span>{" "}
+                <span className="font-semibold">{allergies || "-"}</span>
+              </p>
+
+              <p>
+                <span className="opacity-80">Conditions:</span>{" "}
+                <span className="font-semibold">{conditions || "-"}</span>
+              </p>
+
+              <p>
+                <span className="opacity-80">Medications:</span>{" "}
+                <span className="font-semibold">{medications || "-"}</span>
+              </p>
+
+              <p>
+                <span className="opacity-80">Emergency Contact:</span>{" "}
+                <span className="font-semibold">{contact || "-"}</span>
+              </p>
+            </div>
+
+            {/* QR Code */}
+            <div className="mt-6 flex justify-center">
+              <div className="bg-white p-3 rounded-xl shadow">
+                <QRCode
+                  value={`${window.location.origin}/emergency/${user.uid}`}
+                  size={120}
+                />
+              </div>
+            </div>
+
+            {/* Small Label */}
+            <p className="text-xs text-center mt-3 opacity-80">
+              Scan QR to access emergency medical info
+            </p>
           </div>
         </div>
       )}
