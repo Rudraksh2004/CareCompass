@@ -139,19 +139,22 @@ export default function EmergencyPage() {
       </div>
 
       {/* Emergency Card */}
-      {showQR && user && (
+      {/* Emergency Card */}
+      {user && (
         <div className="flex justify-center">
           <div className="relative bg-gradient-to-br from-red-600 to-pink-600 text-white rounded-2xl p-6 shadow-xl w-full max-w-md">
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-bold">🚑 Emergency Card</h3>
 
-              <button
-                onClick={() => setShowQR(false)}
-                className="text-xs bg-white/20 hover:bg-white/30 px-3 py-1 rounded-lg transition"
-              >
-                Hide QR
-              </button>
+              {showQR && (
+                <button
+                  onClick={() => setShowQR(false)}
+                  className="text-xs bg-white/20 hover:bg-white/30 px-3 py-1 rounded-lg transition"
+                >
+                  Hide QR
+                </button>
+              )}
             </div>
 
             {/* Info */}
@@ -188,18 +191,22 @@ export default function EmergencyPage() {
             </div>
 
             {/* QR Code */}
-            <div className="mt-6 flex justify-center">
-              <div className="bg-white p-3 rounded-xl shadow">
-                <QRCode
-                  value={`${window.location.origin}/emergency/${user.uid}`}
-                  size={120}
-                />
+            {showQR && (
+              <div className="mt-6 flex justify-center">
+                <div className="bg-white p-3 rounded-xl shadow">
+                  <QRCode
+                    value={`${window.location.origin}/emergency/${user.uid}`}
+                    size={120}
+                  />
+                </div>
               </div>
-            </div>
+            )}
 
-            <p className="text-xs text-center mt-3 opacity-80">
-              Scan QR to access emergency medical info
-            </p>
+            {showQR && (
+              <p className="text-xs text-center mt-3 opacity-80">
+                Scan QR to access emergency medical info
+              </p>
+            )}
           </div>
         </div>
       )}
