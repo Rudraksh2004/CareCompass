@@ -141,10 +141,12 @@ export default function EmergencyPage() {
       {/* Emergency Card */}
       {user && (
         <div className="flex justify-center">
-          <div className="relative bg-gradient-to-br from-red-600 to-pink-600 text-white rounded-2xl p-6 shadow-xl w-full max-w-md">
+          <div className="relative bg-gradient-to-br from-red-600 to-pink-600 text-white rounded-2xl p-6 shadow-xl w-full max-w-md animate-pulse-slow">
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold">🚑 Emergency Card</h3>
+              <h3 className="text-lg font-bold flex items-center gap-2">
+                🚑 Emergency Card
+              </h3>
 
               <button
                 onClick={() => setShowQR(!showQR)}
@@ -154,18 +156,23 @@ export default function EmergencyPage() {
               </button>
             </div>
 
-            {/* Info */}
-            <div className="space-y-2 text-sm">
-              <p>
-                <span className="opacity-80">Name:</span>{" "}
-                <span className="font-semibold">{name || "-"}</span>
-              </p>
+            {/* Name */}
+            <p className="text-sm">
+              <span className="opacity-80">Name:</span>{" "}
+              <span className="font-semibold">{name || "-"}</span>
+            </p>
 
-              <p>
-                <span className="opacity-80">Blood Group:</span>{" "}
-                <span className="font-semibold">{bloodGroup || "-"}</span>
-              </p>
+            {/* Blood Group Badge */}
+            <div className="mt-2 flex items-center gap-2">
+              <span className="opacity-80 text-sm">Blood Group:</span>
 
+              <span className="bg-white text-red-600 font-bold px-3 py-1 rounded-full text-xs shadow">
+                {bloodGroup || "-"}
+              </span>
+            </div>
+
+            {/* Medical Info */}
+            <div className="space-y-1 mt-3 text-sm">
               <p>
                 <span className="opacity-80">Allergies:</span>{" "}
                 <span className="font-semibold">{allergies || "-"}</span>
@@ -204,6 +211,11 @@ export default function EmergencyPage() {
                 Scan QR to access emergency medical info
               </p>
             )}
+
+            {/* Footer */}
+            <p className="text-[10px] opacity-70 text-center mt-4">
+              CareCompass Emergency Medical ID
+            </p>
           </div>
         </div>
       )}
