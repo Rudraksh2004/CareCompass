@@ -139,7 +139,6 @@ export default function EmergencyPage() {
       </div>
 
       {/* Emergency Card */}
-      {/* Emergency Card */}
       {user && (
         <div className="flex justify-center">
           <div className="relative bg-gradient-to-br from-red-600 to-pink-600 text-white rounded-2xl p-6 shadow-xl w-full max-w-md">
@@ -147,14 +146,12 @@ export default function EmergencyPage() {
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-bold">🚑 Emergency Card</h3>
 
-              {showQR && (
-                <button
-                  onClick={() => setShowQR(false)}
-                  className="text-xs bg-white/20 hover:bg-white/30 px-3 py-1 rounded-lg transition"
-                >
-                  Hide QR
-                </button>
-              )}
+              <button
+                onClick={() => setShowQR(!showQR)}
+                className="text-xs bg-white/20 hover:bg-white/30 px-3 py-1 rounded-lg transition"
+              >
+                {showQR ? "Hide QR" : "Show QR"}
+              </button>
             </div>
 
             {/* Info */}
