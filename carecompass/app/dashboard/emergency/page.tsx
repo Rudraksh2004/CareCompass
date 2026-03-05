@@ -79,6 +79,7 @@ export default function EmergencyPage() {
             <label className="text-sm text-gray-500 mb-2 block">
               Blood Group
             </label>
+
             <select
               value={bloodGroup}
               onChange={(e) => setBloodGroup(e.target.value)}
@@ -117,8 +118,8 @@ export default function EmergencyPage() {
           />
         </div>
 
+        {/* Buttons */}
         <div className="mt-8 flex items-center justify-end gap-4">
-          {/* Generate QR Button */}
           <button
             onClick={() => setShowQR(true)}
             disabled={!name || !bloodGroup}
@@ -127,7 +128,6 @@ export default function EmergencyPage() {
             Generate QR Code
           </button>
 
-          {/* Save Button */}
           <button
             onClick={handleSave}
             disabled={saving}
@@ -164,25 +164,11 @@ export default function EmergencyPage() {
         </div>
       </div>
 
-      {/* QR Code Section */}
-      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-6 rounded-2xl shadow-sm text-center">
-        <h2 className="text-xl font-semibold mb-4">Emergency QR Card</h2>
+      {/* QR Code Display */}
+      {showQR && user && (
+        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-6 rounded-2xl shadow-sm text-center">
+          <h2 className="text-xl font-semibold mb-4">Emergency QR Card</h2>
 
-        <p className="text-sm text-gray-500 mb-6">
-          Generate a QR code so doctors or emergency responders can access your
-          emergency health information.
-        </p>
-
-        {!showQR && (
-          <button
-            onClick={() => setShowQR(true)}
-            className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl font-medium transition"
-          >
-            Generate QR Code
-          </button>
-        )}
-
-        {showQR && user && (
           <div className="flex flex-col items-center gap-4">
             <div className="bg-white p-4 rounded-xl shadow">
               <QRCode
@@ -198,8 +184,8 @@ export default function EmergencyPage() {
               Hide QR Code
             </button>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
