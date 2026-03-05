@@ -145,7 +145,13 @@ export default function EmergencyPage() {
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-bold">🚑 Emergency Card</h3>
-              <span className="text-sm opacity-80">CareCompass</span>
+
+              <button
+                onClick={() => setShowQR(false)}
+                className="text-xs bg-white/20 hover:bg-white/30 px-3 py-1 rounded-lg transition"
+              >
+                Hide QR
+              </button>
             </div>
 
             {/* Info */}
@@ -191,7 +197,6 @@ export default function EmergencyPage() {
               </div>
             </div>
 
-            {/* Small Label */}
             <p className="text-xs text-center mt-3 opacity-80">
               Scan QR to access emergency medical info
             </p>
