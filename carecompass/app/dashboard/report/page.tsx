@@ -27,9 +27,7 @@ export default function ReportPage() {
     }
   }, [user]);
 
-  const handleFileUpload = async (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -70,8 +68,7 @@ export default function ReportPage() {
       });
 
       const data = await res.json();
-      const explanation =
-        data.explanation || "No response generated.";
+      const explanation = data.explanation || "No response generated.";
 
       setResult(explanation);
 
@@ -102,6 +99,13 @@ export default function ReportPage() {
     }
   };
 
+  // 🔥 Download AI explanation as PDF
+  const downloadReportPDF = () => {
+    if (!result) return;
+
+    exportMedicalPDF("Medical Report Explanation", reportText, result);
+  };
+
   return (
     <div className="max-w-6xl mx-auto space-y-10 text-gray-900 dark:text-gray-100">
       {/* 🌟 Premium Clinical Header (UNCHANGED) */}
@@ -121,9 +125,7 @@ export default function ReportPage() {
       {/* 📤 Upload Card (UNCHANGED) */}
       <div className="bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-gray-200 dark:border-gray-800 p-8 rounded-3xl shadow-2xl space-y-6">
         <div>
-          <h2 className="text-2xl font-semibold">
-            Upload Medical Report
-          </h2>
+          <h2 className="text-2xl font-semibold">Upload Medical Report</h2>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
             Supports images, scanned reports, and PDFs (OCR enabled)
           </p>
@@ -189,13 +191,24 @@ export default function ReportPage() {
         </div>
       </div>
 
-      {/* 🧠 AI Result (UNCHANGED) */}
+      {/* 🧠 AI Result */}
       {result && (
         <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-10 rounded-3xl shadow-2xl">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-semibold">
+              🧠 AI Clinical Explanation
+            </h2>
+
+            <button
+              onClick={downloadReportPDF}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-xl text-sm font-semibold transition shadow"
+            >
+              Download PDF
+            </button>
+          </div>
+
           <div className="prose dark:prose-invert max-w-none text-sm leading-relaxed">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>
-              {result}
-            </ReactMarkdown>
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{result}</ReactMarkdown>
           </div>
         </div>
       )}
@@ -220,9 +233,7 @@ export default function ReportPage() {
                     {item.createdAt?.toDate?.().toLocaleString?.() || ""}
                   </p>
 
-                  <p className="text-sm font-semibold mb-1">
-                    📄 Report Text
-                  </p>
+                  <p className="text-sm font-semibold mb-1">📄 Report Text</p>
                   <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-3">
                     {item.originalText}
                   </p>
@@ -244,9 +255,7 @@ export default function ReportPage() {
                   {/* 🔥 ACTION BUTTONS (EXPAND + VIEWER + DELETE) */}
                   <div className="flex flex-wrap gap-4 mt-4">
                     <button
-                      onClick={() =>
-                        setExpandedId(isExpanded ? null : item.id)
-                      }
+                      onClick={() => setExpandedId(isExpanded ? null : item.id)}
                       className="text-sm font-semibold text-blue-600 hover:underline"
                     >
                       {isExpanded
