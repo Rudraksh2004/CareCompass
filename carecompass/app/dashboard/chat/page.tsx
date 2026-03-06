@@ -110,7 +110,7 @@ export default function ChatPage() {
   // 🧠 Smart Title Generator (UNCHANGED)
   const generateSmartTitle = async (
     firstMessage: string,
-    sessionId: string
+    sessionId: string,
   ) => {
     if (!user) return;
 
@@ -209,9 +209,7 @@ export default function ChatPage() {
     setLoading(false);
   };
 
-  const handleKeyDown = (
-    e: React.KeyboardEvent<HTMLInputElement>
-  ) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
@@ -306,8 +304,8 @@ export default function ChatPage() {
                   Start a Smart Health Conversation
                 </p>
                 <p className="text-sm mt-2">
-                  Ask about medical reports, prescriptions, symptoms,
-                  disease risks, or general health guidance.
+                  Ask about medical reports, prescriptions, symptoms, disease
+                  risks, or general health guidance.
                 </p>
               </div>
             ) : (
@@ -315,21 +313,21 @@ export default function ChatPage() {
                 <div
                   key={index}
                   className={`flex ${
-                    msg.role === "user"
-                      ? "justify-end"
-                      : "justify-start"
+                    msg.role === "user" ? "justify-end" : "justify-start"
                   }`}
                 >
                   <div
-                    className={`max-w-[75%] px-5 py-4 rounded-2xl text-sm shadow-lg ${
+                    className={`max-w-[75%] px-5 py-4 rounded-2xl text-sm shadow-lg whitespace-pre-wrap break-words ${
                       msg.role === "user"
                         ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white"
                         : "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-100"
                     }`}
                   >
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                      {msg.content}
-                    </ReactMarkdown>
+                    <div className="prose dark:prose-invert max-w-none">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        {msg.content}
+                      </ReactMarkdown>
+                    </div>
                   </div>
                 </div>
               ))
