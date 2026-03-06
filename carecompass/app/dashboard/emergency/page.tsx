@@ -7,6 +7,8 @@ import {
   saveEmergencyProfile,
 } from "@/services/emergencyService";
 import QRCode from "react-qr-code";
+import { useRef } from "react";
+import * as htmlToImage from "html-to-image";
 
 export default function EmergencyPage() {
   const { user } = useAuth();
@@ -20,6 +22,7 @@ export default function EmergencyPage() {
 
   const [saving, setSaving] = useState(false);
   const [showQR, setShowQR] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const load = async () => {
@@ -56,6 +59,24 @@ export default function EmergencyPage() {
 
     alert("Emergency profile saved.");
     setSaving(false);
+  };
+
+  const downloadEmergencyCard = async () => {
+    if (!cardRef.current) return;
+
+    try {
+      const dataUrl = await htmlToImage.toPng(cardRef.current, {
+        cacheBust: true,
+        backgroundColor: "#ffffff",
+      });
+
+      const link = document.createElement("a");
+      link.download = "carecompass-emergency-card.png";
+      link.href = dataUrl;
+      link.click();
+    } catch (error) {
+      console.error("Download failed:", error);
+    }
   };
 
   return (
@@ -141,12 +162,13 @@ export default function EmergencyPage() {
       {/* Emergency Card */}
       {user && (
         <div className="flex justify-center">
-          <div className="relative bg-gradient-to-br from-red-600 to-pink-600 text-white rounded-2xl p-6 shadow-xl w-full max-w-md animate-pulse-slow">
+          <div
+            ref={cardRef}
+            className="relative bg-gradient-to-br from-red-600 to-pink-600 text-white rounded-2xl p-6 shadow-xl w-full max-w-md"
+          >
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold flex items-center gap-2">
-                🚑 Emergency Card
-              </h3>
+              <h3 className="text-lg font-bold">🚑 Emergency Card</h3>
 
               <button
                 onClick={() => setShowQR(!showQR)}
@@ -211,6 +233,14 @@ export default function EmergencyPage() {
                 Scan QR to access emergency medical info
               </p>
             )}
+
+            {/* Download Button */}
+            <button
+              onClick={downloadEmergencyCard}
+              className="mt-5 w-full bg-white text-red-600 font-semibold py-2 rounded-xl hover:scale-[1.02] transition"
+            >
+              Download Emergency Card
+            </button>
 
             {/* Footer */}
             <p className="text-[10px] opacity-70 text-center mt-4">
