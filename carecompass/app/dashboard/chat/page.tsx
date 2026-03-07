@@ -12,6 +12,7 @@ import {
 } from "@/services/chatService";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { FaCopy, FaRedo } from "react-icons/fa";
 
 interface Message {
   role: "user" | "assistant";
@@ -30,7 +31,9 @@ export default function ChatPage() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [initializing, setInitializing] = useState(true);
 
-  // 🔥 Load sessions on mount (UNCHANGED)
+  const [expandedMessages, setExpandedMessages] = useState<Record<number, boolean>>({});
+  const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+
   useEffect(() => {
     if (!user) return;
     initializeChat();
@@ -71,7 +74,6 @@ export default function ChatPage() {
     setActiveSession(sessionId);
   };
 
-  // Auto scroll (UNCHANGED)
   useEffect(() => {
     const timeout = setTimeout(() => {
       bottomRef.current?.scrollIntoView({
@@ -83,7 +85,6 @@ export default function ChatPage() {
     return () => clearTimeout(timeout);
   }, [messages.length, loading]);
 
-  // ➕ New Chat (UNCHANGED)
   const handleNewChat = async () => {
     if (!user) return;
 
@@ -93,7 +94,6 @@ export default function ChatPage() {
     await fetchSessions();
   };
 
-  // 🗑 Delete Chat (UNCHANGED)
   const handleDeleteChat = async (sessionId: string) => {
     if (!user) return;
 
@@ -107,7 +107,6 @@ export default function ChatPage() {
     await fetchSessions();
   };
 
-  // 🧠 Smart Title Generator (UNCHANGED)
   const generateSmartTitle = async (
     firstMessage: string,
     sessionId: string,
@@ -133,7 +132,6 @@ export default function ChatPage() {
     }
   };
 
-  // Typing animation (UNCHANGED)
   const typeMessage = async (fullText: string) => {
     let currentText = "";
 
@@ -216,9 +214,30 @@ export default function ChatPage() {
     }
   };
 
+  const toggleExpand = (index: number) => {
+    setExpandedMessages((prev) => ({
+      ...prev,
+      [index]: !prev[index],
+    }));
+  };
+
+  const copyMessage = (text: string, index: number) => {
+    navigator.clipboard.writeText(text);
+    setCopiedIndex(index);
+
+    setTimeout(() => setCopiedIndex(null), 2000);
+  };
+
+  const regenerateAnswer = async () => {
+    const lastUser = [...messages].reverse().find((m) => m.role === "user");
+    if (!lastUser) return;
+
+    setInput(lastUser.content);
+  };
+
   return (
     <div className="max-w-7xl mx-auto space-y-6">
-      {/* 🌟 Premium Header (UI ONLY) */}
+      {/* HEADER */}
       <div className="relative overflow-hidden rounded-3xl border border-gray-200 dark:border-gray-800 bg-gradient-to-br from-blue-600/10 via-purple-600/10 to-emerald-600/10 backdrop-blur-xl p-6 shadow-xl">
         <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-emerald-500 bg-clip-text text-transparent">
           🤖 CareCompass AI Health Chat
@@ -229,9 +248,10 @@ export default function ChatPage() {
         </p>
       </div>
 
-      {/* 🌟 Main Chat Container (GLASS UI) */}
+      {/* MAIN CONTAINER */}
       <div className="flex h-[75vh] rounded-3xl overflow-hidden border border-gray-200 dark:border-gray-800 bg-white/70 dark:bg-gray-900/70 backdrop-blur-2xl shadow-2xl">
-        {/* Sidebar */}
+
+        {/* SIDEBAR */}
         {sidebarOpen && (
           <div className="w-72 border-r border-gray-200 dark:border-gray-800 p-4 flex flex-col bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl">
             <button
@@ -271,9 +291,10 @@ export default function ChatPage() {
           </div>
         )}
 
-        {/* Chat Area */}
+        {/* CHAT AREA */}
         <div className="flex-1 flex flex-col">
-          {/* Top Bar */}
+
+          {/* TOP BAR */}
           <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200 dark:border-gray-800 bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -291,64 +312,99 @@ export default function ChatPage() {
             </span>
           </div>
 
-          {/* Messages */}
+          {/* MESSAGES */}
           <div className="flex-1 overflow-y-auto p-6 space-y-6">
-            {initializing ? (
-              <div className="text-center mt-24 text-gray-500">
-                Initializing AI health chat...
-              </div>
-            ) : messages.length === 0 ? (
-              <div className="text-center mt-24 text-gray-500">
-                <div className="text-6xl mb-4">🧠</div>
-                <p className="font-semibold text-xl text-gray-700 dark:text-gray-200">
-                  Start a Smart Health Conversation
-                </p>
-                <p className="text-sm mt-2">
-                  Ask about medical reports, prescriptions, symptoms, disease
-                  risks, or general health guidance.
-                </p>
-              </div>
-            ) : (
-              messages.map((msg, index) => (
+
+            {messages.map((msg, index) => {
+              const isLong = msg.content.length > 700;
+              const expanded = expandedMessages[index];
+              const displayText =
+                isLong && !expanded
+                  ? msg.content.slice(0, 700) + "..."
+                  : msg.content;
+
+              return (
                 <div
                   key={index}
                   className={`flex ${
-                    msg.role === "user" ? "justify-end" : "justify-start"
+                    msg.role === "user"
+                      ? "justify-end"
+                      : "justify-start"
                   }`}
                 >
                   <div
-                    className={`max-w-[75%] px-5 py-4 rounded-2xl text-sm shadow-lg whitespace-pre-wrap break-words ${
+                    className={`group max-w-[75%] px-5 py-4 rounded-2xl text-sm shadow-lg whitespace-pre-wrap break-words ${
                       msg.role === "user"
                         ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white"
                         : "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-100"
                     }`}
                   >
-                    <div className="prose dark:prose-invert max-w-none">
+                    <div className="prose dark:prose-invert max-w-none prose-pre:bg-gray-900 prose-pre:text-white prose-pre:rounded-xl prose-pre:p-4">
                       <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                        {msg.content}
+                        {displayText}
                       </ReactMarkdown>
                     </div>
+
+                    {isLong && (
+                      <button
+                        onClick={() => toggleExpand(index)}
+                        className="text-xs mt-2 text-blue-500 hover:underline"
+                      >
+                        {expanded ? "Show less" : "Read more"}
+                      </button>
+                    )}
+
+                    {msg.role === "assistant" && (
+                      <div className="flex gap-4 mt-3 opacity-0 group-hover:opacity-100 transition text-xs">
+                        <button
+                          onClick={() =>
+                            copyMessage(msg.content, index)
+                          }
+                          className="flex items-center gap-1 hover:text-blue-500"
+                        >
+                          <FaCopy />
+                          {copiedIndex === index
+                            ? "Copied"
+                            : "Copy"}
+                        </button>
+
+                        <button
+                          onClick={regenerateAnswer}
+                          className="flex items-center gap-1 hover:text-purple-500"
+                        >
+                          <FaRedo />
+                          Regenerate
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
-              ))
-            )}
+              );
+            })}
 
             {loading && (
-              <div className="text-sm text-emerald-600 animate-pulse font-medium">
-                🧠 CareCompass AI is analyzing your health query...
+              <div className="flex items-center gap-2 text-gray-500">
+                <div className="flex gap-1">
+                  <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></span>
+                  <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-100"></span>
+                  <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-200"></span>
+                </div>
+                <span className="text-sm">
+                  CareCompass AI is thinking...
+                </span>
               </div>
             )}
 
             <div ref={bottomRef} />
           </div>
 
-          {/* Input Bar */}
+          {/* INPUT */}
           <div className="p-4 border-t border-gray-200 dark:border-gray-800 flex gap-3 bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl">
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Ask about reports, symptoms, prescriptions, disease risks..."
+              placeholder="Ask about reports, symptoms, prescriptions..."
               className="flex-1 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
             />
 
