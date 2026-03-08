@@ -31,7 +31,9 @@ export default function ChatPage() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [initializing, setInitializing] = useState(true);
 
-  const [expandedMessages, setExpandedMessages] = useState<Record<number, boolean>>({});
+  const [expandedMessages, setExpandedMessages] = useState<
+    Record<number, boolean>
+  >({});
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
   useEffect(() => {
@@ -250,7 +252,6 @@ export default function ChatPage() {
 
       {/* MAIN CONTAINER */}
       <div className="flex h-[75vh] rounded-3xl overflow-hidden border border-gray-200 dark:border-gray-800 bg-white/70 dark:bg-gray-900/70 backdrop-blur-2xl shadow-2xl">
-
         {/* SIDEBAR */}
         {sidebarOpen && (
           <div className="w-72 border-r border-gray-200 dark:border-gray-800 p-4 flex flex-col bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl">
@@ -293,7 +294,6 @@ export default function ChatPage() {
 
         {/* CHAT AREA */}
         <div className="flex-1 flex flex-col">
-
           {/* TOP BAR */}
           <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200 dark:border-gray-800 bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl">
             <button
@@ -314,7 +314,6 @@ export default function ChatPage() {
 
           {/* MESSAGES */}
           <div className="flex-1 overflow-y-auto p-6 space-y-6">
-
             {messages.map((msg, index) => {
               const isLong = msg.content.length > 700;
               const expanded = expandedMessages[index];
@@ -327,9 +326,7 @@ export default function ChatPage() {
                 <div
                   key={index}
                   className={`flex ${
-                    msg.role === "user"
-                      ? "justify-end"
-                      : "justify-start"
+                    msg.role === "user" ? "justify-end" : "justify-start"
                   }`}
                 >
                   <div
@@ -339,7 +336,25 @@ export default function ChatPage() {
                         : "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-100"
                     }`}
                   >
-                    <div className="prose dark:prose-invert max-w-none prose-pre:bg-gray-900 prose-pre:text-white prose-pre:rounded-xl prose-pre:p-4">
+                    <div
+                      className="
+  prose prose-sm sm:prose-base dark:prose-invert max-w-none
+  prose-headings:font-semibold
+  prose-headings:text-blue-600
+  dark:prose-headings:text-blue-400
+  prose-strong:text-purple-600
+  dark:prose-strong:text-purple-400
+  prose-li:marker:text-blue-500
+  prose-p:text-gray-700
+  dark:prose-p:text-gray-300
+  prose-pre:bg-gray-900
+  prose-pre:text-white
+  prose-pre:rounded-xl
+  prose-pre:p-4
+  prose-code:text-pink-500
+  prose-code:font-semibold
+  "
+                    >
                       <ReactMarkdown remarkPlugins={[remarkGfm]}>
                         {displayText}
                       </ReactMarkdown>
@@ -357,15 +372,11 @@ export default function ChatPage() {
                     {msg.role === "assistant" && (
                       <div className="flex gap-4 mt-3 opacity-0 group-hover:opacity-100 transition text-xs">
                         <button
-                          onClick={() =>
-                            copyMessage(msg.content, index)
-                          }
+                          onClick={() => copyMessage(msg.content, index)}
                           className="flex items-center gap-1 hover:text-blue-500"
                         >
                           <FaCopy />
-                          {copiedIndex === index
-                            ? "Copied"
-                            : "Copy"}
+                          {copiedIndex === index ? "Copied" : "Copy"}
                         </button>
 
                         <button
@@ -389,9 +400,7 @@ export default function ChatPage() {
                   <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-100"></span>
                   <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-200"></span>
                 </div>
-                <span className="text-sm">
-                  CareCompass AI is thinking...
-                </span>
+                <span className="text-sm">CareCompass AI is thinking...</span>
               </div>
             )}
 
