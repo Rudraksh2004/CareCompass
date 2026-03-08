@@ -240,10 +240,11 @@ export default function ChatPage() {
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       {/* HEADER */}
-      <div className="relative overflow-hidden rounded-3xl border border-gray-200 dark:border-gray-800 bg-gradient-to-br from-blue-600/10 via-purple-600/10 to-emerald-600/10 backdrop-blur-xl p-6 shadow-xl">
+      <div className="relative overflow-hidden rounded-3xl border border-gray-200/70 dark:border-gray-800/70 bg-gradient-to-br from-blue-600/10 via-purple-600/10 to-emerald-600/10 backdrop-blur-xl p-6 shadow-xl">
         <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-emerald-500 bg-clip-text text-transparent">
           🤖 CareCompass AI Health Chat
         </h1>
+
         <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
           Memory-enabled clinical assistant for reports, symptoms,
           prescriptions, and general health queries.
@@ -251,13 +252,13 @@ export default function ChatPage() {
       </div>
 
       {/* MAIN CONTAINER */}
-      <div className="flex h-[75vh] rounded-3xl overflow-hidden border border-gray-200 dark:border-gray-800 bg-white/70 dark:bg-gray-900/70 backdrop-blur-2xl shadow-2xl">
+      <div className="flex h-[75vh] rounded-3xl overflow-hidden border border-gray-200/70 dark:border-gray-800/70 bg-white/70 dark:bg-gray-900/70 backdrop-blur-2xl shadow-2xl">
         {/* SIDEBAR */}
         {sidebarOpen && (
-          <div className="w-72 border-r border-gray-200 dark:border-gray-800 p-4 flex flex-col bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl">
+          <div className="w-72 border-r border-gray-200/70 dark:border-gray-800/70 p-4 flex flex-col bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl">
             <button
               onClick={handleNewChat}
-              className="mb-4 w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl font-semibold shadow-lg hover:opacity-90 transition"
+              className="mb-4 w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl font-semibold shadow-md hover:shadow-lg hover:scale-[1.02] transition"
             >
               + New Health Chat
             </button>
@@ -269,8 +270,8 @@ export default function ChatPage() {
                   onClick={() => loadMessages(session.id)}
                   className={`group flex items-center justify-between p-3 rounded-xl cursor-pointer transition ${
                     activeSession === session.id
-                      ? "bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-200 dark:border-blue-900"
-                      : "hover:bg-gray-100 dark:hover:bg-gray-800"
+                      ? "bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-200 dark:border-blue-900 shadow-sm"
+                      : "hover:bg-gray-100/70 dark:hover:bg-gray-800/60"
                   }`}
                 >
                   <span className="text-sm font-medium truncate">
@@ -295,10 +296,10 @@ export default function ChatPage() {
         {/* CHAT AREA */}
         <div className="flex-1 flex flex-col">
           {/* TOP BAR */}
-          <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200 dark:border-gray-800 bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200/70 dark:border-gray-800/70 bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-sm font-medium"
+              className="px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition"
             >
               ☰
             </button>
@@ -307,7 +308,7 @@ export default function ChatPage() {
               AI Health Assistant
             </h2>
 
-            <span className="text-xs px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 font-semibold">
+            <span className="text-xs px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 font-semibold shadow-sm">
               Memory Enabled • Non-Diagnostic
             </span>
           </div>
@@ -317,6 +318,7 @@ export default function ChatPage() {
             {messages.map((msg, index) => {
               const isLong = msg.content.length > 700;
               const expanded = expandedMessages[index];
+
               const displayText =
                 isLong && !expanded
                   ? msg.content.slice(0, 700) + "..."
@@ -330,30 +332,37 @@ export default function ChatPage() {
                   }`}
                 >
                   <div
-                    className={`group max-w-[75%] px-5 py-4 rounded-2xl text-sm shadow-lg whitespace-pre-wrap break-words ${
+                    className={`group max-w-[75%] px-5 py-4 rounded-2xl text-sm whitespace-pre-wrap break-words transition ${
                       msg.role === "user"
-                        ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white"
-                        : "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-100"
+                        ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md"
+                        : "bg-white/80 dark:bg-gray-900/80 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-100 backdrop-blur-xl shadow-sm"
                     }`}
                   >
+                    {/* AI badge */}
+                    {msg.role === "assistant" && (
+                      <div className="mb-2 text-xs font-medium text-emerald-600 dark:text-emerald-400">
+                        CareCompass AI
+                      </div>
+                    )}
+
                     <div
                       className="
-  prose prose-sm sm:prose-base dark:prose-invert max-w-none
-  prose-headings:font-semibold
-  prose-headings:text-blue-600
-  dark:prose-headings:text-blue-400
-  prose-strong:text-purple-600
-  dark:prose-strong:text-purple-400
-  prose-li:marker:text-blue-500
-  prose-p:text-gray-700
-  dark:prose-p:text-gray-300
-  prose-pre:bg-gray-900
-  prose-pre:text-white
-  prose-pre:rounded-xl
-  prose-pre:p-4
-  prose-code:text-pink-500
-  prose-code:font-semibold
-  "
+                    prose prose-sm sm:prose-base dark:prose-invert max-w-none
+                    prose-headings:font-semibold
+                    prose-headings:text-blue-600
+                    dark:prose-headings:text-blue-400
+                    prose-strong:text-purple-600
+                    dark:prose-strong:text-purple-400
+                    prose-li:marker:text-blue-500
+                    prose-p:text-gray-700
+                    dark:prose-p:text-gray-300
+                    prose-pre:bg-gray-900
+                    prose-pre:text-white
+                    prose-pre:rounded-xl
+                    prose-pre:p-4
+                    prose-code:text-pink-500
+                    prose-code:font-semibold
+                    "
                     >
                       <ReactMarkdown remarkPlugins={[remarkGfm]}>
                         {displayText}
@@ -373,7 +382,7 @@ export default function ChatPage() {
                       <div className="flex gap-4 mt-3 opacity-0 group-hover:opacity-100 transition text-xs">
                         <button
                           onClick={() => copyMessage(msg.content, index)}
-                          className="flex items-center gap-1 hover:text-blue-500"
+                          className="flex items-center gap-1 hover:text-blue-500 transition"
                         >
                           <FaCopy />
                           {copiedIndex === index ? "Copied" : "Copy"}
@@ -381,7 +390,7 @@ export default function ChatPage() {
 
                         <button
                           onClick={regenerateAnswer}
-                          className="flex items-center gap-1 hover:text-purple-500"
+                          className="flex items-center gap-1 hover:text-purple-500 transition"
                         >
                           <FaRedo />
                           Regenerate
@@ -408,7 +417,7 @@ export default function ChatPage() {
           </div>
 
           {/* INPUT */}
-          <div className="p-4 border-t border-gray-200 dark:border-gray-800 flex gap-3 bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl">
+          <div className="p-4 border-t border-gray-200/70 dark:border-gray-800/70 flex gap-3 bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl">
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
@@ -420,7 +429,7 @@ export default function ChatPage() {
             <button
               onClick={sendMessage}
               disabled={loading || !activeSession}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg disabled:opacity-50 hover:opacity-90 transition"
+              className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-xl font-semibold shadow-md hover:shadow-lg hover:scale-[1.02] disabled:opacity-50 transition"
             >
               Send
             </button>
