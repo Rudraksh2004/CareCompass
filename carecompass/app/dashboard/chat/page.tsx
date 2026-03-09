@@ -30,10 +30,9 @@ export default function ChatPage() {
   const [loading, setLoading] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [initializing, setInitializing] = useState(true);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
 
-  const [expandedMessages, setExpandedMessages] = useState<
-    Record<number, boolean>
-  >({});
+  const [expandedMessages, setExpandedMessages] = useState<Record<number, boolean>>({});
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
   useEffect(() => {
@@ -239,6 +238,7 @@ export default function ChatPage() {
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
+
       {/* HEADER */}
       <div className="relative overflow-hidden rounded-3xl border border-gray-200/70 dark:border-gray-800/70 bg-gradient-to-br from-blue-600/10 via-purple-600/10 to-emerald-600/10 backdrop-blur-xl p-6 shadow-xl">
         <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-emerald-500 bg-clip-text text-transparent">
@@ -253,9 +253,11 @@ export default function ChatPage() {
 
       {/* MAIN CONTAINER */}
       <div className="flex h-[75vh] rounded-3xl overflow-hidden border border-gray-200/70 dark:border-gray-800/70 bg-white/70 dark:bg-gray-900/70 backdrop-blur-2xl shadow-2xl">
+
         {/* SIDEBAR */}
         {sidebarOpen && (
           <div className="w-72 border-r border-gray-200/70 dark:border-gray-800/70 p-4 flex flex-col bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl">
+
             <button
               onClick={handleNewChat}
               className="mb-4 w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl font-semibold shadow-md hover:shadow-lg hover:scale-[1.02] transition"
@@ -295,6 +297,7 @@ export default function ChatPage() {
 
         {/* CHAT AREA */}
         <div className="flex-1 flex flex-col">
+
           {/* TOP BAR */}
           <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200/70 dark:border-gray-800/70 bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl">
             <button
@@ -338,32 +341,13 @@ export default function ChatPage() {
                         : "bg-white/80 dark:bg-gray-900/80 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-100 backdrop-blur-xl shadow-sm"
                     }`}
                   >
-                    {/* AI badge */}
                     {msg.role === "assistant" && (
                       <div className="mb-2 text-xs font-medium text-emerald-600 dark:text-emerald-400">
                         CareCompass AI
                       </div>
                     )}
 
-                    <div
-                      className="
-                    prose prose-sm sm:prose-base dark:prose-invert max-w-none
-                    prose-headings:font-semibold
-                    prose-headings:text-blue-600
-                    dark:prose-headings:text-blue-400
-                    prose-strong:text-purple-600
-                    dark:prose-strong:text-purple-400
-                    prose-li:marker:text-blue-500
-                    prose-p:text-gray-700
-                    dark:prose-p:text-gray-300
-                    prose-pre:bg-gray-900
-                    prose-pre:text-white
-                    prose-pre:rounded-xl
-                    prose-pre:p-4
-                    prose-code:text-pink-500
-                    prose-code:font-semibold
-                    "
-                    >
+                    <div className="prose prose-sm sm:prose-base dark:prose-invert max-w-none">
                       <ReactMarkdown remarkPlugins={[remarkGfm]}>
                         {displayText}
                       </ReactMarkdown>
@@ -416,6 +400,27 @@ export default function ChatPage() {
             <div ref={bottomRef} />
           </div>
 
+          {/* SUGGESTIONS */}
+          {suggestions.length > 0 && (
+            <div className="px-6 pb-2">
+              <div className="text-xs text-gray-500 mb-2">
+                Suggested follow-up questions
+              </div>
+
+              <div className="flex flex-wrap gap-2">
+                {suggestions.map((s, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setInput(s)}
+                    className="text-xs px-3 py-1.5 rounded-full border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* INPUT */}
           <div className="p-4 border-t border-gray-200/70 dark:border-gray-800/70 flex gap-3 bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl">
             <input
@@ -434,6 +439,7 @@ export default function ChatPage() {
               Send
             </button>
           </div>
+
         </div>
       </div>
     </div>
