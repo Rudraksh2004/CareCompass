@@ -94,6 +94,7 @@ export default function ChatPage() {
     const sessionId = await createChatSession(user.uid);
     setActiveSession(sessionId);
     setMessages([]);
+    setSuggestions([]);
     await fetchSessions();
   };
 
@@ -105,6 +106,7 @@ export default function ChatPage() {
     if (activeSession === sessionId) {
       setActiveSession(null);
       setMessages([]);
+      setSuggestions([]);
     }
 
     await fetchSessions();
@@ -160,6 +162,8 @@ export default function ChatPage() {
     const userMessage = input.trim();
     const isFirstMessage = messages.length === 0;
 
+    setSuggestions([]); // clear old suggestions
+
     setMessages((prev) => [
       ...prev,
       { role: "user", content: userMessage },
@@ -176,7 +180,7 @@ export default function ChatPage() {
         generateSmartTitle(userMessage, activeSession);
       }
 
-      const res = await fetch("/api/ai/chat", {
+      const chatRes = await fetch("/api/ai/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -188,17 +192,18 @@ export default function ChatPage() {
         }),
       });
 
-      const data = await res.json();
+      const chatData = await chatRes.json();
+
       const aiReply =
-        data.reply || "I'm here to help with your health questions.";
+        chatData.reply || "I'm here to help with your health questions.";
 
       await typeMessage(aiReply);
 
       await saveMessage(user.uid, activeSession, "assistant", aiReply);
 
-      // 🔹 Generate follow-up suggestions
+      // Generate suggestions
       try {
-        const res = await fetch("/api/ai/suggestions", {
+        const suggestionRes = await fetch("/api/ai/suggestions", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -206,8 +211,8 @@ export default function ChatPage() {
           body: JSON.stringify({ text: aiReply }),
         });
 
-        const data = await res.json();
-        setSuggestions(data.suggestions || []);
+        const suggestionData = await suggestionRes.json();
+        setSuggestions(suggestionData.suggestions || []);
       } catch {
         setSuggestions([]);
       }
@@ -255,6 +260,7 @@ export default function ChatPage() {
   };
 
   return (
+    /* UI section unchanged */
     <div className="max-w-7xl mx-auto space-y-6">
       {/* HEADER */}
       <div className="relative overflow-hidden rounded-3xl border border-gray-200/70 dark:border-gray-800/70 bg-gradient-to-br from-blue-600/10 via-purple-600/10 to-emerald-600/10 backdrop-blur-xl p-6 shadow-xl">
