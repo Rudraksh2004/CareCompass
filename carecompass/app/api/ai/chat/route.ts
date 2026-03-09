@@ -103,7 +103,7 @@ ${message}
           generationConfig: {
             temperature: 0.7,
             topP: 0.9,
-            maxOutputTokens: 800,
+            maxOutputTokens: 1120,
           },
         }),
       },
