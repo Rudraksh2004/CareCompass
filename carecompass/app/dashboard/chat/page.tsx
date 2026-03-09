@@ -32,7 +32,9 @@ export default function ChatPage() {
   const [initializing, setInitializing] = useState(true);
   const [suggestions, setSuggestions] = useState<string[]>([]);
 
-  const [expandedMessages, setExpandedMessages] = useState<Record<number, boolean>>({});
+  const [expandedMessages, setExpandedMessages] = useState<
+    Record<number, boolean>
+  >({});
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
   useEffect(() => {
@@ -193,6 +195,22 @@ export default function ChatPage() {
       await typeMessage(aiReply);
 
       await saveMessage(user.uid, activeSession, "assistant", aiReply);
+
+      // 🔹 Generate follow-up suggestions
+      try {
+        const res = await fetch("/api/ai/suggestions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ text: aiReply }),
+        });
+
+        const data = await res.json();
+        setSuggestions(data.suggestions || []);
+      } catch {
+        setSuggestions([]);
+      }
     } catch (error) {
       console.error("Chat error:", error);
 
@@ -238,7 +256,6 @@ export default function ChatPage() {
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
-
       {/* HEADER */}
       <div className="relative overflow-hidden rounded-3xl border border-gray-200/70 dark:border-gray-800/70 bg-gradient-to-br from-blue-600/10 via-purple-600/10 to-emerald-600/10 backdrop-blur-xl p-6 shadow-xl">
         <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-emerald-500 bg-clip-text text-transparent">
@@ -253,11 +270,9 @@ export default function ChatPage() {
 
       {/* MAIN CONTAINER */}
       <div className="flex h-[75vh] rounded-3xl overflow-hidden border border-gray-200/70 dark:border-gray-800/70 bg-white/70 dark:bg-gray-900/70 backdrop-blur-2xl shadow-2xl">
-
         {/* SIDEBAR */}
         {sidebarOpen && (
           <div className="w-72 border-r border-gray-200/70 dark:border-gray-800/70 p-4 flex flex-col bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl">
-
             <button
               onClick={handleNewChat}
               className="mb-4 w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl font-semibold shadow-md hover:shadow-lg hover:scale-[1.02] transition"
@@ -297,7 +312,6 @@ export default function ChatPage() {
 
         {/* CHAT AREA */}
         <div className="flex-1 flex flex-col">
-
           {/* TOP BAR */}
           <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200/70 dark:border-gray-800/70 bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl">
             <button
@@ -439,7 +453,6 @@ export default function ChatPage() {
               Send
             </button>
           </div>
-
         </div>
       </div>
     </div>
