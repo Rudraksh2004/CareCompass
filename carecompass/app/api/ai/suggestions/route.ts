@@ -40,24 +40,22 @@ Rules:
             maxOutputTokens: 120,
           },
         }),
-      }
+      },
     );
 
     const data = await response.json();
 
-    const output =
-      data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    const output = data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
     const suggestions = output
-      .split("\n")
-      .map((s: string) =>
-        s.replace(/^[0-9]+\.\s*/, "").trim()
-      )
-      .filter((s: string) => s.length > 5)
-      .slice(0, 3);
+      .replace(/\n/g, " ")
+      .split("?")
+      .map((q: string) => q.trim())
+      .filter((q: string) => q.length > 10)
+      .slice(0, 3)
+      .map((q: string) => q + "?");
 
     return NextResponse.json({ suggestions });
-
   } catch (error) {
     console.error("Suggestion API error:", error);
     return NextResponse.json({ suggestions: [] });
