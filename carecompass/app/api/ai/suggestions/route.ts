@@ -11,28 +11,14 @@ export async function POST(req: Request) {
     const apiKey = process.env.GEMINI_API_KEY;
 
     const prompt = `
-You are an AI health assistant.
+Based on the following health AI answer, generate 3 short follow-up questions the user might ask next.
 
-Based on the following AI response, generate 3 short follow-up health questions the user might ask next.
-
-Rules:
-- Questions must be short
-- Keep them helpful
-- Do not repeat the same topic
-- Return ONLY the questions
-
-AI Response:
+Answer:
 ${text}
 
-Format output as JSON:
-
-{
-  "suggestions": [
-    "question 1",
-    "question 2",
-    "question 3"
-  ]
-}
+Rules:
+- Avoid numbering
+- Return only the questions separated by new lines
 `;
 
     const response = await fetch(
@@ -51,7 +37,7 @@ Format output as JSON:
           ],
           generationConfig: {
             temperature: 0.6,
-            maxOutputTokens: 200,
+            maxOutputTokens: 120,
           },
         }),
       }
@@ -59,22 +45,21 @@ Format output as JSON:
 
     const data = await response.json();
 
-    const textOutput =
+    const output =
       data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
-    let suggestions: string[] = [];
-
-    try {
-      const parsed = JSON.parse(textOutput);
-      suggestions = parsed.suggestions || [];
-    } catch {
-      suggestions = [];
-    }
+    const suggestions = output
+      .split("\n")
+      .map((s: string) =>
+        s.replace(/^[0-9]+\.\s*/, "").trim()
+      )
+      .filter((s: string) => s.length > 5)
+      .slice(0, 3);
 
     return NextResponse.json({ suggestions });
+
   } catch (error) {
     console.error("Suggestion API error:", error);
-
     return NextResponse.json({ suggestions: [] });
   }
 }
