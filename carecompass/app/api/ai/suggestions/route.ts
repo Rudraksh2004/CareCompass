@@ -11,14 +11,22 @@ export async function POST(req: Request) {
     const apiKey = process.env.GEMINI_API_KEY;
 
     const prompt = `
-Based on the following health AI answer, generate 3 short follow-up questions the user might ask next.
+Based on the following AI health answer, generate exactly 4 follow-up questions a user might ask next.
 
 Answer:
 ${text}
 
 Rules:
-- Avoid numbering
-- Return only the questions separated by new lines
+- Each item must be a complete question
+- Each question must end with a question mark
+- Return the questions as a numbered list
+
+Example format:
+
+1. Question one?
+2. Question two?
+3. Question three?
+4. Question four?
 `;
 
     const response = await fetch(
@@ -48,12 +56,10 @@ Rules:
     const output = data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
     const suggestions = output
-      .replace(/\n/g, " ")
-      .split("?")
+      .split(/\d+\.\s/)
       .map((q: string) => q.trim())
       .filter((q: string) => q.length > 10)
-      .slice(0, 3)
-      .map((q: string) => q + "?");
+      .slice(0, 4);
 
     return NextResponse.json({ suggestions });
   } catch (error) {
