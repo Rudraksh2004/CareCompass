@@ -59,19 +59,23 @@ export default function DashboardLayout({
   };
 
   return (
-    <div className="min-h-screen flex bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-[#020617] dark:via-[#020617] dark:to-[#020617]">
-      {/* 🌟 COLLAPSIBLE PREMIUM SIDEBAR (ONLY UI CHANGE) */}
+    <div className="relative min-h-screen flex bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-[#020617] dark:via-[#020617] dark:to-[#020617]">
+      {/* Background Glow */}
+      <div className="pointer-events-none absolute inset-0 -z-10">
+        <div className="absolute top-[-200px] left-[-200px] w-[500px] h-[500px] bg-blue-500/10 blur-[140px] rounded-full" />
+        <div className="absolute bottom-[-200px] right-[-200px] w-[500px] h-[500px] bg-purple-500/10 blur-[140px] rounded-full" />
+      </div>
+
+      {/* 🌟 SIDEBAR */}
       <aside
         className={`${
           collapsed ? "w-20" : "w-72"
-        } p-6 border-r border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-[#020617]/80 backdrop-blur-xl shadow-xl flex flex-col transition-all duration-300`}
+        } p-6 border-r border-white/10 bg-white/70 dark:bg-[#020617]/70 backdrop-blur-2xl shadow-[0_8px_40px_rgba(0,0,0,0.35)] flex flex-col transition-all duration-300`}
       >
-        {/* Toggle Button (NEW) */}
+        {/* Collapse Button */}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="mb-6 mx-auto flex items-center justify-center w-10 h-10 
-  rounded-xl bg-white/10 dark:bg-white/5 border border-white/10 
-  hover:bg-white/20 transition-all duration-300 backdrop-blur-lg shadow-lg"
+          className="mb-6 mx-auto flex items-center justify-center w-10 h-10 rounded-xl bg-white/10 dark:bg-white/5 border border-white/10 hover:bg-white/20 transition-all duration-300 backdrop-blur-lg shadow-lg hover:scale-105"
         >
           {collapsed ? (
             <PanelLeftOpen className="w-5 h-5 text-white" />
@@ -83,21 +87,22 @@ export default function DashboardLayout({
         {/* Brand */}
         <div className="mb-10">
           <div
-            className={`flex items-center ${collapsed ? "justify-center" : "gap-3"}`}
+            className={`flex items-center ${
+              collapsed ? "justify-center" : "gap-3"
+            }`}
           >
-            {/* Logo Always Visible */}
             <img
               src="/logo.png"
               alt="CareCompass Logo"
-              className="w-10 h-10 object-contain"
+              className="w-10 h-10 object-contain drop-shadow-lg"
             />
 
-            {/* Show Text Only When NOT Collapsed */}
             {!collapsed && (
               <div>
                 <h1 className="text-2xl font-extrabold bg-gradient-to-r from-blue-600 to-emerald-500 bg-clip-text text-transparent">
                   CareCompass
                 </h1>
+
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                   AI Health Companion
                 </p>
@@ -115,6 +120,7 @@ export default function DashboardLayout({
             collapsed={collapsed}
             pathname={pathname}
           />
+
           <NavItem
             href="/dashboard/report"
             icon={<FileText className={iconClasses("/dashboard/report")} />}
@@ -122,6 +128,7 @@ export default function DashboardLayout({
             collapsed={collapsed}
             pathname={pathname}
           />
+
           <NavItem
             href="/dashboard/prescription"
             icon={<Pill className={iconClasses("/dashboard/prescription")} />}
@@ -129,6 +136,7 @@ export default function DashboardLayout({
             collapsed={collapsed}
             pathname={pathname}
           />
+
           <NavItem
             href="/dashboard/health"
             icon={<LineChart className={iconClasses("/dashboard/health")} />}
@@ -136,6 +144,7 @@ export default function DashboardLayout({
             collapsed={collapsed}
             pathname={pathname}
           />
+
           <NavItem
             href="/dashboard/reminders"
             icon={<Clock className={iconClasses("/dashboard/reminders")} />}
@@ -143,6 +152,7 @@ export default function DashboardLayout({
             collapsed={collapsed}
             pathname={pathname}
           />
+
           <NavItem
             href="/dashboard/medicine"
             icon={
@@ -152,6 +162,7 @@ export default function DashboardLayout({
             collapsed={collapsed}
             pathname={pathname}
           />
+
           <NavItem
             href="/dashboard/disease-predictor"
             icon={
@@ -161,6 +172,7 @@ export default function DashboardLayout({
             collapsed={collapsed}
             pathname={pathname}
           />
+
           <NavItem
             href="/dashboard/chat"
             icon={<Bot className={iconClasses("/dashboard/chat")} />}
@@ -168,6 +180,7 @@ export default function DashboardLayout({
             collapsed={collapsed}
             pathname={pathname}
           />
+
           <NavItem
             href="/dashboard/emergency"
             icon={
@@ -179,8 +192,8 @@ export default function DashboardLayout({
           />
         </nav>
 
-        {/* Bottom Section (UNCHANGED LOGIC) */}
-        <div className="mt-auto pt-6 border-t border-gray-200 dark:border-gray-800 space-y-3">
+        {/* Bottom Section */}
+        <div className="mt-auto pt-6 border-t border-white/10 space-y-3">
           <NavItem
             href="/dashboard/profile"
             icon={<User className={iconClasses("/dashboard/profile")} />}
@@ -193,14 +206,14 @@ export default function DashboardLayout({
             <>
               <button
                 onClick={toggleTheme}
-                className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-gray-100 dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-300 hover:scale-[1.02] transition"
+                className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-white/10 dark:bg-white/5 backdrop-blur border border-white/10 text-sm font-medium text-gray-700 dark:text-gray-300 hover:scale-[1.03] transition"
               >
                 {theme === "dark" ? "☀️ Light Mode" : "🌙 Dark Mode"}
               </button>
 
               <button
                 onClick={handleLogout}
-                className="w-full text-red-500 text-sm font-semibold hover:text-red-600 transition py-2 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20"
+                className="w-full text-red-500 text-sm font-semibold hover:text-red-600 transition py-2 rounded-xl hover:bg-red-500/10"
               >
                 Logout
               </button>
@@ -215,24 +228,29 @@ export default function DashboardLayout({
         </div>
       </aside>
 
-      {/* MAIN CONTENT (UNCHANGED) */}
+      {/* MAIN CONTENT */}
       <main className="flex-1 flex flex-col">
-        <header className="h-16 px-8 flex items-center justify-between border-b border-gray-200 dark:border-gray-800 bg-white/60 dark:bg-[#020617]/60 backdrop-blur-xl">
+        {/* Header */}
+        <header className="h-16 px-8 flex items-center justify-between border-b border-white/10 bg-white/60 dark:bg-[#020617]/60 backdrop-blur-xl">
           <div>
             <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
               Welcome back 👋
             </h2>
+
             <p className="text-xs text-gray-500 dark:text-gray-400">
               Your AI-powered health dashboard
             </p>
           </div>
 
-          <div className="hidden md:flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-blue-500/10 to-emerald-500/10 border border-blue-200 dark:border-emerald-900 text-xs font-medium text-blue-600 dark:text-emerald-400">
+          <div className="hidden md:flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-blue-500/10 to-emerald-500/10 border border-blue-200 dark:border-emerald-900 text-xs font-medium text-blue-600 dark:text-emerald-400 shadow-[0_0_12px_rgba(59,130,246,0.25)]">
             ✨ CareCompass AI Active
           </div>
         </header>
 
-        <div className="flex-1 p-6 md:p-10 overflow-auto">{children}</div>
+        {/* Page Content */}
+        <div className="flex-1 p-8 md:p-12 overflow-y-auto">
+          <div className="max-w-[1400px] mx-auto">{children}</div>
+        </div>
       </main>
     </div>
   );
