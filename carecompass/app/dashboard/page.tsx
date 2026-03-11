@@ -146,9 +146,15 @@ export default function DashboardPage() {
   }, [reminders]);
 
   return (
-    <div className="space-y-10">
+    <div className="relative space-y-10">
+      {/* Floating background gradients */}
+      <div className="pointer-events-none absolute inset-0 -z-10">
+        <div className="absolute top-[-200px] left-[-200px] w-[500px] h-[500px] bg-blue-500/10 blur-[140px] rounded-full" />
+        <div className="absolute bottom-[-200px] right-[-200px] w-[500px] h-[500px] bg-purple-500/10 blur-[140px] rounded-full" />
+      </div>
+
       {/* 🌟 Welcome Header */}
-      <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] backdrop-blur-3xl p-10 shadow-[0_8px_40px_rgba(0,0,0,0.45)]">
+      <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] backdrop-blur-3xl p-10 shadow-[0_8px_40px_rgba(0,0,0,0.45)] transition-all duration-500 hover:border-blue-500/40 hover:shadow-[0_0_40px_rgba(59,130,246,0.25)]">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(59,130,246,0.18),_transparent_40%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,_rgba(16,185,129,0.15),_transparent_40%)]" />
 
@@ -156,6 +162,7 @@ export default function DashboardPage() {
           <h1 className="text-3xl font-bold text-white tracking-tight">
             Welcome to CareCompass 🧭
           </h1>
+
           <p className="text-slate-400 mt-3 max-w-2xl leading-relaxed">
             Your all-in-one health companion to manage reports, prescriptions,
             health tracking, reminders, and clinical summaries in one secure
@@ -164,9 +171,9 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* 📊 Stat Cards */}
+      {/* 📊 Premium Stat Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="relative group overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-2xl p-7 shadow-lg transition-all duration-300 hover:scale-[1.03] hover:shadow-[0_0_35px_rgba(59,130,246,0.25)]">
+        <div className="relative group overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-2xl p-7 shadow-lg transition-all duration-300 hover:scale-[1.04] hover:shadow-[0_0_35px_rgba(59,130,246,0.25)]">
           <p className="text-sm text-slate-400">Active Medicine Reminders</p>
           <h2 className="text-4xl font-bold text-white mt-3">
             {reminderCount}
@@ -176,7 +183,7 @@ export default function DashboardPage() {
           </p>
         </div>
 
-        <div className="relative group overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-2xl p-7 shadow-lg transition-all duration-300 hover:scale-[1.03] hover:shadow-[0_0_35px_rgba(168,85,247,0.25)]">
+        <div className="relative group overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-2xl p-7 shadow-lg transition-all duration-300 hover:scale-[1.04] hover:shadow-[0_0_35px_rgba(168,85,247,0.25)]">
           <p className="text-sm text-slate-400">Platform Features</p>
           <h2 className="text-lg font-semibold text-white mt-3 leading-relaxed">
             Reports • Prescriptions • Chat • Tracking
@@ -186,7 +193,7 @@ export default function DashboardPage() {
           </p>
         </div>
 
-        <div className="relative group overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-2xl p-7 shadow-lg transition-all duration-300 hover:scale-[1.03] hover:shadow-[0_0_35px_rgba(16,185,129,0.25)]">
+        <div className="relative group overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-2xl p-7 shadow-lg transition-all duration-300 hover:scale-[1.04] hover:shadow-[0_0_35px_rgba(16,185,129,0.25)]">
           <p className="text-sm text-slate-400">Health Monitoring</p>
           <h2 className="text-3xl font-bold mt-3 text-emerald-400">
             {healthActive ? "Active" : "Inactive"}
@@ -197,9 +204,9 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* 🚑 Emergency Card */}
+      {/* 🚑 Emergency Card Widget */}
       {emergencyProfile && (
-        <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] backdrop-blur-3xl p-10 shadow-2xl">
+        <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] backdrop-blur-3xl p-10 shadow-2xl transition-all duration-500 hover:border-red-500/40 hover:shadow-[0_0_40px_rgba(239,68,68,0.25)]">
           <div className="flex items-center justify-between flex-wrap gap-6">
             <div>
               <h3 className="text-2xl font-bold text-white">
@@ -223,7 +230,7 @@ export default function DashboardPage() {
 
             <Link
               href="/dashboard/emergency"
-              className="inline-flex items-center justify-center bg-gradient-to-r from-red-600 to-pink-600 hover:opacity-90 transition text-white px-8 py-4 rounded-2xl font-semibold shadow-lg hover:scale-[1.03]"
+              className="inline-flex items-center justify-center bg-gradient-to-r from-red-600 to-pink-600 hover:opacity-90 transition text-white px-8 py-4 rounded-2xl font-semibold shadow-lg hover:scale-[1.04]"
             >
               View Emergency Card →
             </Link>
@@ -232,7 +239,7 @@ export default function DashboardPage() {
       )}
 
       {/* 🧠 Disease Predictor */}
-      <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] backdrop-blur-3xl p-10 shadow-2xl">
+      <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] backdrop-blur-3xl p-10 shadow-2xl transition-all duration-500 hover:border-purple-500/40 hover:shadow-[0_0_40px_rgba(168,85,247,0.25)]">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(168,85,247,0.18),_transparent_40%)]" />
 
         <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
@@ -240,6 +247,7 @@ export default function DashboardPage() {
             <h3 className="text-2xl font-bold text-white">
               🧠 AI Disease Predictor
             </h3>
+
             <p className="text-slate-400 text-sm mt-2 max-w-xl leading-relaxed">
               Analyze symptoms using hybrid AI, clinical logic, and
               location-aware insights with optional medical Q&A.
@@ -248,68 +256,15 @@ export default function DashboardPage() {
 
           <Link
             href="/dashboard/disease-predictor"
-            className="inline-flex items-center justify-center bg-gradient-to-r from-purple-600 to-blue-600 hover:opacity-90 transition text-white px-8 py-4 rounded-2xl font-semibold shadow-lg hover:scale-[1.03]"
+            className="inline-flex items-center justify-center bg-gradient-to-r from-purple-600 to-blue-600 hover:opacity-90 transition text-white px-8 py-4 rounded-2xl font-semibold shadow-lg hover:scale-[1.04]"
           >
             🧠 Start Analysis →
           </Link>
         </div>
       </div>
 
-      {/* 🧠 AI Health Summary */}
-      <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] backdrop-blur-3xl p-10 shadow-2xl">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-          <div>
-            <h3 className="text-2xl font-bold text-white">
-              🧠 AI Health Summary
-            </h3>
-            <p className="text-slate-400 text-sm mt-2 max-w-xl">
-              Generate a personalized AI overview using your reports,
-              prescriptions, disease analysis, and health logs.
-            </p>
-          </div>
-
-          <button
-            onClick={generateAISummary}
-            disabled={loadingSummary || !user}
-            className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:opacity-90 transition text-white px-8 py-4 rounded-2xl font-semibold shadow-lg disabled:opacity-50"
-          >
-            {loadingSummary
-              ? "Generating Clinical Summary..."
-              : "Generate AI Summary"}
-          </button>
-        </div>
-
-        {aiSummary && (
-          <div className="mt-8 space-y-6">
-            {(healthScore !== null || riskLevel) && (
-              <div className="flex flex-wrap gap-4">
-                {healthScore !== null && (
-                  <div className="px-5 py-3 rounded-2xl bg-blue-500/10 border border-blue-400/20 text-blue-300 font-semibold backdrop-blur">
-                    Health Score: {healthScore}/100
-                  </div>
-                )}
-
-                {riskLevel && (
-                  <div className="px-5 py-3 rounded-2xl font-semibold border bg-emerald-500/10 border-emerald-400/20 text-emerald-400 backdrop-blur">
-                    Risk Level: {riskLevel}
-                  </div>
-                )}
-              </div>
-            )}
-
-            <div className="bg-black/30 border border-white/10 rounded-2xl p-6 text-sm leading-relaxed text-slate-300 whitespace-pre-line backdrop-blur">
-              {aiSummary}
-            </div>
-
-            <p className="text-xs text-slate-500">
-              ⚠️ Non-diagnostic AI guidance. Not a medical diagnosis.
-            </p>
-          </div>
-        )}
-      </div>
-
       {/* 💊 Adherence Widget */}
-      <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] backdrop-blur-3xl p-10 shadow-2xl">
+      <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] backdrop-blur-3xl p-10 shadow-2xl transition-all duration-500 hover:border-emerald-500/40 hover:shadow-[0_0_40px_rgba(16,185,129,0.25)]">
         <p className="text-sm text-slate-400">Today’s Medication Adherence</p>
 
         <div className="mt-4 flex items-center justify-between">
@@ -331,7 +286,9 @@ export default function DashboardPage() {
         <div className="mt-5 w-full bg-white/10 rounded-full h-3 overflow-hidden">
           <div
             className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-500"
-            style={{ width: `${adherenceData.progressPercent}%` }}
+            style={{
+              width: `${adherenceData.progressPercent}%`,
+            }}
           />
         </div>
       </div>
