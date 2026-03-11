@@ -5,7 +5,8 @@ import { useAuth } from "@/context/AuthContext";
 import { logout } from "@/services/authService";
 import { useRouter, usePathname } from "next/navigation";
 import { useTheme } from "@/context/ThemeContext";
-import { useState } from "react"; // ⭐ NEW (safe)
+import { useState } from "react";
+
 import {
   Home,
   FileText,
@@ -31,7 +32,6 @@ export default function DashboardLayout({
   const pathname = usePathname();
   const { theme, toggleTheme } = useTheme();
 
-  // ⭐ ONLY NEW STATE (NON-BREAKING)
   const [collapsed, setCollapsed] = useState(false);
 
   const handleLogout = async () => {
@@ -39,18 +39,9 @@ export default function DashboardLayout({
     router.push("/auth/login");
   };
 
-  const linkClasses = (path: string) => {
-    const isActive = pathname === path;
-
-    return `group relative flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 overflow-hidden ${
-      isActive
-        ? "bg-gradient-to-r from-blue-500/10 to-emerald-500/10 text-blue-600 dark:text-emerald-400 border border-blue-200/70 dark:border-emerald-900 shadow-[0_0_20px_rgba(59,130,246,0.15)]"
-        : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60"
-    }`;
-  };
-
   const iconClasses = (path: string) => {
     const isActive = pathname === path;
+
     return `w-5 h-5 transition-all duration-300 ${
       isActive
         ? "scale-110 text-blue-600 dark:text-emerald-400 drop-shadow-[0_0_6px_rgba(59,130,246,0.6)]"
@@ -59,18 +50,18 @@ export default function DashboardLayout({
   };
 
   return (
-    <div className="relative min-h-screen flex bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-[#020617] dark:via-[#020617] dark:to-[#020617]">
+    <div className="relative min-h-screen flex overflow-x-hidden bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-[#020617] dark:via-[#020617] dark:to-[#020617]">
       {/* Background Glow */}
       <div className="pointer-events-none absolute inset-0 -z-10">
         <div className="absolute top-[-200px] left-[-200px] w-[500px] h-[500px] bg-blue-500/10 blur-[140px] rounded-full" />
         <div className="absolute bottom-[-200px] right-[-200px] w-[500px] h-[500px] bg-purple-500/10 blur-[140px] rounded-full" />
       </div>
 
-      {/* 🌟 SIDEBAR */}
+      {/* SIDEBAR */}
       <aside
         className={`${
           collapsed ? "w-20" : "w-72"
-        } p-6 border-r border-white/10 bg-white/70 dark:bg-[#020617]/70 backdrop-blur-2xl shadow-[0_8px_40px_rgba(0,0,0,0.35)] flex flex-col transition-all duration-300`}
+        } p-6 border-r border-white/10 bg-white/60 dark:bg-[#020617]/60 backdrop-blur-2xl shadow-[0_8px_40px_rgba(0,0,0,0.35)] flex flex-col transition-all duration-300`}
       >
         {/* Collapse Button */}
         <button
@@ -248,7 +239,7 @@ export default function DashboardLayout({
         </header>
 
         {/* Page Content */}
-        <div className="flex-1 p-8 md:p-12 overflow-y-auto">
+        <div className="flex-1 p-8 md:p-12">
           <div className="max-w-[1400px] mx-auto">{children}</div>
         </div>
       </main>
@@ -282,12 +273,10 @@ function NavItem({
           : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60"
       }`}
     >
-      {/* 🔥 FIX: Fixed icon container (prevents disappearing icons) */}
       <div className="flex items-center justify-center w-6 h-6 shrink-0">
         {icon}
       </div>
 
-      {/* Label only when expanded (UNCHANGED behavior) */}
       {!collapsed && (
         <span className="font-medium whitespace-nowrap">{label}</span>
       )}
