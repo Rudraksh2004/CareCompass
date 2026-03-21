@@ -109,12 +109,16 @@ function TrustMarquee() {
 
 /* ─── Main Page ─── */
 export default function Home() {
-  const { theme, toggleTheme } = useTheme();
-  const isDark = theme === "dark";
+  const { theme, toggleTheme, mounted } = useTheme();
+  const isDark = mounted ? theme === "dark" : false;
   const revealRefs = useRef<HTMLDivElement[]>([]);
   const [statsVisible, setStatsVisible] = useState(false);
   const statsRef = useRef<HTMLDivElement>(null);
   const [mobileMenu, setMobileMenu] = useState(false);
+
+  const handleToggle = useCallback(() => {
+    toggleTheme();
+  }, [toggleTheme]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -169,14 +173,22 @@ export default function Home() {
 
           <div className="flex items-center gap-3">
             {/* Theme Toggle */}
-            <button
-              onClick={toggleTheme}
-              className="relative w-10 h-10 rounded-xl border border-gray-200 dark:border-white/[0.08] bg-gray-100/80 dark:bg-white/[0.04] flex items-center justify-center hover:bg-gray-200/80 dark:hover:bg-white/[0.08] transition-all duration-300 hover:scale-105 group"
-              aria-label="Toggle theme"
-            >
-              <Sun className="w-[18px] h-[18px] text-amber-500 absolute transition-all duration-500 rotate-0 scale-100 dark:-rotate-90 dark:scale-0" />
-              <Moon className="w-[18px] h-[18px] text-blue-400 absolute transition-all duration-500 rotate-90 scale-0 dark:rotate-0 dark:scale-100" />
-            </button>
+            {mounted ? (
+              <button
+                type="button"
+                onClick={handleToggle}
+                className="relative w-10 h-10 rounded-xl border border-gray-200 dark:border-white/[0.08] bg-gray-100/80 dark:bg-white/[0.04] flex items-center justify-center hover:bg-gray-200/80 dark:hover:bg-white/[0.08] transition-all duration-300 hover:scale-105 cursor-pointer"
+                aria-label="Toggle theme"
+              >
+                {isDark ? (
+                  <Moon className="w-[18px] h-[18px] text-blue-400" />
+                ) : (
+                  <Sun className="w-[18px] h-[18px] text-amber-500" />
+                )}
+              </button>
+            ) : (
+              <div className="w-10 h-10 rounded-xl border border-gray-200 dark:border-white/[0.08] bg-gray-100/80 dark:bg-white/[0.04]" />
+            )}
 
             <Link href="/auth/login" className="hidden md:inline-flex text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white font-medium transition-colors duration-300">Login</Link>
 

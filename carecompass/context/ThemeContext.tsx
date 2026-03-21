@@ -12,6 +12,7 @@ type Theme = "light" | "dark";
 const ThemeContext = createContext({
   theme: "light" as Theme,
   toggleTheme: () => {},
+  mounted: false,
 });
 
 export const ThemeProvider = ({
@@ -20,6 +21,7 @@ export const ThemeProvider = ({
   children: React.ReactNode;
 }) => {
   const [theme, setTheme] = useState<Theme>("light");
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     const savedTheme =
@@ -29,6 +31,7 @@ export const ThemeProvider = ({
       "dark",
       savedTheme === "dark"
     );
+    setMounted(true);
   }, []);
 
   const toggleTheme = () => {
@@ -43,7 +46,7 @@ export const ThemeProvider = ({
   };
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+    <ThemeContext.Provider value={{ theme, toggleTheme, mounted }}>
       {children}
     </ThemeContext.Provider>
   );
