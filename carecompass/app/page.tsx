@@ -97,7 +97,7 @@ function TrustMarquee() {
   ];
   const doubled = [...items, ...items];
   return (
-    <div className="relative overflow-hidden py-5 border-y border-gray-200/60 dark:border-white/[0.04] bg-gray-50/80 dark:bg-white/[0.015] backdrop-blur-xl">
+    <div className="relative overflow-hidden py-5 border-y border-white/40 dark:border-white/[0.04] bg-white/30 dark:bg-white/[0.01] backdrop-blur-3xl backdrop-saturate-[1.5]">
       <div className="flex animate-marquee whitespace-nowrap">
         {doubled.map((item, i) => (
           <span key={i} className="mx-8 text-sm text-gray-500 dark:text-gray-500 font-medium flex-shrink-0">{item}</span>
@@ -139,21 +139,23 @@ export default function Home() {
   const availCount = useCountUp(24, 1600, 0, statsVisible);
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#030712] text-gray-900 dark:text-gray-100 overflow-hidden scroll-smooth transition-colors duration-500">
-      {/* ─── AMBIENT BACKGROUND ─── */}
-      <div className="fixed inset-0 -z-10 transition-colors duration-500">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20 dark:from-[#020617] dark:via-[#0a0f1f] dark:to-[#030b1a] text-gray-900 dark:text-gray-100 overflow-hidden scroll-smooth transition-colors duration-700">
+      {/* ─── LIQUID GLASS AMBIENT BACKGROUND ─── */}
+      <div className="fixed inset-0 -z-10">
         <StarField isDark={isDark} />
-        <div className="absolute top-[-200px] left-[-150px] w-[600px] h-[600px] bg-blue-400/10 dark:bg-blue-600/15 rounded-full blur-[180px] animate-float" />
-        <div className="absolute bottom-[-200px] right-[-150px] w-[600px] h-[600px] bg-emerald-400/10 dark:bg-emerald-500/12 rounded-full blur-[180px] animate-float-reverse" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-indigo-300/8 dark:bg-purple-600/8 rounded-full blur-[200px]" />
-        {/* Noise */}
-        <div className="absolute inset-0 opacity-[0.02] dark:opacity-[0.015]" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E\")", backgroundRepeat: "repeat", backgroundSize: "256px" }} />
-        {/* Grid */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(0,0,0,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.03)_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,rgba(255,255,255,0.015)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[size:60px_60px]" />
+        {/* Primary liquid orbs */}
+        <div className="absolute top-[-15%] left-[-10%] w-[600px] h-[600px] rounded-full bg-gradient-to-br from-blue-400/20 to-cyan-300/10 dark:from-blue-600/15 dark:to-cyan-500/8 blur-[120px] animate-float" />
+        <div className="absolute bottom-[-15%] right-[-10%] w-[600px] h-[600px] rounded-full bg-gradient-to-tl from-emerald-400/15 to-teal-300/8 dark:from-emerald-600/12 dark:to-teal-500/6 blur-[120px] animate-float-reverse" />
+        <div className="absolute top-[40%] left-[50%] -translate-x-1/2 w-[700px] h-[700px] rounded-full bg-gradient-to-br from-violet-400/10 to-fuchsia-300/5 dark:from-violet-600/8 dark:to-fuchsia-500/4 blur-[150px]" />
+        {/* Secondary accent orbs */}
+        <div className="absolute top-[20%] right-[15%] w-[250px] h-[250px] rounded-full bg-blue-300/12 dark:bg-blue-500/8 blur-[80px] animate-float" style={{ animationDelay: '1s', animationDuration: '8s' }} />
+        <div className="absolute bottom-[30%] left-[10%] w-[220px] h-[220px] rounded-full bg-emerald-300/12 dark:bg-emerald-500/8 blur-[80px] animate-float-reverse" style={{ animationDelay: '2s', animationDuration: '9s' }} />
+        {/* Dot pattern */}
+        <div className="absolute inset-0 opacity-[0.25] dark:opacity-[0.06]" style={{ backgroundImage: 'radial-gradient(circle, rgba(100,116,139,0.15) 1px, transparent 1px)', backgroundSize: '28px 28px' }} />
       </div>
 
-      {/* ─── NAVBAR ─── */}
-      <header className="w-full border-b border-gray-200/60 dark:border-white/[0.06] backdrop-blur-2xl bg-white/70 dark:bg-[#030712]/70 sticky top-0 z-50 transition-colors duration-500">
+      {/* ─── NAVBAR (Liquid Glass) ─── */}
+      <header className="w-full border-b border-white/40 dark:border-white/[0.06] backdrop-blur-3xl backdrop-saturate-[1.6] bg-white/50 dark:bg-white/[0.02] sticky top-0 z-50 transition-all duration-500 shadow-[0_4px_30px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_30px_rgba(0,0,0,0.2)]">
         <div className="max-w-7xl mx-auto px-6 md:px-8 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3 group">
             <div className="relative">
@@ -177,7 +179,7 @@ export default function Home() {
               <button
                 type="button"
                 onClick={handleToggle}
-                className="relative w-10 h-10 rounded-xl border border-gray-200 dark:border-white/[0.08] bg-gray-100/80 dark:bg-white/[0.04] flex items-center justify-center hover:bg-gray-200/80 dark:hover:bg-white/[0.08] transition-all duration-300 hover:scale-105 cursor-pointer"
+                className="relative w-10 h-10 rounded-2xl border border-white/50 dark:border-white/[0.08] bg-white/60 dark:bg-white/[0.04] backdrop-blur-2xl flex items-center justify-center hover:bg-white/80 dark:hover:bg-white/[0.08] transition-all duration-500 hover:scale-110 cursor-pointer shadow-[0_4px_16px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.2)]"
                 aria-label="Toggle theme"
               >
                 {isDark ? (
@@ -206,7 +208,7 @@ export default function Home() {
 
         {/* Mobile menu dropdown */}
         {mobileMenu && (
-          <div className="md:hidden border-t border-gray-200/60 dark:border-white/[0.06] bg-white/90 dark:bg-[#030712]/90 backdrop-blur-2xl px-6 py-4 space-y-3">
+          <div className="md:hidden border-t border-white/30 dark:border-white/[0.06] bg-white/40 dark:bg-white/[0.02] backdrop-blur-3xl backdrop-saturate-[1.6] px-6 py-4 space-y-3">
             {["Features", "How It Works", "Testimonials"].map((l) => (
               <a key={l} href={`#${l.toLowerCase().replace(/ /g, "-")}`} className="block text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white py-2" onClick={() => setMobileMenu(false)}>{l}</a>
             ))}
@@ -223,7 +225,7 @@ export default function Home() {
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] bg-[radial-gradient(ellipse_at_center,rgba(59,130,246,0.08),transparent_70%)] dark:bg-[radial-gradient(ellipse_at_center,rgba(59,130,246,0.12),transparent_70%)] -z-10" />
 
         <div className="max-w-5xl mx-auto text-center">
-          <div className="animate-fade-in-up inline-flex items-center gap-2 mb-8 px-5 py-2 rounded-full bg-blue-50 dark:bg-white/[0.06] border border-blue-200/60 dark:border-white/[0.08] text-sm font-medium text-blue-600 dark:text-blue-300 backdrop-blur-xl shadow-sm dark:shadow-[0_0_20px_rgba(59,130,246,0.1)] animate-badge-pulse">
+          <div className="animate-fade-in-up inline-flex items-center gap-2 mb-8 px-5 py-2.5 rounded-full bg-white/50 dark:bg-white/[0.04] border border-white/60 dark:border-white/[0.08] text-sm font-medium text-blue-600 dark:text-blue-300 backdrop-blur-2xl shadow-[0_4px_20px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_rgba(59,130,246,0.08)]">
             <Sparkles className="w-4 h-4" />
             AI-Powered Non-Diagnostic Health Companion
           </div>
@@ -258,7 +260,7 @@ export default function Home() {
               { icon: <Brain className="w-4 h-4 text-indigo-500 dark:text-indigo-400" />, text: "Gemini AI Powered" },
               { icon: <Stethoscope className="w-4 h-4 text-blue-500 dark:text-blue-400" />, text: "Non-Diagnostic Guidance" },
             ].map((badge, i) => (
-              <span key={i} className="flex items-center gap-2.5 px-4 py-2 rounded-full bg-white/80 dark:bg-white/[0.04] border border-gray-200/60 dark:border-white/[0.06] text-sm text-gray-600 dark:text-gray-400 backdrop-blur-xl hover:border-gray-300 dark:hover:border-white/[0.12] hover:bg-gray-50 dark:hover:bg-white/[0.06] transition-all duration-300 shadow-sm dark:shadow-none">
+              <span key={i} className="flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-white/50 dark:bg-white/[0.03] border border-white/60 dark:border-white/[0.06] text-sm text-gray-600 dark:text-gray-400 backdrop-blur-2xl hover:border-white/80 dark:hover:border-white/[0.12] hover:bg-white/70 dark:hover:bg-white/[0.05] transition-all duration-300 shadow-[0_4px_16px_rgba(0,0,0,0.03)] dark:shadow-none">
                 {badge.icon} {badge.text}
               </span>
             ))}
@@ -269,8 +271,9 @@ export default function Home() {
       {/* ─── DASHBOARD PREVIEW ─── */}
       <section className="px-6 pb-20">
         <div ref={addRevealRef} className="reveal max-w-5xl mx-auto">
-          <div className="relative rounded-2xl border border-gray-200/80 dark:border-white/[0.08] bg-white/50 dark:bg-white/[0.02] backdrop-blur-xl p-1 shadow-2xl shadow-gray-300/30 dark:shadow-blue-500/5">
-            <div className="absolute -inset-[1px] rounded-2xl bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-emerald-500/20 -z-10 blur-sm" />
+          <div className="relative rounded-[24px] border border-white/50 dark:border-white/[0.08] bg-white/40 dark:bg-white/[0.02] backdrop-blur-3xl backdrop-saturate-[1.6] p-1.5 shadow-[0_24px_80px_-12px_rgba(0,0,0,0.08)] dark:shadow-[0_24px_80px_-12px_rgba(0,0,0,0.4)]">
+            <div className="absolute -inset-[1px] rounded-[24px] bg-gradient-to-r from-blue-500/15 via-purple-500/10 to-emerald-500/15 -z-10 blur-sm" />
+            <div className="absolute inset-0 rounded-[24px] shadow-[inset_0_1px_1px_rgba(255,255,255,0.3)] dark:shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] pointer-events-none" />
             <div className="rounded-xl bg-gray-50 dark:bg-[#0a0f1e] overflow-hidden transition-colors duration-500">
               {/* Title bar */}
               <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-200/60 dark:border-white/[0.06]">
@@ -331,7 +334,7 @@ export default function Home() {
       {/* ─── FEATURES ─── */}
       <section id="features" className="px-6 py-24 md:py-28 max-w-7xl mx-auto">
         <div ref={addRevealRef} className="reveal text-center mb-16 md:mb-20">
-          <span className="inline-flex items-center gap-2 mb-4 px-4 py-1.5 rounded-full bg-emerald-50 dark:bg-white/[0.04] border border-emerald-200/60 dark:border-white/[0.06] text-xs font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">
+          <span className="inline-flex items-center gap-2 mb-4 px-4 py-2 rounded-full bg-white/50 dark:bg-white/[0.04] border border-white/60 dark:border-white/[0.06] text-xs font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest backdrop-blur-2xl shadow-[0_4px_16px_rgba(0,0,0,0.03)]">
             <Activity className="w-3.5 h-3.5" /> Core Features
           </span>
           <h2 className="text-3xl md:text-5xl font-bold mb-5 tracking-tight">
@@ -346,7 +349,8 @@ export default function Home() {
             <div key={i} ref={addRevealRef} className={`reveal stagger-${i + 1} group relative rounded-2xl p-[1px] transition-all duration-500 hover:-translate-y-1.5 overflow-hidden`}>
               <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${f.borderGlow} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
               <div className="absolute inset-0 rounded-2xl bg-gray-200/60 dark:bg-white/[0.06] group-hover:bg-transparent transition-colors duration-500" />
-              <div className="relative bg-white dark:bg-[#060b18] backdrop-blur-xl rounded-2xl p-7 md:p-8 h-full transition-colors duration-500">
+              <div className="relative bg-white/60 dark:bg-white/[0.03] backdrop-blur-3xl backdrop-saturate-[1.6] rounded-[22px] p-7 md:p-8 h-full transition-all duration-500">
+                <div className="absolute inset-0 rounded-[22px] shadow-[inset_0_1px_1px_rgba(255,255,255,0.3)] dark:shadow-[inset_0_1px_1px_rgba(255,255,255,0.04)] pointer-events-none" />
                 <div className={`absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br ${f.glow}`} />
                 <div className="relative z-10">
                   <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${f.gradient} flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 group-hover:shadow-xl transition-all duration-300 group-hover:rotate-3`}>
@@ -371,7 +375,7 @@ export default function Home() {
         </div>
         <div className="max-w-6xl mx-auto">
           <div ref={addRevealRef} className="reveal text-center mb-16 md:mb-20">
-            <span className="inline-flex items-center gap-2 mb-4 px-4 py-1.5 rounded-full bg-indigo-50 dark:bg-white/[0.04] border border-indigo-200/60 dark:border-white/[0.06] text-xs font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest">
+            <span className="inline-flex items-center gap-2 mb-4 px-4 py-2 rounded-full bg-white/50 dark:bg-white/[0.04] border border-white/60 dark:border-white/[0.06] text-xs font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest backdrop-blur-2xl shadow-[0_4px_16px_rgba(0,0,0,0.03)]">
               <Sparkles className="w-3.5 h-3.5" /> Simple Process
             </span>
             <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-gray-900 dark:text-white">How CareCompass Works</h2>
@@ -411,7 +415,8 @@ export default function Home() {
               { value: `${availCount}/7`, label: "AI Availability", icon: <Activity className="w-5 h-5 text-blue-500" /> },
               { value: "Free", label: "To Get Started", icon: <Sparkles className="w-5 h-5 text-purple-500" /> },
             ].map((stat, i) => (
-              <div key={i} className="group text-center p-6 md:p-8 rounded-2xl bg-white/80 dark:bg-white/[0.03] border border-gray-200/60 dark:border-white/[0.06] backdrop-blur-xl hover:border-gray-300 dark:hover:border-white/[0.15] hover:bg-white dark:hover:bg-white/[0.05] transition-all duration-300 hover:-translate-y-1 shadow-sm dark:shadow-none">
+              <div key={i} className="group text-center p-6 md:p-8 rounded-[22px] bg-white/50 dark:bg-white/[0.02] border border-white/50 dark:border-white/[0.06] backdrop-blur-3xl backdrop-saturate-[1.5] hover:border-white/70 dark:hover:border-white/[0.12] hover:bg-white/70 dark:hover:bg-white/[0.04] transition-all duration-500 hover:-translate-y-1.5 shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.2)] relative overflow-hidden">
+                <div className="absolute inset-0 rounded-[22px] shadow-[inset_0_1px_1px_rgba(255,255,255,0.3)] dark:shadow-[inset_0_1px_1px_rgba(255,255,255,0.04)] pointer-events-none" />
                 <div className="flex justify-center mb-3 opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300">{stat.icon}</div>
                 <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-emerald-500 dark:from-blue-400 dark:to-emerald-400 bg-clip-text text-transparent mb-2">{stat.value}</div>
                 <div className="text-sm text-gray-500 dark:text-gray-400">{stat.label}</div>
@@ -428,7 +433,7 @@ export default function Home() {
         </div>
         <div className="max-w-6xl mx-auto">
           <div ref={addRevealRef} className="reveal text-center mb-14 md:mb-16">
-            <span className="inline-flex items-center gap-2 mb-4 px-4 py-1.5 rounded-full bg-rose-50 dark:bg-white/[0.04] border border-rose-200/60 dark:border-white/[0.06] text-xs font-semibold text-rose-500 dark:text-rose-400 uppercase tracking-widest">
+            <span className="inline-flex items-center gap-2 mb-4 px-4 py-2 rounded-full bg-white/50 dark:bg-white/[0.04] border border-white/60 dark:border-white/[0.06] text-xs font-semibold text-rose-500 dark:text-rose-400 uppercase tracking-widest backdrop-blur-2xl shadow-[0_4px_16px_rgba(0,0,0,0.03)]">
               <MessageSquare className="w-3.5 h-3.5" /> Testimonials
             </span>
             <h2 className="text-3xl md:text-5xl font-bold tracking-tight">
@@ -440,7 +445,8 @@ export default function Home() {
             {testimonials.map((t, i) => (
               <div key={i} ref={addRevealRef} className={`reveal stagger-${i + 1} group relative rounded-2xl p-[1px]`}>
                 <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-gray-200/80 to-gray-100/40 dark:from-white/[0.08] dark:to-white/[0.02] group-hover:from-gray-300/80 group-hover:to-gray-200/40 dark:group-hover:from-white/[0.12] dark:group-hover:to-white/[0.04] transition-all duration-500" />
-                <div className="relative bg-white dark:bg-[#060b18] rounded-2xl p-7 md:p-8 h-full transition-colors duration-500">
+                <div className="relative bg-white/60 dark:bg-white/[0.03] backdrop-blur-3xl backdrop-saturate-[1.6] rounded-[22px] p-7 md:p-8 h-full transition-all duration-500">
+                  <div className="absolute inset-0 rounded-[22px] shadow-[inset_0_1px_1px_rgba(255,255,255,0.3)] dark:shadow-[inset_0_1px_1px_rgba(255,255,255,0.04)] pointer-events-none" />
                   <div className="flex gap-1 mb-4">
                     {[...Array(5)].map((_, j) => (
                       <svg key={j} className="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
@@ -487,7 +493,7 @@ export default function Home() {
       </section>
 
       {/* ─── FOOTER ─── */}
-      <footer className="border-t border-gray-200/60 dark:border-white/[0.06] bg-gray-50/80 dark:bg-[#020509]/90 backdrop-blur-xl transition-colors duration-500">
+      <footer className="border-t border-white/40 dark:border-white/[0.06] bg-white/30 dark:bg-white/[0.01] backdrop-blur-3xl backdrop-saturate-[1.5] transition-all duration-500">
         <div className="max-w-7xl mx-auto px-6 md:px-8 py-14">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
             <div className="md:col-span-2">
