@@ -196,3 +196,18 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(107, 114, 128, 0.5);
 }
+
+/* Marquee animation */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  animation: marquee 30s linear infinite;
+}
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
+}
