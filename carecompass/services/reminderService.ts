@@ -3,7 +3,6 @@ import {
   addDoc,
   collection,
   query,
-  where,
   getDocs,
   deleteDoc,
   doc,
@@ -31,31 +30,34 @@ const getTodayKey = () => {
   return `${year}-${month}-${day}`;
 };
 
-// ✅ FIXED: Now supports MULTI-DOSE directly (no race condition)
+// ✅ NEW STRUCTURE: users/{uid}/reminders/{doc}
 export const addReminder = async (
   uid: string,
   medicineName: string,
   dosage: string,
-  times: string[] // 🔥 CHANGED from string → string[]
+  times: string[]
 ) => {
   if (!uid || !medicineName || !times || times.length === 0) return;
 
-  await addDoc(collection(db, "reminders"), {
+  await addDoc(collection(db, "users", uid, "reminders"), {
     userId: uid,
     medicineName,
     dosage: dosage || "",
-    times: times, // 🔥 save all doses at once
+    times,
     takenTimes: [],
     createdAt: serverTimestamp(),
   });
 };
 
-// 📥 Get User Reminders (UNCHANGED)
-export const getUserReminders = async (uid: string): Promise<Reminder[]> => {
+// 📥 Get User Reminders (UPDATED PATH)
+export const getUserReminders = async (
+  uid: string
+): Promise<Reminder[]> => {
   if (!uid) return [];
 
-  const q = query(collection(db, "reminders"), where("userId", "==", uid));
-  const snapshot = await getDocs(q);
+  const snapshot = await getDocs(
+    collection(db, "users", uid, "reminders")
+  );
 
   return snapshot.docs.map((docSnap) => {
     const data = docSnap.data();
@@ -72,20 +74,29 @@ export const getUserReminders = async (uid: string): Promise<Reminder[]> => {
       medicineName: data.medicineName || "",
       dosage: data.dosage || "",
       times: safeTimes,
-      takenTimes: Array.isArray(data.takenTimes) ? data.takenTimes : [],
+      takenTimes: Array.isArray(data.takenTimes)
+        ? data.takenTimes
+        : [],
       createdAt: data.createdAt || null,
     };
   });
 };
 
-// 🗑 Delete Reminder (UNCHANGED)
-export const deleteReminder = async (reminderId: string) => {
-  if (!reminderId) return;
-  await deleteDoc(doc(db, "reminders", reminderId));
+// 🗑 Delete Reminder
+export const deleteReminder = async (
+  uid: string,
+  reminderId: string
+) => {
+  if (!uid || !reminderId) return;
+
+  await deleteDoc(
+    doc(db, "users", uid, "reminders", reminderId)
+  );
 };
 
-// ✏️ Update Reminder (UNCHANGED)
+// ✏️ Update Reminder
 export const updateReminder = async (
+  uid: string,
   reminderId: string,
   data: {
     medicineName?: string;
@@ -93,14 +104,24 @@ export const updateReminder = async (
     times?: string[];
   }
 ) => {
-  if (!reminderId) return;
+  if (!uid || !reminderId) return;
 
   try {
-    const docRef = doc(db, "reminders", reminderId);
+    const docRef = doc(
+      db,
+      "users",
+      uid,
+      "reminders",
+      reminderId
+    );
+
     const docSnap = await getDoc(docRef);
 
     if (!docSnap.exists()) {
-      console.error("Reminder document does not exist:", reminderId);
+      console.error(
+        "Reminder document does not exist:",
+        reminderId
+      );
       return;
     }
 
@@ -109,9 +130,11 @@ export const updateReminder = async (
     if (data.medicineName !== undefined)
       payload.medicineName = data.medicineName;
 
-    if (data.dosage !== undefined) payload.dosage = data.dosage;
+    if (data.dosage !== undefined)
+      payload.dosage = data.dosage;
 
-    if (data.times !== undefined) payload.times = data.times;
+    if (data.times !== undefined)
+      payload.times = data.times;
 
     await updateDoc(docRef, payload);
   } catch (error) {
@@ -119,20 +142,25 @@ export const updateReminder = async (
   }
 };
 
-// ✅ Mark Dose as Taken (UNCHANGED)
+// ✅ Mark Dose Taken
 export const markDoseTaken = async (
+  uid: string,
   reminderId: string,
   todayDoseKey: string,
   currentTaken: string[] = []
 ) => {
-  if (!reminderId || !todayDoseKey) return;
+  if (!uid || !reminderId || !todayDoseKey) return;
 
   try {
-    const docRef = doc(db, "reminders", reminderId);
+    const docRef = doc(
+      db,
+      "users",
+      uid,
+      "reminders",
+      reminderId
+    );
 
-    if (currentTaken?.includes(todayDoseKey)) {
-      return;
-    }
+    if (currentTaken?.includes(todayDoseKey)) return;
 
     await updateDoc(docRef, {
       takenTimes: arrayUnion(todayDoseKey),
@@ -145,15 +173,20 @@ export const markDoseTaken = async (
 // 📊 Progress (UNCHANGED)
 export const getTodayProgress = (reminder: Reminder) => {
   const today = getTodayKey();
+
   const totalDoses = reminder.times?.length || 0;
 
   const takenToday =
-    reminder.takenTimes?.filter((t) => t.startsWith(today)).length || 0;
+    reminder.takenTimes?.filter((t) =>
+      t.startsWith(today)
+    ).length || 0;
 
   return {
     takenToday,
     totalDoses,
     progressPercent:
-      totalDoses === 0 ? 0 : Math.round((takenToday / totalDoses) * 100),
+      totalDoses === 0
+        ? 0
+        : Math.round((takenToday / totalDoses) * 100),
   };
 };
