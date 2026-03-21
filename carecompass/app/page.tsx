@@ -47,13 +47,14 @@ function StarField({ isDark }: { isDark: boolean }) {
     resize();
     window.addEventListener("resize", resize);
 
-    for (let i = 0; i < 80; i++) {
+    const starCount = isDark ? 120 : 60;
+    for (let i = 0; i < starCount; i++) {
       stars.push({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
-        size: Math.random() * 1.5 + 0.5,
+        size: isDark ? Math.random() * 2 + 0.5 : Math.random() * 1.5 + 0.5,
         speed: Math.random() * 0.3 + 0.1,
-        opacity: Math.random() * 0.5 + 0.2,
+        opacity: isDark ? Math.random() * 0.7 + 0.3 : Math.random() * 0.5 + 0.2,
         pulse: Math.random() * Math.PI * 2,
       });
     }
@@ -143,19 +144,21 @@ export default function Home() {
       {/* ─── LIQUID GLASS AMBIENT BACKGROUND ─── */}
       <div className="fixed inset-0 -z-10">
         <StarField isDark={isDark} />
-        {/* Primary liquid orbs */}
-        <div className="absolute top-[-15%] left-[-10%] w-[600px] h-[600px] rounded-full bg-gradient-to-br from-blue-400/20 to-cyan-300/10 dark:from-blue-600/15 dark:to-cyan-500/8 blur-[120px] animate-float" />
-        <div className="absolute bottom-[-15%] right-[-10%] w-[600px] h-[600px] rounded-full bg-gradient-to-tl from-emerald-400/15 to-teal-300/8 dark:from-emerald-600/12 dark:to-teal-500/6 blur-[120px] animate-float-reverse" />
-        <div className="absolute top-[40%] left-[50%] -translate-x-1/2 w-[700px] h-[700px] rounded-full bg-gradient-to-br from-violet-400/10 to-fuchsia-300/5 dark:from-violet-600/8 dark:to-fuchsia-500/4 blur-[150px]" />
-        {/* Secondary accent orbs */}
-        <div className="absolute top-[20%] right-[15%] w-[250px] h-[250px] rounded-full bg-blue-300/12 dark:bg-blue-500/8 blur-[80px] animate-float" style={{ animationDelay: '1s', animationDuration: '8s' }} />
-        <div className="absolute bottom-[30%] left-[10%] w-[220px] h-[220px] rounded-full bg-emerald-300/12 dark:bg-emerald-500/8 blur-[80px] animate-float-reverse" style={{ animationDelay: '2s', animationDuration: '9s' }} />
+        {/* Primary liquid orbs — STRONGER in dark mode */}
+        <div className="absolute top-[-15%] left-[-10%] w-[600px] h-[600px] rounded-full bg-gradient-to-br from-blue-400/20 to-cyan-300/10 dark:from-blue-500/25 dark:to-cyan-400/15 blur-[100px] animate-float" />
+        <div className="absolute bottom-[-15%] right-[-10%] w-[600px] h-[600px] rounded-full bg-gradient-to-tl from-emerald-400/15 to-teal-300/8 dark:from-emerald-500/20 dark:to-teal-400/12 blur-[100px] animate-float-reverse" />
+        <div className="absolute top-[40%] left-[50%] -translate-x-1/2 w-[700px] h-[700px] rounded-full bg-gradient-to-br from-violet-400/10 to-fuchsia-300/5 dark:from-violet-500/15 dark:to-fuchsia-400/8 blur-[130px]" />
+        {/* Secondary accent orbs — MORE visible in dark */}
+        <div className="absolute top-[20%] right-[15%] w-[280px] h-[280px] rounded-full bg-blue-300/12 dark:bg-blue-400/15 blur-[80px] animate-float" style={{ animationDelay: '1s', animationDuration: '8s' }} />
+        <div className="absolute bottom-[30%] left-[10%] w-[250px] h-[250px] rounded-full bg-emerald-300/12 dark:bg-emerald-400/15 blur-[80px] animate-float-reverse" style={{ animationDelay: '2s', animationDuration: '9s' }} />
+        {/* Warm accent orb (dark mode depth) */}
+        <div className="absolute top-[60%] right-[25%] w-[300px] h-[300px] rounded-full bg-transparent dark:bg-amber-500/6 blur-[100px] animate-float" style={{ animationDelay: '3s', animationDuration: '10s' }} />
         {/* Dot pattern */}
-        <div className="absolute inset-0 opacity-[0.25] dark:opacity-[0.06]" style={{ backgroundImage: 'radial-gradient(circle, rgba(100,116,139,0.15) 1px, transparent 1px)', backgroundSize: '28px 28px' }} />
+        <div className="absolute inset-0 opacity-[0.25] dark:opacity-[0.08]" style={{ backgroundImage: 'radial-gradient(circle, rgba(100,116,139,0.15) 1px, transparent 1px)', backgroundSize: '28px 28px' }} />
       </div>
 
       {/* ─── NAVBAR (Liquid Glass) ─── */}
-      <header className="w-full border-b border-white/40 dark:border-white/[0.06] backdrop-blur-3xl backdrop-saturate-[1.6] bg-white/50 dark:bg-white/[0.02] sticky top-0 z-50 transition-all duration-500 shadow-[0_4px_30px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_30px_rgba(0,0,0,0.2)]">
+      <header className="w-full border-b border-white/40 dark:border-white/[0.08] backdrop-blur-3xl backdrop-saturate-[1.6] bg-white/50 dark:bg-white/[0.03] sticky top-0 z-50 transition-all duration-500 shadow-[0_4px_30px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_40px_rgba(0,0,0,0.3),0_0_60px_rgba(59,130,246,0.04)]">
         <div className="max-w-7xl mx-auto px-6 md:px-8 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3 group">
             <div className="relative">
@@ -225,15 +228,15 @@ export default function Home() {
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] bg-[radial-gradient(ellipse_at_center,rgba(59,130,246,0.08),transparent_70%)] dark:bg-[radial-gradient(ellipse_at_center,rgba(59,130,246,0.12),transparent_70%)] -z-10" />
 
         <div className="max-w-5xl mx-auto text-center">
-          <div className="animate-fade-in-up inline-flex items-center gap-2 mb-8 px-5 py-2.5 rounded-full bg-white/50 dark:bg-white/[0.04] border border-white/60 dark:border-white/[0.08] text-sm font-medium text-blue-600 dark:text-blue-300 backdrop-blur-2xl shadow-[0_4px_20px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_rgba(59,130,246,0.08)]">
+          <div className="animate-fade-in-up inline-flex items-center gap-2 mb-8 px-5 py-2.5 rounded-full bg-white/50 dark:bg-white/[0.05] border border-white/60 dark:border-blue-400/20 text-sm font-medium text-blue-600 dark:text-blue-300 backdrop-blur-2xl shadow-[0_4px_20px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_30px_rgba(59,130,246,0.12),0_0_0_1px_rgba(59,130,246,0.06)]">
             <Sparkles className="w-4 h-4" />
             AI-Powered Non-Diagnostic Health Companion
           </div>
 
           <h1 className="animate-fade-in-up stagger-1 text-5xl md:text-7xl font-extrabold leading-[1.1] tracking-tight mb-8">
-            <span className="text-gray-900 dark:text-white">Understand Your Health</span>
+            <span className="text-gray-900 dark:text-white dark:drop-shadow-[0_0_40px_rgba(255,255,255,0.06)]">Understand Your Health</span>
             <br />
-            <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-emerald-500 dark:from-blue-400 dark:via-indigo-400 dark:to-emerald-400 bg-clip-text text-transparent animate-gradient-shift">
+            <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-emerald-500 dark:from-blue-400 dark:via-indigo-400 dark:to-emerald-400 bg-clip-text text-transparent animate-gradient-shift dark:drop-shadow-[0_0_60px_rgba(99,102,241,0.15)]">
               With Clinical-Grade AI
             </span>
           </h1>
@@ -243,12 +246,12 @@ export default function Home() {
           </p>
 
           <div className="animate-fade-in-up stagger-3 flex flex-wrap justify-center gap-5">
-            <Link href="/auth/signup" className="group relative bg-gradient-to-r from-blue-600 to-emerald-500 text-white px-10 py-4 rounded-2xl text-lg font-semibold shadow-2xl shadow-blue-500/25 transition-all duration-300 hover:shadow-blue-500/40 hover:scale-[1.04] flex items-center gap-3 overflow-hidden">
+            <Link href="/auth/signup" className="group relative bg-gradient-to-r from-blue-600 to-emerald-500 text-white px-10 py-4 rounded-2xl text-lg font-semibold shadow-2xl shadow-blue-500/25 dark:shadow-[0_20px_60px_-12px_rgba(59,130,246,0.5),0_0_20px_rgba(16,185,129,0.15)] transition-all duration-300 hover:shadow-blue-500/40 dark:hover:shadow-[0_20px_70px_-12px_rgba(59,130,246,0.6),0_0_30px_rgba(16,185,129,0.2)] hover:scale-[1.04] flex items-center gap-3 overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
               <span className="relative z-10">Get Started Free</span>
               <ArrowRight className="relative z-10 w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Link>
-            <Link href="/auth/login" className="group px-10 py-4 rounded-2xl border border-gray-300 dark:border-white/[0.1] text-lg font-semibold hover:border-gray-400 dark:hover:border-white/[0.25] hover:bg-gray-50 dark:hover:bg-white/[0.04] transition-all duration-300 backdrop-blur-xl flex items-center gap-2">
+            <Link href="/auth/login" className="group px-10 py-4 rounded-2xl border border-gray-300 dark:border-white/[0.12] text-lg font-semibold hover:border-gray-400 dark:hover:border-white/[0.3] hover:bg-gray-50 dark:hover:bg-white/[0.05] transition-all duration-300 backdrop-blur-xl flex items-center gap-2 dark:shadow-[0_0_20px_rgba(255,255,255,0.02)]">
               Sign In
               <ArrowRight className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
             </Link>
@@ -349,8 +352,8 @@ export default function Home() {
             <div key={i} ref={addRevealRef} className={`reveal stagger-${i + 1} group relative rounded-2xl p-[1px] transition-all duration-500 hover:-translate-y-1.5 overflow-hidden`}>
               <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${f.borderGlow} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
               <div className="absolute inset-0 rounded-2xl bg-gray-200/60 dark:bg-white/[0.06] group-hover:bg-transparent transition-colors duration-500" />
-              <div className="relative bg-white/60 dark:bg-white/[0.03] backdrop-blur-3xl backdrop-saturate-[1.6] rounded-[22px] p-7 md:p-8 h-full transition-all duration-500">
-                <div className="absolute inset-0 rounded-[22px] shadow-[inset_0_1px_1px_rgba(255,255,255,0.3)] dark:shadow-[inset_0_1px_1px_rgba(255,255,255,0.04)] pointer-events-none" />
+              <div className="relative bg-white/60 dark:bg-white/[0.035] backdrop-blur-3xl backdrop-saturate-[1.6] rounded-[22px] p-7 md:p-8 h-full transition-all duration-500 dark:shadow-[0_0_0_1px_rgba(255,255,255,0.03)]">
+                <div className="absolute inset-0 rounded-[22px] shadow-[inset_0_1px_1px_rgba(255,255,255,0.3)] dark:shadow-[inset_0_1px_2px_rgba(255,255,255,0.06)] pointer-events-none" />
                 <div className={`absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br ${f.glow}`} />
                 <div className="relative z-10">
                   <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${f.gradient} flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 group-hover:shadow-xl transition-all duration-300 group-hover:rotate-3`}>
@@ -415,8 +418,8 @@ export default function Home() {
               { value: `${availCount}/7`, label: "AI Availability", icon: <Activity className="w-5 h-5 text-blue-500" /> },
               { value: "Free", label: "To Get Started", icon: <Sparkles className="w-5 h-5 text-purple-500" /> },
             ].map((stat, i) => (
-              <div key={i} className="group text-center p-6 md:p-8 rounded-[22px] bg-white/50 dark:bg-white/[0.02] border border-white/50 dark:border-white/[0.06] backdrop-blur-3xl backdrop-saturate-[1.5] hover:border-white/70 dark:hover:border-white/[0.12] hover:bg-white/70 dark:hover:bg-white/[0.04] transition-all duration-500 hover:-translate-y-1.5 shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.2)] relative overflow-hidden">
-                <div className="absolute inset-0 rounded-[22px] shadow-[inset_0_1px_1px_rgba(255,255,255,0.3)] dark:shadow-[inset_0_1px_1px_rgba(255,255,255,0.04)] pointer-events-none" />
+              <div key={i} className="group text-center p-6 md:p-8 rounded-[22px] bg-white/50 dark:bg-white/[0.025] border border-white/50 dark:border-white/[0.08] backdrop-blur-3xl backdrop-saturate-[1.5] hover:border-white/70 dark:hover:border-white/[0.15] hover:bg-white/70 dark:hover:bg-white/[0.05] transition-all duration-500 hover:-translate-y-1.5 shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_40px_rgba(0,0,0,0.25),0_0_0_1px_rgba(255,255,255,0.03)] dark:hover:shadow-[0_12px_50px_rgba(59,130,246,0.08),0_0_0_1px_rgba(255,255,255,0.06)] relative overflow-hidden">
+                <div className="absolute inset-0 rounded-[22px] shadow-[inset_0_1px_1px_rgba(255,255,255,0.3)] dark:shadow-[inset_0_1px_2px_rgba(255,255,255,0.06)] pointer-events-none" />
                 <div className="flex justify-center mb-3 opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300">{stat.icon}</div>
                 <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-emerald-500 dark:from-blue-400 dark:to-emerald-400 bg-clip-text text-transparent mb-2">{stat.value}</div>
                 <div className="text-sm text-gray-500 dark:text-gray-400">{stat.label}</div>
@@ -471,9 +474,9 @@ export default function Home() {
 
       {/* ─── CTA ─── */}
       <section className="px-6 py-24 md:py-28">
-        <div ref={addRevealRef} className="reveal relative max-w-4xl mx-auto overflow-hidden rounded-3xl">
+        <div ref={addRevealRef} className="reveal relative max-w-4xl mx-auto overflow-hidden rounded-3xl border border-transparent dark:border-white/[0.08]">
           <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-indigo-600 to-emerald-500 animate-gradient-shift" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.15),transparent_60%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.2),transparent_60%)]" />
           <div className="absolute top-[-50px] right-[-30px] w-[200px] h-[200px] bg-white/10 rounded-full blur-3xl animate-float" />
           <div className="absolute bottom-[-60px] left-[-40px] w-[180px] h-[180px] bg-white/10 rounded-full blur-3xl animate-float-reverse" />
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-white/5 rounded-full blur-3xl" />
