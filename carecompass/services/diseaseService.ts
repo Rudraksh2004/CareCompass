@@ -3,7 +3,6 @@ import {
   addDoc,
   collection,
   query,
-  where,
   getDocs,
   orderBy,
   serverTimestamp,
@@ -31,7 +30,7 @@ export interface DiseaseHistory {
   createdAt?: any;
 }
 
-// 🔥 Save Disease Prediction History (Auth Mode A) — UNCHANGED LOGIC
+// ✅ Save Disease Prediction History → users/{uid}/disease_history/{doc}
 export const saveDiseaseHistory = async (
   uid: string,
   data: {
@@ -46,33 +45,39 @@ export const saveDiseaseHistory = async (
   if (!uid || !data?.prediction) return;
 
   try {
-    await addDoc(collection(db, "disease_history"), {
-      userId: uid,
-      symptoms: data.symptoms || [],
-      customText: data.customText || "",
-      location: data.location || "",
-      qa: data.qa || null, // optional clinical Q&A (safe)
-      severity: data.severity,
-      prediction: data.prediction,
-      createdAt: serverTimestamp(),
-    });
+    await addDoc(
+      collection(db, "users", uid, "disease_history"),
+      {
+        userId: uid,
+        symptoms: data.symptoms || [],
+        customText: data.customText || "",
+        location: data.location || "",
+        qa: data.qa || null,
+        severity: data.severity,
+        prediction: data.prediction,
+        createdAt: serverTimestamp(),
+      }
+    );
   } catch (error) {
     console.error("Error saving disease history:", error);
   }
 };
 
-// 📥 Get User Disease History (UNCHANGED STRUCTURE, SAFER PARSING)
+// 📥 Get User Disease History
 export const getDiseaseHistory = async (
   uid: string
 ): Promise<DiseaseHistory[]> => {
   if (!uid) return [];
 
   try {
-    const q = query(
-      collection(db, "disease_history"),
-      where("userId", "==", uid),
-      orderBy("createdAt", "desc")
+    const historyRef = collection(
+      db,
+      "users",
+      uid,
+      "disease_history"
     );
+
+    const q = query(historyRef, orderBy("createdAt", "desc"));
 
     const snapshot = await getDocs(q);
 
@@ -82,7 +87,9 @@ export const getDiseaseHistory = async (
       return {
         id: docSnap.id,
         userId: data.userId || uid,
-        symptoms: Array.isArray(data.symptoms) ? data.symptoms : [],
+        symptoms: Array.isArray(data.symptoms)
+          ? data.symptoms
+          : [],
         customText: data.customText || "",
         location: data.location || "",
         qa: data.qa ?? null,
@@ -91,13 +98,14 @@ export const getDiseaseHistory = async (
         createdAt: data.createdAt ?? null,
       };
     });
+
   } catch (error) {
     console.error("Error fetching disease history:", error);
     return [];
   }
 };
 
-// 🗑️ NEW: Delete Single Disease History (REQUIRED for history UI)
+// 🗑️ Delete Disease History Entry
 export const deleteDiseaseHistory = async (
   uid: string,
   historyId: string
@@ -105,9 +113,15 @@ export const deleteDiseaseHistory = async (
   if (!uid || !historyId) return;
 
   try {
-    // Extra safety: ensure document belongs to user before deletion
-    const docRef = doc(db, "disease_history", historyId);
-    await deleteDoc(docRef);
+    await deleteDoc(
+      doc(
+        db,
+        "users",
+        uid,
+        "disease_history",
+        historyId
+      )
+    );
   } catch (error) {
     console.error("Error deleting disease history:", error);
   }
