@@ -1,13 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { login } from "@/services/authService";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowRight, Lock, Mail, Sparkles, Shield, Eye, EyeOff } from "lucide-react";
+import { ArrowRight, Lock, Mail, Sparkles, Shield, Eye, EyeOff, Sun, Moon } from "lucide-react";
+import { useTheme } from "@/context/ThemeContext";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { theme, toggleTheme, mounted } = useTheme();
+  const isDark = mounted ? theme === "dark" : false;
+  const handleToggle = useCallback(() => { toggleTheme(); }, [toggleTheme]);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -36,6 +40,18 @@ export default function LoginPage() {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-300/8 dark:bg-purple-600/8 rounded-full blur-[180px]" />
         <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(0,0,0,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.02)_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,rgba(255,255,255,0.012)_1px,transparent_1px),linear_gradient(to_bottom,rgba(255,255,255,0.012)_1px,transparent_1px)] bg-[size:50px_50px]" />
       </div>
+
+      {/* Theme Toggle */}
+      {mounted && (
+        <button
+          type="button"
+          onClick={handleToggle}
+          className="absolute top-6 right-6 z-50 w-10 h-10 rounded-xl border border-gray-200 dark:border-white/[0.08] bg-white/80 dark:bg-white/[0.04] backdrop-blur-lg flex items-center justify-center hover:bg-gray-100 dark:hover:bg-white/[0.08] transition-all duration-300 hover:scale-105 cursor-pointer shadow-lg shadow-gray-200/30 dark:shadow-black/20"
+          aria-label="Toggle theme"
+        >
+          {isDark ? <Moon className="w-[18px] h-[18px] text-blue-400" /> : <Sun className="w-[18px] h-[18px] text-amber-500" />}
+        </button>
+      )}
 
       <div className="relative w-full max-w-md animate-fade-in-up">
         {/* Brand */}

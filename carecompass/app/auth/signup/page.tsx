@@ -1,14 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { signup } from "@/services/authService";
 import { createUserProfile } from "@/services/userService";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowRight, User, Calendar, Droplets, Mail, Lock, Sparkles, Shield, Eye, EyeOff, HeartPulse } from "lucide-react";
+import { ArrowRight, User, Calendar, Droplets, Mail, Lock, Sparkles, Shield, Eye, EyeOff, HeartPulse, Sun, Moon } from "lucide-react";
+import { useTheme } from "@/context/ThemeContext";
 
 export default function SignupPage() {
   const router = useRouter();
+  const { theme, toggleTheme, mounted } = useTheme();
+  const isDark = mounted ? theme === "dark" : false;
+  const handleToggle = useCallback(() => { toggleTheme(); }, [toggleTheme]);
   const [name, setName] = useState("");
   const [age, setAge] = useState("");
   const [bloodGroup, setBloodGroup] = useState("");
@@ -50,6 +54,18 @@ export default function SignupPage() {
         <div className="absolute top-1/3 right-1/3 w-[400px] h-[400px] bg-purple-300/8 dark:bg-purple-600/8 rounded-full blur-[160px]" />
         <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(0,0,0,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.02)_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,rgba(255,255,255,0.012)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.012)_1px,transparent_1px)] bg-[size:50px_50px]" />
       </div>
+
+      {/* Theme Toggle */}
+      {mounted && (
+        <button
+          type="button"
+          onClick={handleToggle}
+          className="absolute top-6 right-6 z-50 w-10 h-10 rounded-xl border border-gray-200 dark:border-white/[0.08] bg-white/80 dark:bg-white/[0.04] backdrop-blur-lg flex items-center justify-center hover:bg-gray-100 dark:hover:bg-white/[0.08] transition-all duration-300 hover:scale-105 cursor-pointer shadow-lg shadow-gray-200/30 dark:shadow-black/20"
+          aria-label="Toggle theme"
+        >
+          {isDark ? <Moon className="w-[18px] h-[18px] text-blue-400" /> : <Sun className="w-[18px] h-[18px] text-amber-500" />}
+        </button>
+      )}
 
       <div className="relative w-full max-w-lg animate-fade-in-up">
         {/* Brand */}
