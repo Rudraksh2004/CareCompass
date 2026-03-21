@@ -10,11 +10,10 @@ import {
   doc,
 } from "firebase/firestore";
 
-// 🧠 Types (non-breaking + optional safety)
+// 🧠 Types
 export type HistoryType = "reports" | "prescriptions" | "chats";
 
-// 🔥 SAVE HISTORY (Robust + Safe)
-// Fixes: history not being created when uid is undefined
+// 🔥 SAVE HISTORY (Production-safe)
 export const saveHistory = async (
   uid: string,
   type: HistoryType,
@@ -30,18 +29,16 @@ export const saveHistory = async (
 
     await addDoc(ref, {
       ...data,
-      createdAt: serverTimestamp(), // ensures proper sorting
+      type, // ⭐ future timeline support
+      createdAt: serverTimestamp(), // ensures consistent ordering
     });
+
   } catch (error) {
     console.error("Error saving history:", error);
   }
 };
 
-// 📥 GET HISTORY (Fixed for missing createdAt + empty collections)
-// Fixes:
-// - History not loading if orderBy fails
-// - Silent Firestore query errors
-// - Empty UI when docs exist
+// 📥 GET HISTORY (Reliable ordered fetch)
 export const getHistory = async (
   uid: string,
   type: HistoryType
@@ -54,36 +51,44 @@ export const getHistory = async (
 
     const ref = collection(db, "users", uid, type);
 
-    // 🔥 Safe query with fallback (very important)
-    const q = query(ref, orderBy("createdAt", "desc"));
+    const q = query(
+      ref,
+      orderBy("createdAt", "desc")
+    );
+
     const snapshot = await getDocs(q);
 
-    const historyData = snapshot.docs.map((docSnap) => ({
+    return snapshot.docs.map((docSnap) => ({
       id: docSnap.id,
       ...docSnap.data(),
     }));
 
-    return historyData;
   } catch (error: any) {
-    console.error("Error fetching history (ordered):", error);
+    console.error("Error fetching ordered history:", error);
 
-    // 🚑 FALLBACK: Fetch without orderBy if index or createdAt issue
+    // 🚑 fallback without ordering (index-safe fallback)
     try {
       const fallbackRef = collection(db, "users", uid, type);
+
       const fallbackSnap = await getDocs(fallbackRef);
 
       return fallbackSnap.docs.map((docSnap) => ({
         id: docSnap.id,
         ...docSnap.data(),
       }));
+
     } catch (fallbackError) {
-      console.error("Fallback history fetch failed:", fallbackError);
+      console.error(
+        "Fallback history fetch failed:",
+        fallbackError
+      );
+
       return [];
     }
   }
 };
 
-// 🧹 CLEAR HISTORY (Optimized batch deletion)
+// 🧹 CLEAR HISTORY (Batch-safe deletion)
 export const clearHistory = async (
   uid: string,
   type: HistoryType
@@ -95,15 +100,25 @@ export const clearHistory = async (
     }
 
     const ref = collection(db, "users", uid, type);
+
     const snapshot = await getDocs(ref);
 
     if (snapshot.empty) return;
 
     const deletions = snapshot.docs.map((document) =>
-      deleteDoc(doc(db, "users", uid, type, document.id))
+      deleteDoc(
+        doc(
+          db,
+          "users",
+          uid,
+          type,
+          document.id
+        )
+      )
     );
 
     await Promise.all(deletions);
+
   } catch (error) {
     console.error("Error clearing history:", error);
   }
