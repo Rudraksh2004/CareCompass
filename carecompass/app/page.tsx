@@ -274,9 +274,9 @@ export default function Home() {
       {/* ─── DASHBOARD PREVIEW ─── */}
       <section className="px-6 pb-20">
         <div ref={addRevealRef} className="reveal max-w-5xl mx-auto">
-          <div className="relative rounded-[24px] border border-white/50 dark:border-white/[0.08] bg-white/40 dark:bg-white/[0.02] backdrop-blur-3xl backdrop-saturate-[1.6] p-1.5 shadow-[0_24px_80px_-12px_rgba(0,0,0,0.08)] dark:shadow-[0_24px_80px_-12px_rgba(0,0,0,0.4)]">
-            <div className="absolute -inset-[1px] rounded-[24px] bg-gradient-to-r from-blue-500/15 via-purple-500/10 to-emerald-500/15 -z-10 blur-sm" />
-            <div className="absolute inset-0 rounded-[24px] shadow-[inset_0_1px_1px_rgba(255,255,255,0.3)] dark:shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] pointer-events-none" />
+          <div className="relative rounded-[24px] border border-white/50 dark:border-white/[0.1] bg-white/40 dark:bg-white/[0.05] backdrop-blur-3xl backdrop-saturate-[1.6] p-1.5 shadow-[0_24px_80px_-12px_rgba(0,0,0,0.08)] dark:shadow-[0_24px_80px_-12px_rgba(0,0,0,0.5),0_0_60px_rgba(59,130,246,0.06)]">
+            <div className="absolute -inset-[1px] rounded-[24px] bg-gradient-to-r from-blue-500/15 via-purple-500/10 to-emerald-500/15 dark:from-blue-500/25 dark:via-purple-500/15 dark:to-emerald-500/25 -z-10 blur-sm" />
+            <div className="absolute inset-0 rounded-[24px] shadow-[inset_0_1px_1px_rgba(255,255,255,0.3)] dark:shadow-[inset_0_1px_2px_rgba(255,255,255,0.08)] pointer-events-none" />
             <div className="rounded-xl bg-gray-50 dark:bg-[#0a0f1e] overflow-hidden transition-colors duration-500">
               {/* Title bar */}
               <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-200/60 dark:border-white/[0.06]">
@@ -351,9 +351,9 @@ export default function Home() {
           {features.map((f, i) => (
             <div key={i} ref={addRevealRef} className={`reveal stagger-${i + 1} group relative rounded-2xl p-[1px] transition-all duration-500 hover:-translate-y-1.5 overflow-hidden`}>
               <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${f.borderGlow} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
-              <div className="absolute inset-0 rounded-2xl bg-gray-200/60 dark:bg-white/[0.06] group-hover:bg-transparent transition-colors duration-500" />
-              <div className="relative bg-white/60 dark:bg-white/[0.035] backdrop-blur-3xl backdrop-saturate-[1.6] rounded-[22px] p-7 md:p-8 h-full transition-all duration-500 dark:shadow-[0_0_0_1px_rgba(255,255,255,0.03)]">
-                <div className="absolute inset-0 rounded-[22px] shadow-[inset_0_1px_1px_rgba(255,255,255,0.3)] dark:shadow-[inset_0_1px_2px_rgba(255,255,255,0.06)] pointer-events-none" />
+              <div className="absolute inset-0 rounded-2xl bg-gray-200/60 dark:bg-white/[0.08] group-hover:bg-transparent transition-colors duration-500" />
+              <div className="relative bg-white/60 dark:bg-white/[0.06] backdrop-blur-3xl backdrop-saturate-[1.8] rounded-[22px] p-7 md:p-8 h-full transition-all duration-500 dark:shadow-[0_8px_40px_rgba(0,0,0,0.2),0_0_0_1px_rgba(255,255,255,0.05)] dark:group-hover:shadow-[0_12px_50px_rgba(0,0,0,0.3),0_0_0_1px_rgba(255,255,255,0.08)]">
+                <div className="absolute inset-0 rounded-[22px] shadow-[inset_0_1px_1px_rgba(255,255,255,0.3)] dark:shadow-[inset_0_1px_2px_rgba(255,255,255,0.1)] pointer-events-none" />
                 <div className={`absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br ${f.glow}`} />
                 <div className="relative z-10">
                   <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${f.gradient} flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 group-hover:shadow-xl transition-all duration-300 group-hover:rotate-3`}>
@@ -418,8 +418,8 @@ export default function Home() {
               { value: `${availCount}/7`, label: "AI Availability", icon: <Activity className="w-5 h-5 text-blue-500" /> },
               { value: "Free", label: "To Get Started", icon: <Sparkles className="w-5 h-5 text-purple-500" /> },
             ].map((stat, i) => (
-              <div key={i} className="group text-center p-6 md:p-8 rounded-[22px] bg-white/50 dark:bg-white/[0.025] border border-white/50 dark:border-white/[0.08] backdrop-blur-3xl backdrop-saturate-[1.5] hover:border-white/70 dark:hover:border-white/[0.15] hover:bg-white/70 dark:hover:bg-white/[0.05] transition-all duration-500 hover:-translate-y-1.5 shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_40px_rgba(0,0,0,0.25),0_0_0_1px_rgba(255,255,255,0.03)] dark:hover:shadow-[0_12px_50px_rgba(59,130,246,0.08),0_0_0_1px_rgba(255,255,255,0.06)] relative overflow-hidden">
-                <div className="absolute inset-0 rounded-[22px] shadow-[inset_0_1px_1px_rgba(255,255,255,0.3)] dark:shadow-[inset_0_1px_2px_rgba(255,255,255,0.06)] pointer-events-none" />
+              <div key={i} className="group text-center p-6 md:p-8 rounded-[22px] bg-white/50 dark:bg-white/[0.05] border border-white/50 dark:border-white/[0.1] backdrop-blur-3xl backdrop-saturate-[1.8] hover:border-white/70 dark:hover:border-white/[0.18] hover:bg-white/70 dark:hover:bg-white/[0.08] transition-all duration-500 hover:-translate-y-1.5 shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_40px_rgba(0,0,0,0.3),0_0_0_1px_rgba(255,255,255,0.05)] dark:hover:shadow-[0_16px_60px_rgba(59,130,246,0.1),0_0_0_1px_rgba(255,255,255,0.08)] relative overflow-hidden">
+                <div className="absolute inset-0 rounded-[22px] shadow-[inset_0_1px_1px_rgba(255,255,255,0.3)] dark:shadow-[inset_0_1px_2px_rgba(255,255,255,0.1)] pointer-events-none" />
                 <div className="flex justify-center mb-3 opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300">{stat.icon}</div>
                 <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-emerald-500 dark:from-blue-400 dark:to-emerald-400 bg-clip-text text-transparent mb-2">{stat.value}</div>
                 <div className="text-sm text-gray-500 dark:text-gray-400">{stat.label}</div>
@@ -447,9 +447,9 @@ export default function Home() {
           <div className="grid md:grid-cols-3 gap-5 md:gap-6">
             {testimonials.map((t, i) => (
               <div key={i} ref={addRevealRef} className={`reveal stagger-${i + 1} group relative rounded-2xl p-[1px]`}>
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-gray-200/80 to-gray-100/40 dark:from-white/[0.08] dark:to-white/[0.02] group-hover:from-gray-300/80 group-hover:to-gray-200/40 dark:group-hover:from-white/[0.12] dark:group-hover:to-white/[0.04] transition-all duration-500" />
-                <div className="relative bg-white/60 dark:bg-white/[0.03] backdrop-blur-3xl backdrop-saturate-[1.6] rounded-[22px] p-7 md:p-8 h-full transition-all duration-500">
-                  <div className="absolute inset-0 rounded-[22px] shadow-[inset_0_1px_1px_rgba(255,255,255,0.3)] dark:shadow-[inset_0_1px_1px_rgba(255,255,255,0.04)] pointer-events-none" />
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-gray-200/80 to-gray-100/40 dark:from-white/[0.1] dark:to-white/[0.04] group-hover:from-gray-300/80 group-hover:to-gray-200/40 dark:group-hover:from-white/[0.15] dark:group-hover:to-white/[0.06] transition-all duration-500" />
+                <div className="relative bg-white/60 dark:bg-white/[0.06] backdrop-blur-3xl backdrop-saturate-[1.8] rounded-[22px] p-7 md:p-8 h-full transition-all duration-500 dark:shadow-[0_8px_40px_rgba(0,0,0,0.2),0_0_0_1px_rgba(255,255,255,0.04)]">
+                  <div className="absolute inset-0 rounded-[22px] shadow-[inset_0_1px_1px_rgba(255,255,255,0.3)] dark:shadow-[inset_0_1px_2px_rgba(255,255,255,0.08)] pointer-events-none" />
                   <div className="flex gap-1 mb-4">
                     {[...Array(5)].map((_, j) => (
                       <svg key={j} className="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
