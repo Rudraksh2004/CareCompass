@@ -240,13 +240,13 @@ export default function DashboardLayout({
       {/* MAIN CONTENT */}
       <main className="flex-1 flex flex-col">
         {/* Header (Liquid Glass) */}
-        <header className="h-[76px] px-8 flex items-center justify-between border-b border-white/40 dark:border-white/[0.08] backdrop-blur-3xl backdrop-saturate-[1.6] bg-white/50 dark:bg-white/[0.03] sticky top-0 z-10 shadow-[0_4px_30px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_40px_rgba(0,0,0,0.2),0_0_60px_rgba(59,130,246,0.04)]">
+        <header className="h-[76px] px-8 flex items-center justify-between border-b border-white/60 dark:border-white/[0.08] backdrop-blur-3xl backdrop-saturate-[2] bg-gradient-to-r from-white/80 to-white/60 dark:from-[#0a0f1f]/80 dark:to-[#020617]/60 sticky top-0 z-10 shadow-[0_4px_30px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_40px_rgba(0,0,0,0.4),0_0_60px_rgba(59,130,246,0.05)]">
           <div>
-            <h2 className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+            <h2 className="text-2xl font-black tracking-tight text-gray-900 dark:text-white dark:drop-shadow-[0_2px_10px_rgba(255,255,255,0.15)]">
               Welcome back 👋
             </h2>
 
-            <p className="text-xs text-gray-500 dark:text-gray-400 font-medium mt-0.5">
+            <p className="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-300 mt-0.5">
               Your AI-powered health dashboard
             </p>
           </div>
