@@ -225,14 +225,24 @@ export const exportMedicalPDF = async (
         // Slightly bolder the first few words if it looks like a label (e.g. "Medication Name:")
         if (!isHeading && j === 0 && lines[j].includes(":")) {
            const splitIdx = lines[j].indexOf(":");
-           if (splitIdx < 30) { 
+           if (splitIdx < 35 && splitIdx > 2) { 
              const boldPart = lines[j].substring(0, splitIdx + 1);
-             const normalPart = lines[j].substring(splitIdx + 1);
+             let normalPart = lines[j].substring(splitIdx + 1);
+             
+             // Ensure we don't double space
+             if (normalPart.startsWith(" ")) {
+                 normalPart = normalPart.substring(1);
+             }
+
              doc.setFont("helvetica", "bold");
              doc.text(boldPart, xPos, currentY);
+             
              doc.setFont("helvetica", "normal");
              const boldWidth = doc.getTextWidth(boldPart);
-             doc.text(normalPart, xPos + boldWidth, currentY);
+             // Add a small 1.5 padding space after the bolded label
+             doc.text(" " + normalPart, xPos + boldWidth, currentY);
+             
+             currentY += LINE_HEIGHT; // CRITICAL FIX: Ensure Y increments
              continue; // Go to next loop iteration, skip generic text print
            }
         }
