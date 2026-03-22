@@ -74,17 +74,17 @@ export default function DashboardLayout({
       <aside
         className={`${
           collapsed ? "w-20" : "w-72"
-        } relative z-20 p-6 border-r border-white/40 dark:border-white/[0.08] backdrop-blur-3xl backdrop-saturate-[1.6] bg-white/50 dark:bg-[#020617]/50 shadow-[4px_0_30px_rgba(0,0,0,0.03)] dark:shadow-[4px_0_40px_rgba(0,0,0,0.2),0_0_60px_rgba(59,130,246,0.02)] flex flex-col transition-all duration-500 ease-in-out`}
+        } relative z-20 p-6 border-r border-white/40 dark:border-white/[0.08] backdrop-blur-3xl backdrop-saturate-[1.6] bg-white/50 dark:bg-white/[0.03] shadow-[4px_0_30px_rgba(0,0,0,0.03)] dark:shadow-[4px_0_40px_rgba(0,0,0,0.2),0_0_60px_rgba(59,130,246,0.04)] flex flex-col transition-all duration-500 ease-in-out`}
       >
-        {/* Collapse Button */}
+        {/* 🔥 Premium Edge Collapse Button */}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="mb-6 mx-auto flex items-center justify-center w-10 h-10 rounded-2xl bg-white/60 dark:bg-white/[0.04] border border-white/50 dark:border-white/[0.08] hover:bg-white/80 dark:hover:bg-white/[0.08] transition-all duration-500 backdrop-blur-2xl shadow-[0_4px_16px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.2)] hover:scale-110"
+          className="absolute -right-3.5 top-8 flex items-center justify-center w-7 h-7 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-md hover:bg-gray-50 dark:hover:bg-gray-700 hover:scale-110 transition-all duration-300 z-50 text-gray-500 dark:text-gray-400 focus:outline-none group"
         >
           {collapsed ? (
-            <PanelLeftOpen className="w-5 h-5 text-white" />
+            <PanelLeftOpen className="w-3.5 h-3.5 group-hover:text-blue-500 transition-colors" />
           ) : (
-            <PanelLeftClose className="w-5 h-5 text-white" />
+            <PanelLeftClose className="w-3.5 h-3.5 group-hover:text-blue-500 transition-colors" />
           )}
         </button>
 
@@ -240,13 +240,13 @@ export default function DashboardLayout({
       {/* MAIN CONTENT */}
       <main className="flex-1 flex flex-col">
         {/* Header (Liquid Glass) */}
-        <header className="h-[76px] px-8 flex items-center justify-between border-b border-white/40 dark:border-white/[0.08] backdrop-blur-3xl backdrop-saturate-[1.6] bg-white/50 dark:bg-white/[0.02] sticky top-0 z-10 shadow-[0_4px_30px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_40px_rgba(0,0,0,0.3),0_0_60px_rgba(59,130,246,0.04)]">
+        <header className="h-[76px] px-8 flex items-center justify-between border-b border-white/40 dark:border-white/[0.08] backdrop-blur-3xl backdrop-saturate-[1.6] bg-white/50 dark:bg-white/[0.03] sticky top-0 z-10 shadow-[0_4px_30px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_40px_rgba(0,0,0,0.2),0_0_60px_rgba(59,130,246,0.04)]">
           <div>
             <h2 className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
               Welcome back 👋
             </h2>
 
-            <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+            <p className="text-xs text-gray-500 dark:text-gray-400 font-medium mt-0.5">
               Your AI-powered health dashboard
             </p>
           </div>
@@ -266,23 +266,23 @@ export default function DashboardLayout({
         </div>
 
         {/* ─── DASHBOARD FOOTER ─── */}
-        <footer className="mt-auto border-t border-white/40 dark:border-white/[0.08] backdrop-blur-3xl backdrop-saturate-[1.6] bg-white/40 dark:bg-white/[0.02] py-8 px-8 transition-all duration-500 shadow-[0_-4px_30px_rgba(0,0,0,0.02)] dark:shadow-[0_-4px_30px_rgba(0,0,0,0.2)]">
+        <footer className="mt-auto border-t border-white/40 dark:border-white/[0.08] backdrop-blur-3xl backdrop-saturate-[1.6] bg-white/40 dark:bg-white/[0.02] py-8 px-8 transition-all duration-500 shadow-[0_-4px_30px_rgba(0,0,0,0.02)] dark:shadow-[0_-4px_30px_rgba(0,0,0,0.15)]">
           <div className="max-w-[1400px] mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <img src="/logo.png" alt="CareCompass" className="w-6 h-6 object-contain opacity-80" />
-              <span className="text-sm font-semibold bg-gradient-to-r from-gray-700 to-gray-500 dark:from-gray-300 dark:to-gray-500 bg-clip-text text-transparent">
+              <img src="/logo.png" alt="CareCompass" className="w-7 h-7 object-contain drop-shadow-sm opacity-90 dark:opacity-100" />
+              <span className="text-sm font-bold bg-gradient-to-r from-gray-800 to-gray-500 dark:from-white dark:to-gray-400 bg-clip-text text-transparent">
                 CareCompass AI
               </span>
             </div>
             
-            <p className="text-xs text-gray-500 dark:text-gray-500 text-center md:text-left">
+            <p className="text-xs text-gray-500 dark:text-gray-500/80 text-center md:text-left font-medium">
               © {new Date().getFullYear()} CareCompass AI. All rights reserved. <br className="md:hidden" />
-              Not a substitute for professional medical advice.
+              Not a medical diagnostic tool.
             </p>
 
-            <div className="flex gap-4 text-xs font-medium text-gray-500 dark:text-gray-500">
-              <span className="hover:text-gray-800 dark:hover:text-gray-300 cursor-pointer transition">Privacy Policy</span>
-              <span className="hover:text-gray-800 dark:hover:text-gray-300 cursor-pointer transition">Terms of Service</span>
+            <div className="flex gap-5 text-xs font-bold tracking-wide text-gray-500 dark:text-gray-500/80">
+              <span className="hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer transition-colors duration-300">Privacy</span>
+              <span className="hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer transition-colors duration-300">Terms</span>
             </div>
           </div>
         </footer>
@@ -313,8 +313,8 @@ function NavItem({
         collapsed ? "justify-center" : "gap-3"
       } px-4 py-3.5 rounded-2xl transition-all duration-300 ${
         isActive
-          ? "bg-white/80 dark:bg-white/[0.08] text-blue-600 dark:text-emerald-400 shadow-[0_8px_30px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_20px_rgba(0,0,0,0.3)] border border-white/80 dark:border-white/[0.15]"
-          : "text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-emerald-300 hover:bg-white/60 dark:hover:bg-white/[0.04] border border-transparent hover:border-white/50 dark:hover:border-white/[0.06]"
+          ? "bg-gradient-to-r from-blue-500/10 to-emerald-500/10 text-blue-600 dark:text-emerald-400 shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_20px_rgba(0,0,0,0.2)] border border-blue-500/20 dark:border-emerald-500/20 backdrop-blur-xl"
+          : "text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-emerald-400 hover:bg-white/60 dark:hover:bg-white/[0.04] border border-transparent hover:border-white/50 dark:hover:border-white/[0.06]"
       }`}
     >
       <div className="flex items-center justify-center w-6 h-6 shrink-0">
