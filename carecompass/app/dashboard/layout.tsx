@@ -55,13 +55,13 @@ export default function DashboardLayout({
       {/* ─── LIQUID GLASS AMBIENT BACKGROUND ─── */}
       <div className="fixed inset-0 -z-10 pointer-events-none">
         {/* Primary liquid orbs */}
-        <div className="absolute top-[-15%] left-[-10%] w-[600px] h-[600px] rounded-full bg-gradient-to-br from-blue-400/20 to-cyan-300/10 dark:from-blue-500/25 dark:to-cyan-400/15 blur-[100px] animate-float" />
-        <div className="absolute bottom-[-15%] right-[-10%] w-[600px] h-[600px] rounded-full bg-gradient-to-tl from-emerald-400/15 to-teal-300/8 dark:from-emerald-500/20 dark:to-teal-400/12 blur-[100px] animate-float-reverse" />
-        <div className="absolute top-[40%] left-[50%] -translate-x-1/2 w-[700px] h-[700px] rounded-full bg-gradient-to-br from-violet-400/10 to-fuchsia-300/5 dark:from-violet-500/15 dark:to-fuchsia-400/8 blur-[130px]" />
+        <div className="absolute top-[-10%] left-[-5%] w-[600px] h-[600px] rounded-full bg-gradient-to-br from-blue-400/25 to-cyan-300/15 dark:from-blue-600/20 dark:to-cyan-400/10 blur-[100px] animate-float opacity-80" />
+        <div className="absolute bottom-[-15%] right-[-5%] w-[700px] h-[700px] rounded-full bg-gradient-to-tl from-emerald-400/20 to-teal-300/15 dark:from-emerald-600/15 dark:to-teal-500/10 blur-[110px] animate-float-reverse opacity-80" />
+        <div className="absolute top-[35%] left-[50%] -translate-x-1/2 w-[800px] h-[800px] rounded-full bg-gradient-to-br from-violet-400/15 to-purple-300/10 dark:from-violet-600/10 dark:to-purple-500/5 blur-[140px] opacity-70" />
         
         {/* Secondary accent orbs */}
-        <div className="absolute top-[20%] right-[15%] w-[280px] h-[280px] rounded-full bg-blue-300/12 dark:bg-blue-400/15 blur-[80px] animate-float" style={{ animationDelay: '1s', animationDuration: '8s' }} />
-        <div className="absolute bottom-[30%] left-[10%] w-[250px] h-[250px] rounded-full bg-emerald-300/12 dark:bg-emerald-400/15 blur-[80px] animate-float-reverse" style={{ animationDelay: '2s', animationDuration: '9s' }} />
+        <div className="absolute top-[20%] right-[10%] w-[350px] h-[350px] rounded-full bg-blue-300/20 dark:bg-blue-500/15 blur-[90px] animate-float" style={{ animationDelay: '1.5s', animationDuration: '10s' }} />
+        <div className="absolute bottom-[25%] left-[5%] w-[400px] h-[400px] rounded-full bg-emerald-300/20 dark:bg-emerald-500/15 blur-[90px] animate-float-reverse" style={{ animationDelay: '2.5s', animationDuration: '12s' }} />
         
         {/* Warm accent orb (dark mode depth) */}
         <div className="absolute top-[60%] right-[25%] w-[300px] h-[300px] rounded-full bg-transparent dark:bg-amber-500/6 blur-[100px] animate-float" style={{ animationDelay: '3s', animationDuration: '10s' }} />
@@ -73,8 +73,8 @@ export default function DashboardLayout({
       {/* SIDEBAR (Liquid Glass) */}
       <aside
         className={`${
-          collapsed ? "w-20" : "w-72"
-        } relative z-20 p-6 border-r border-white/40 dark:border-white/[0.08] backdrop-blur-3xl backdrop-saturate-[1.6] bg-white/50 dark:bg-white/[0.03] shadow-[4px_0_30px_rgba(0,0,0,0.03)] dark:shadow-[4px_0_40px_rgba(0,0,0,0.2),0_0_60px_rgba(59,130,246,0.04)] flex flex-col transition-all duration-500 ease-in-out`}
+          collapsed ? "w-20" : "w-[280px]"
+        } relative z-20 p-6 border-r border-white/80 dark:border-white/[0.08] border-r-white/40 bg-white/[0.65] dark:bg-[#030712]/40 backdrop-blur-[40px] backdrop-saturate-[2] shadow-[8px_0_40px_rgba(0,0,0,0.03)] dark:shadow-[8px_0_40px_rgba(0,0,0,0.4),0_0_60px_rgba(59,130,246,0.03)] flex flex-col transition-all duration-500 ease-in-out`}
       >
         {/* 🔥 Premium Edge Collapse Button */}
         <button
@@ -240,7 +240,7 @@ export default function DashboardLayout({
       {/* MAIN CONTENT */}
       <main className="flex-1 flex flex-col">
         {/* Header (Liquid Glass) */}
-        <header className="h-[76px] px-8 flex items-center justify-between border-b border-white/60 dark:border-white/[0.08] backdrop-blur-3xl backdrop-saturate-[2] bg-gradient-to-r from-white/80 to-white/60 dark:from-[#0a0f1f]/80 dark:to-[#020617]/60 sticky top-0 z-10 shadow-[0_4px_30px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_40px_rgba(0,0,0,0.4),0_0_60px_rgba(59,130,246,0.05)]">
+        <header className="h-[80px] px-8 flex items-center justify-between border-b border-white/80 border-b-white/40 dark:border-white/[0.08] backdrop-blur-[40px] backdrop-saturate-[2] bg-white/[0.65] dark:bg-[#030712]/40 sticky top-0 z-10 shadow-[0_4px_30px_rgba(0,0,0,0.02)] dark:shadow-[0_8px_40px_rgba(0,0,0,0.4),0_0_60px_rgba(59,130,246,0.03)]">
           <div>
             <h2 className="text-2xl font-black tracking-tight text-gray-900 dark:text-white dark:drop-shadow-[0_2px_10px_rgba(255,255,255,0.15)]">
               Welcome back 👋
@@ -251,10 +251,10 @@ export default function DashboardLayout({
             </p>
           </div>
 
-          <div className="hidden md:flex items-center gap-2 px-4 py-2 rounded-2xl bg-white/60 dark:bg-white/[0.04] border border-white/50 dark:border-white/[0.08] text-xs font-semibold text-blue-600 dark:text-emerald-400 shadow-[0_4px_16px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.2)] backdrop-blur-2xl">
+          <div className="hidden md:flex items-center gap-2 px-4 py-2 rounded-2xl bg-white/80 dark:bg-white/[0.05] border border-white dark:border-white/[0.1] text-xs font-bold text-blue-700 dark:text-emerald-400 shadow-[0_4px_20px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.3)] backdrop-blur-3xl transition-transform hover:scale-[1.02]">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
             </span>
             CareCompass AI Active
           </div>
@@ -266,7 +266,7 @@ export default function DashboardLayout({
         </div>
 
         {/* ─── DASHBOARD FOOTER ─── */}
-        <footer className="mt-auto border-t border-white/40 dark:border-white/[0.08] backdrop-blur-3xl backdrop-saturate-[1.6] bg-white/40 dark:bg-white/[0.02] py-8 px-8 transition-all duration-500 shadow-[0_-4px_30px_rgba(0,0,0,0.02)] dark:shadow-[0_-4px_30px_rgba(0,0,0,0.15)]">
+        <footer className="mt-auto border-t border-white/80 border-t-white/40 dark:border-white/[0.08] backdrop-blur-[40px] backdrop-saturate-[2] bg-white/[0.65] dark:bg-[#030712]/40 py-8 px-8 transition-all duration-500 shadow-[0_-4px_30px_rgba(0,0,0,0.02)] dark:shadow-[0_-8px_40px_rgba(0,0,0,0.2)]">
           <div className="max-w-[1400px] mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <img src="/logo.png" alt="CareCompass" className="w-7 h-7 object-contain drop-shadow-sm opacity-90 dark:opacity-100" />
@@ -311,13 +311,18 @@ function NavItem({
       href={href}
       className={`group relative flex items-center ${
         collapsed ? "justify-center" : "gap-3"
-      } px-4 py-3.5 rounded-2xl transition-all duration-300 ${
+      } px-4 py-3.5 rounded-2xl transition-all duration-500 overflow-hidden ${
         isActive
-          ? "bg-gradient-to-r from-blue-500/15 to-emerald-500/15 text-blue-700 dark:text-emerald-300 shadow-[0_8px_30px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_20px_rgba(0,0,0,0.3)] border border-blue-500/30 dark:border-emerald-500/30 backdrop-blur-xl font-bold"
-          : "text-gray-800 dark:text-gray-200 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-white/60 dark:hover:bg-white/[0.04] border border-transparent hover:border-gray-400/40 dark:hover:border-white/[0.1] font-semibold"
+          ? "bg-white/[0.85] dark:bg-white/[0.08] text-blue-700 dark:text-emerald-300 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] border border-white border-t-white border-l-white/90 dark:border-white/[0.12] dark:border-t-white/[0.2] dark:border-l-white/[0.15] backdrop-blur-[20px] backdrop-saturate-[1.5] font-black translate-x-1"
+          : "text-gray-700 dark:text-gray-300 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-white/60 dark:hover:bg-white/[0.05] border border-transparent hover:border-white/80 dark:hover:border-white/[0.08] font-bold hover:translate-x-1"
       }`}
     >
-      <div className="flex items-center justify-center w-6 h-6 shrink-0 drop-shadow-sm">
+      {/* Dynamic Active Indicator Glow */}
+      {isActive && (
+        <div className="absolute inset-x-0 bottom-0 h-[100%] bg-gradient-to-r from-blue-400/10 to-transparent dark:from-emerald-400/10 pointer-events-none opacity-100" />
+      )}
+      
+      <div className={`flex items-center justify-center w-6 h-6 shrink-0 z-10 transition-transform duration-500 ${isActive ? "scale-110 drop-shadow-md" : "drop-shadow-sm group-hover:scale-110"}`}>
         {icon}
       </div>
 
