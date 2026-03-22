@@ -8,7 +8,6 @@ function cleanText(text: string) {
 
   return (
     text
-
       // FIX 1: Remove markdown separators like ---
       .replace(/-{3,}/g, "")
 
@@ -145,9 +144,13 @@ export const exportMedicalPDF = async (
 
   // Helper: Renders sleek page borders and footers on EVERY page
   const renderPageBase = () => {
+    // Ultra-Premium Top Header Bar (Deep Indigo)
+    doc.setFillColor(30, 27, 75);
+    doc.rect(0, 0, 210, 6, "F");
+
     // Elegant left-edge color accent (Clinical Blue)
     doc.setFillColor(37, 99, 235);
-    doc.rect(0, 0, 4, 297, "F");
+    doc.rect(0, 6, 2.5, 291, "F");
 
     // Page Footer
     doc.setDrawColor(229, 231, 235);
@@ -186,6 +189,12 @@ export const exportMedicalPDF = async (
         continue;
       }
 
+      // 1. Preserve asterisk bullets by converting them before stripping markdown markers
+      para = para.replace(/^\*\s/, "- ");
+      
+      // 2. Clean bold/italic syntax FIRST so regex evaluations don't break
+      para = para.replace(/\*\*/g, "").replace(/\*/g, "").replace(/`/g, "").trim();
+
       // Check Heading
       let isHeading = false;
       let headingLevel = 0;
@@ -195,15 +204,19 @@ export const exportMedicalPDF = async (
 
       // Check Bullet
       let isBullet = false;
-      if (para.startsWith("- ") || para.startsWith("* ")) {
-        isBullet = true;
-        para = para.substring(2);
-      } else if (/^\d+\.\s/.test(para)) {
-        isBullet = true; // Numbered list treat like bullet indentation
-      }
+      let bulletNumber = "";
 
-      // Clean bold/italic syntax from string to just render normally but structured
-      para = para.replace(/\*\*/g, "").replace(/\*/g, "").replace(/`/g, "");
+      if (para.startsWith("- ")) {
+        isBullet = true;
+        para = para.substring(2).trim();
+      } else {
+        const numMatch = para.match(/^(\d+\.)\s/);
+        if (numMatch) {
+          isBullet = true;
+          bulletNumber = numMatch[1];
+          para = para.replace(/^\d+\.\s/, "").trim(); // Remove number so text prints at indent
+        }
+      }
 
       // Apply Fonts
       if (isHeading) {
@@ -221,13 +234,11 @@ export const exportMedicalPDF = async (
 
       // Layout coordinates
       const xPos = isBullet ? startX + 6 : startX;
+      
       if (isBullet) {
-        // Draw physical bullet or number
-        if (/^\d+\.\s/.test(paragraphs[i].trim())) {
+        if (bulletNumber) {
           doc.setFont("helvetica", "bold");
-          const numMatch = paragraphs[i].trim().match(/^(\d+\.)\s/);
-          if (numMatch) doc.text(numMatch[1], startX, currentY);
-          para = para.replace(/^\d+\.\s/, ""); // remove from content to print adjacent
+          doc.text(bulletNumber, startX, currentY);
         } else {
           doc.setFillColor(55, 65, 81);
           doc.circle(startX + 2, currentY - 1.2, 0.8, "F");
@@ -281,69 +292,90 @@ export const exportMedicalPDF = async (
   // INITIALIZE FIRST PAGE
   renderPageBase();
 
-  // 🌟 BRAND HEADER BAR
-  doc.setFillColor(30, 27, 75); // Deep Indigo/Slate
-  doc.roundedRect(margin - 4, 15, 178, 45, 4, 4, "F");
-
+  // 🌟 ULTRA-PREMIUM MINIMALIST BRANDING
   doc.setFont("helvetica", "bold");
   doc.setFontSize(26);
-  doc.setTextColor(255, 255, 255);
-  doc.text("CareCompass AI", margin + 6, 32);
-
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(11);
-  doc.setTextColor(167, 139, 250); // Beautiful Purple-300
-  doc.text("Premium Clinical Intelligence Report", margin + 7, 42);
-  
-  y = 75;
-
-  // REPORT TYPE & DATE
-  doc.setFontSize(11);
-  doc.setFont("helvetica", "bold");
-  doc.setTextColor(75, 85, 99); // Gray 600
-  doc.text("Report Title:", margin, y);
-  
-  doc.setFont("helvetica", "normal");
   doc.setTextColor(17, 24, 39); // Gray 900
-  doc.text(title, margin + 28, y);
+  doc.text("CareCompass", margin - 1, 30);
+  
+  doc.setTextColor(79, 70, 229); // Indigo 600
+  doc.text(" AI", margin + 63, 30);
 
   doc.setFont("helvetica", "bold");
-  doc.setTextColor(75, 85, 99);
-  doc.text("Generated:", margin + 110, y);
+  doc.setFontSize(10.5);
+  doc.setTextColor(107, 114, 128); // Gray 500
+  doc.text("PREMIUM CLINICAL INTELLIGENCE REPORT", margin, 38);
   
-  doc.setFont("helvetica", "normal");
-  doc.setTextColor(17, 24, 39);
-  const dateStr = new Date().toLocaleDateString();
-  doc.text(dateStr, margin + 135, y);
+  // Header Divider
+  doc.setDrawColor(229, 231, 235); // Gray 200
+  doc.setLineWidth(0.5);
+  doc.line(margin - 2, 45, 210 - margin + 2, 45);
 
-  // RISK BADGE
-  y += 16;
+  y = 55;
+
+  // 📝 METADATA GRID LAYOUT
+  doc.setFontSize(9.5);
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(156, 163, 175); // Gray 400
+  doc.text("REPORT CONTEXT", margin, y);
+  
+  doc.setTextColor(31, 41, 55); // Gray 800
   doc.setFont("helvetica", "bold");
   doc.setFontSize(11);
-  doc.setTextColor(75, 85, 99);
-  doc.text("AI Risk Assessment:", margin, y);
+  doc.text(title.toUpperCase(), margin, y + 6.5);
+
+  doc.setFontSize(9.5);
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(156, 163, 175);
+  doc.text("GENERATED DATE", margin + 70, y);
+  
+  doc.setTextColor(31, 41, 55);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(11);
+  doc.text(new Date().toLocaleDateString(), margin + 70, y + 6.5);
+
+  doc.setFontSize(9.5);
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(156, 163, 175);
+  doc.text("DOCUMENT ID", margin + 125, y);
+  
+  doc.setTextColor(31, 41, 55);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(11);
+  doc.text(reportId, margin + 125, y + 6.5);
+
+  y += 18;
+  doc.setDrawColor(243, 244, 246); // Gray 100
+  doc.line(margin - 2, y, 210 - margin + 2, y);
+
+  // 🚨 RISK BADGE CALLOUT BLOCK
+  y += 10;
+  doc.setFillColor(249, 250, 251); // Gray 50
+  doc.setDrawColor(229, 231, 235); // Gray 200
+  doc.roundedRect(margin - 2, y - 6, 174, 18, 3, 3, "FD");
+  
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(11);
+  doc.setTextColor(75, 85, 99); // Gray 600
+  doc.text("AI Risk Assessment:", margin + 4, y + 5);
 
   // Pill Badge
   doc.setFillColor(risk.bg[0], risk.bg[1], risk.bg[2]);
-  doc.roundedRect(margin + 42, y - 5.5, 60, 8, 4, 4, "F");
+  doc.roundedRect(margin + 44, y - 1.5, 56, 8.5, 4.25, 4.25, "F");
 
   doc.setTextColor(risk.color[0], risk.color[1], risk.color[2]);
   doc.setFontSize(9.5);
   doc.setFont("helvetica", "bold");
-  doc.text(risk.label, margin + 46, y + 0.5);
+  doc.text(risk.label, margin + 48, y + 4.5);
   
   doc.setTextColor(0, 0, 0);
 
-  y += 12;
-  doc.setDrawColor(229, 231, 235); // Gray 200
-  doc.setLineWidth(0.5);
-  doc.line(margin, y, 210 - margin, y);
+  y += 24;
 
   // CHART
   if (chartImage) {
     checkPageBreak(100);
 
-    y += 18;
     doc.setFont("helvetica", "bold");
     doc.setFontSize(15);
     doc.setTextColor(31, 41, 55);
@@ -366,7 +398,6 @@ export const exportMedicalPDF = async (
   const cleanedOriginal = cleanText(originalText);
 
   checkPageBreak(35);
-  y += 12;
 
   // Header Box
   doc.setFillColor(248, 250, 252); // Slate 50
@@ -381,15 +412,7 @@ export const exportMedicalPDF = async (
   y += 12;
 
   // Add a soft left vertical border for the content block
-  const originalStartY = y - 4;
-  
   renderMarkdownText(cleanedOriginal || "No data available.", margin, y, 170);
-
-  doc.setDrawColor(203, 213, 225); // Slate 300
-  doc.setLineWidth(1.5);
-  // Do not cross page boundaries with single rect, just bound what's on this page loosely
-  // Actually, left accent lines span nicely if we keep it simple, but let's skip the vertical line to prevent multi-page complexity
-  // and purely rely on excellent text layouts.
 
   // AI EXPLANATION SECTION
   checkPageBreak(35);
@@ -405,12 +428,12 @@ export const exportMedicalPDF = async (
   doc.setTextColor(67, 56, 202); // Indigo 700
   doc.text("AI CLINICAL EXPLANATION & INSIGHTS", margin, y - 0.5);
 
-  y += 12;
+  y += 14;
   renderMarkdownText(cleanedAI || "No AI explanation generated.", margin, y, 170);
 
   // DISCLAIMER
   checkPageBreak(40);
-  y += 18;
+  y += 16;
 
   doc.setDrawColor(254, 202, 202); // Red 200
   doc.setFillColor(254, 242, 242); // Red 50
@@ -432,4 +455,4 @@ export const exportMedicalPDF = async (
   );
 
   doc.save("CareCompass-AI-Premium-Report.pdf");
-}; 
+};
