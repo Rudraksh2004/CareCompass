@@ -10,6 +10,7 @@ import {
   serverTimestamp,
   getDoc,
   arrayUnion,
+  where
 } from "firebase/firestore";
 
 export interface Reminder {
@@ -55,31 +56,52 @@ export const getUserReminders = async (
 ): Promise<Reminder[]> => {
   if (!uid) return [];
 
-  const snapshot = await getDocs(
-    collection(db, "users", uid, "reminders")
-  );
+  let mergedDocs: any[] = [];
 
-  return snapshot.docs.map((docSnap) => {
-    const data = docSnap.data();
+  // Old Structure (Legacy root)
+  try {
+    const rootRef = collection(db, "reminders");
+    const rootQ = query(rootRef, where("userId", "==", uid));
+    const rootSnap = await getDocs(rootQ);
+    mergedDocs = [...mergedDocs, ...rootSnap.docs];
+  } catch (err) {
+    console.warn("Legacy root reminders fetch failed:", err);
+  }
 
-    const safeTimes = Array.isArray(data.times)
-      ? data.times
-      : data.time
-      ? [data.time]
-      : [];
+  // New Structure
+  try {
+    const subRef = collection(db, "users", uid, "reminders");
+    const subSnap = await getDocs(subRef);
+    mergedDocs = [...mergedDocs, ...subSnap.docs];
+  } catch (err) {
+    console.warn("Subcollection reminders fetch failed:", err);
+  }
 
-    return {
-      id: docSnap.id,
-      userId: data.userId,
-      medicineName: data.medicineName || "",
-      dosage: data.dosage || "",
-      times: safeTimes,
-      takenTimes: Array.isArray(data.takenTimes)
-        ? data.takenTimes
-        : [],
-      createdAt: data.createdAt || null,
-    };
+  const uniqueMap = new Map();
+  mergedDocs.forEach((docSnap) => {
+    if (!uniqueMap.has(docSnap.id)) {
+      const data = docSnap.data();
+      const safeTimes = Array.isArray(data.times)
+        ? data.times
+        : data.time
+        ? [data.time]
+        : [];
+  
+      uniqueMap.set(docSnap.id, {
+        id: docSnap.id,
+        userId: data.userId || uid,
+        medicineName: data.medicineName || "",
+        dosage: data.dosage || "",
+        times: safeTimes,
+        takenTimes: Array.isArray(data.takenTimes)
+          ? data.takenTimes
+          : [],
+        createdAt: data.createdAt || null,
+      });
+    }
   });
+
+  return Array.from(uniqueMap.values());
 };
 
 // 🗑 Delete Reminder

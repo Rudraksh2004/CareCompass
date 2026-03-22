@@ -8,6 +8,7 @@ import {
   serverTimestamp,
   deleteDoc,
   doc,
+  where,
 } from "firebase/firestore";
 
 export interface DiseaseQA {
@@ -70,33 +71,51 @@ export const getDiseaseHistory = async (
   if (!uid) return [];
 
   try {
-    const historyRef = collection(
-      db,
-      "users",
-      uid,
-      "disease_history"
-    );
+    let mergedDocs: any[] = [];
+    
+    // Fetch from Old Root Collection (Legacy Data)
+    try {
+      const rootRef = collection(db, "disease_history");
+      const rootQ = query(rootRef, where("userId", "==", uid));
+      const rootSnap = await getDocs(rootQ);
+      mergedDocs = [...mergedDocs, ...rootSnap.docs];
+    } catch (err) {
+      console.warn("Legacy root fetch failed (permissions/missing):", err);
+    }
 
-    const q = query(historyRef, orderBy("createdAt", "desc"));
+    // Fetch from New Subcollection Structure
+    try {
+      const historyRef = collection(db, "users", uid, "disease_history");
+      const newSnap = await getDocs(historyRef);
+      mergedDocs = [...mergedDocs, ...newSnap.docs];
+    } catch (err) {
+      console.warn("Subcollection fetch failed:", err);
+    }
 
-    const snapshot = await getDocs(q);
+    // Extract, merge unique by ID, and sort in JavaScript to avoid composite index requirements
+    const uniqueMap = new Map();
+    mergedDocs.forEach((docSnap) => {
+      if (!uniqueMap.has(docSnap.id)) {
+        uniqueMap.set(docSnap.id, { id: docSnap.id, ...docSnap.data() });
+      }
+    });
 
-    return snapshot.docs.map((docSnap) => {
-      const data = docSnap.data();
+    const combinedHistory = Array.from(uniqueMap.values()).map((data: any) => ({
+      id: data.id,
+      userId: data.userId || uid,
+      symptoms: Array.isArray(data.symptoms) ? data.symptoms : [],
+      customText: data.customText || "",
+      location: data.location || "",
+      qa: data.qa ?? null,
+      severity: data.severity || "Low",
+      prediction: data.prediction || "",
+      createdAt: data.createdAt ?? null,
+    }));
 
-      return {
-        id: docSnap.id,
-        userId: data.userId || uid,
-        symptoms: Array.isArray(data.symptoms)
-          ? data.symptoms
-          : [],
-        customText: data.customText || "",
-        location: data.location || "",
-        qa: data.qa ?? null,
-        severity: data.severity || "Low",
-        prediction: data.prediction || "",
-        createdAt: data.createdAt ?? null,
-      };
+    return combinedHistory.sort((a: any, b: any) => {
+      const timeA = a.createdAt?.toMillis ? a.createdAt.toMillis() : (a.createdAt?.toDate ? a.createdAt.toDate().getTime() : 0);
+      const timeB = b.createdAt?.toMillis ? b.createdAt.toMillis() : (b.createdAt?.toDate ? b.createdAt.toDate().getTime() : 0);
+      return timeB - timeA; // Descending order
     });
 
   } catch (error) {

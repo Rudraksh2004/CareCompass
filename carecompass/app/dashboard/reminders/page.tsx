@@ -136,7 +136,8 @@ export default function ReminderPage() {
   };
 
   const handleDelete = async (id: string) => {
-    await deleteReminder(id);
+    if (!user) return;
+    await deleteReminder(user.uid, id);
     loadReminders();
   };
 
@@ -165,6 +166,7 @@ export default function ReminderPage() {
 
     try {
       await markDoseTaken(
+        user.uid,
         reminder.id,
         todayKey,
         reminder.takenTimes || []
@@ -188,9 +190,9 @@ export default function ReminderPage() {
   };
 
   const saveReminderEdit = async () => {
-    if (!editingId) return;
+    if (!editingId || !user) return;
 
-    await updateReminder(editingId, {
+    await updateReminder(user.uid, editingId, {
       medicineName: editMedicine,
       dosage: editDosage,
     });
@@ -210,7 +212,8 @@ export default function ReminderPage() {
       t === oldTime ? editTimeValue : t
     );
 
-    await updateReminder(reminder.id, { times: updatedTimes });
+    if (!user) return;
+    await updateReminder(user.uid, reminder.id, { times: updatedTimes });
 
     setEditingTimeKey(null);
     setEditTimeValue("");
