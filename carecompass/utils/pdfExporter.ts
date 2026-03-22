@@ -3,7 +3,7 @@ import jsPDF from "jspdf";
 const PAGE_HEIGHT = 297; // Standard A4 height
 const PAGE_WIDTH = 210;  // Standard A4 width
 const MARGIN = 18;       // Elegant 18mm margin
-const LINE_HEIGHT = 6.5; // Airy line height for premium feel
+const LINE_HEIGHT = 5.8; // Optimized tighter line height for premium density
 
 function cleanText(text: string) {
   if (!text) return "";
@@ -179,7 +179,7 @@ export const exportMedicalPDF = async (
     for (let i = 0; i < paragraphs.length; i++) {
       let para = paragraphs[i].trim();
       if (!para) {
-        currentY += 3; 
+        currentY += 2; // Tighter paragraph spacing
         continue;
       }
 
@@ -188,9 +188,12 @@ export const exportMedicalPDF = async (
 
       let isHeading = false;
       let headingLevel = 0;
-      if (para.startsWith("# ")) { isHeading = true; headingLevel = 1; para = para.replace(/^# /, ""); }
-      else if (para.startsWith("## ")) { isHeading = true; headingLevel = 2; para = para.replace(/^## /, ""); }
-      else if (para.startsWith("### ")) { isHeading = true; headingLevel = 3; para = para.replace(/^### /, ""); }
+      const headingMatch = para.match(/^(#{1,6})\s*(.*)/);
+      if (headingMatch) {
+         isHeading = true;
+         headingLevel = headingMatch[1].length;
+         para = headingMatch[2]; // Captures cleanly without the hashes
+      }
 
       let isBullet = false;
       let bulletNumber = "";
@@ -223,9 +226,9 @@ export const exportMedicalPDF = async (
         // Draw soft divider line under headings
         doc.setDrawColor(241, 245, 249); // slate 100
         doc.setLineWidth(0.5);
-        doc.line(startX, currentY + 3, startX + maxWidth, currentY + 3);
+        doc.line(startX, currentY + 2.5, startX + maxWidth, currentY + 2.5);
         
-        currentY += 9;
+        currentY += 6.5; // Refined padding directly after heading
         continue; // skip the normal drawing below
       } 
 
