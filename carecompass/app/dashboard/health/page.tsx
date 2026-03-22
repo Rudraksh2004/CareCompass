@@ -5,8 +5,8 @@ import { useAuth } from "@/context/AuthContext";
 import { addHealthLog, getHealthLogs } from "@/services/healthService";
 import { getUserProfile } from "@/services/userService";
 import {
-  LineChart,
-  Line,
+  AreaChart,
+  Area,
   XAxis,
   YAxis,
   Tooltip,
@@ -151,9 +151,11 @@ export default function HealthPage() {
     setExportingPDF(true);
 
     try {
+      const isDark = document.documentElement.classList.contains("dark");
       const chartImage = await htmlToImage.toPng(chartRef.current, {
         cacheBust: true,
-        backgroundColor: "#ffffff",
+        backgroundColor: isDark ? "#0f172a" : "#ffffff", // Deep slate for dark mode PDF capturing
+        style: { borderRadius: "0px" }, // Prevent visual rounded clipping artifacts in PDF
       });
 
       const formattedLogs = formatHealthLogsForReport();
@@ -273,28 +275,38 @@ ${trendAnalysis || "No trend analysis generated."}
             <p className="text-gray-500 font-bold">No health tracking data available yet. Add logs above.</p>
           </div>
         ) : (
-          <div ref={chartRef} className="w-full h-[360px] bg-white/40 dark:bg-black/20 backdrop-blur-md rounded-2xl p-4 border border-white/60 dark:border-white/[0.05]">
+          <div ref={chartRef} className="w-full h-[360px] bg-gradient-to-br from-white to-gray-50 dark:from-[#0f172a] dark:to-[#020617] rounded-2xl p-6 border border-gray-200 dark:border-white/[0.05] shadow-inner relative overflow-hidden">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={processedChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="4 4" opacity={0.3} stroke="#9ca3af" />
-                <XAxis dataKey="name" tick={{ fill: "#6b7280", fontWeight: 'bold' }} />
-                <YAxis tick={{ fill: "#6b7280", fontWeight: 'bold' }} />
+              <AreaChart data={processedChartData} margin={{ top: 15, right: 15, left: -15, bottom: 5 }}>
+                <defs>
+                  <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#6366f1" stopOpacity={0.35}/>
+                    <stop offset="95%" stopColor="#6366f1" stopOpacity={0.0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="4 4" opacity={0.15} vertical={false} stroke="#64748b" />
+                <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fill: "#64748b", fontWeight: 'bold', fontSize: 12 }} dy={10} />
+                <YAxis tickLine={false} axisLine={false} tick={{ fill: "#64748b", fontWeight: 'bold', fontSize: 12 }} dx={-10} />
                 <Tooltip
                   contentStyle={{
                     borderRadius: "16px",
-                    border: "1px solid rgba(255,255,255,0.4)",
-                    backgroundColor: "rgba(255,255,255,0.85)",
+                    border: "1px solid rgba(255,255,255,0.2)",
+                    backgroundColor: "rgba(255,255,255,0.9)",
                     backdropFilter: "blur(12px)",
                     fontWeight: 'bold',
-                    color: '#1f2937',
-                    boxShadow: "0 4px 20px rgba(0,0,0,0.1)"
+                    color: '#1e293b',
+                    boxShadow: "0 8px 30px rgba(0,0,0,0.12)",
+                    padding: "12px 16px"
                   }}
+                  itemStyle={{ color: '#4f46e5' }}
                 />
-                <Line
+                <Area
                   type="monotone"
                   dataKey="value"
-                  stroke="#6366f1"
-                  strokeWidth={5}
+                  stroke="#4f46e5"
+                  strokeWidth={4}
+                  fillOpacity={1}
+                  fill="url(#colorValue)"
                   animationDuration={1500}
                   dot={({ cx, cy, payload }: any) => {
                     const color =
@@ -302,23 +314,23 @@ ${trendAnalysis || "No trend analysis generated."}
                         ? "#ef4444"
                         : payload.status === "warning"
                         ? "#f59e0b"
-                        : "#6366f1";
+                        : "#4f46e5";
 
                     return (
                       <circle
                         cx={cx}
                         cy={cy}
-                        r={8}
+                        r={6.5}
                         fill={color}
-                        stroke="#fff"
-                        strokeWidth={3}
-                        style={{ filter: "drop-shadow(0px 2px 4px rgba(0,0,0,0.2))" }}
+                        stroke="#ffffff"
+                        strokeWidth={2.5}
+                        style={{ filter: "drop-shadow(0px 2px 4px rgba(0,0,0,0.3))" }}
                       />
                     );
                   }}
-                  activeDot={{ r: 10, stroke: "#fff", strokeWidth: 3 }}
+                  activeDot={{ r: 8, stroke: "#ffffff", strokeWidth: 3, fill: "#4f46e5", style: { filter: "drop-shadow(0 0 10px rgba(99,102,241,0.8))" } }}
                 />
-              </LineChart>
+              </AreaChart>
             </ResponsiveContainer>
           </div>
         )}
