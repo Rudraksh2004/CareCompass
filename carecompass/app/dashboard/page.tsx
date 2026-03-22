@@ -154,16 +154,16 @@ export default function DashboardPage() {
       </div>
 
       {/* 🌟 Welcome Header */}
-      <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] backdrop-blur-3xl p-10 shadow-[0_8px_40px_rgba(0,0,0,0.45)] transition-all duration-500 hover:border-blue-500/40 hover:shadow-[0_0_40px_rgba(59,130,246,0.25)]">
+      <div className="relative overflow-hidden rounded-3xl border border-white/60 dark:border-white/10 bg-white/60 dark:bg-white/[0.04] backdrop-blur-3xl p-10 shadow-[0_8px_40px_rgba(0,0,0,0.05)] dark:shadow-[0_8px_40px_rgba(0,0,0,0.45)] transition-all duration-500 hover:border-blue-400/60 dark:hover:border-blue-500/40 hover:shadow-[0_0_40px_rgba(59,130,246,0.15)] dark:hover:shadow-[0_0_40px_rgba(59,130,246,0.25)]">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(59,130,246,0.18),_transparent_40%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,_rgba(16,185,129,0.15),_transparent_40%)]" />
 
         <div className="relative z-10">
-          <h1 className="text-3xl font-bold text-white tracking-tight">
+          <h1 className="text-3xl font-black text-gray-900 dark:text-white tracking-tight drop-shadow-sm">
             Welcome to CareCompass 🧭
           </h1>
 
-          <p className="text-slate-400 mt-3 max-w-2xl leading-relaxed">
+          <p className="text-gray-700 dark:text-slate-400 mt-3 max-w-2xl leading-relaxed font-medium">
             Your all-in-one health companion to manage reports, prescriptions,
             health tracking, reminders, and clinical summaries in one secure
             platform.
@@ -173,32 +173,32 @@ export default function DashboardPage() {
 
       {/* 📊 Premium Stat Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="relative group overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-2xl p-7 shadow-lg transition-all duration-300 hover:scale-[1.04] hover:shadow-[0_0_35px_rgba(59,130,246,0.25)]">
-          <p className="text-sm text-slate-400">Active Medicine Reminders</p>
-          <h2 className="text-4xl font-bold text-white mt-3">
+        <div className="relative group overflow-hidden rounded-2xl border border-white/60 dark:border-white/10 bg-white/60 dark:bg-white/[0.04] backdrop-blur-2xl p-7 shadow-lg transition-all duration-300 hover:scale-[1.04] hover:shadow-[0_0_35px_rgba(59,130,246,0.15)] dark:hover:shadow-[0_0_35px_rgba(59,130,246,0.25)]">
+          <p className="text-sm font-bold text-gray-600 dark:text-slate-400 uppercase tracking-widest">Active Reminders</p>
+          <h2 className="text-4xl font-black text-gray-900 dark:text-white mt-3 drop-shadow-sm">
             {reminderCount}
           </h2>
-          <p className="text-xs text-slate-500 mt-2">
+          <p className="text-xs font-semibold text-gray-500 dark:text-slate-500 mt-2">
             Stay consistent with your medications
           </p>
         </div>
 
-        <div className="relative group overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-2xl p-7 shadow-lg transition-all duration-300 hover:scale-[1.04] hover:shadow-[0_0_35px_rgba(168,85,247,0.25)]">
-          <p className="text-sm text-slate-400">Platform Features</p>
-          <h2 className="text-lg font-semibold text-white mt-3 leading-relaxed">
+        <div className="relative group overflow-hidden rounded-2xl border border-white/60 dark:border-white/10 bg-white/60 dark:bg-white/[0.04] backdrop-blur-2xl p-7 shadow-lg transition-all duration-300 hover:scale-[1.04] hover:shadow-[0_0_35px_rgba(168,85,247,0.15)] dark:hover:shadow-[0_0_35px_rgba(168,85,247,0.25)]">
+          <p className="text-sm font-bold text-gray-600 dark:text-slate-400 uppercase tracking-widest">Platform Features</p>
+          <h2 className="text-lg font-bold text-gray-900 dark:text-white mt-3 leading-relaxed drop-shadow-sm">
             Reports • Prescriptions • Chat • Tracking
           </h2>
-          <p className="text-xs text-slate-500 mt-2">
+          <p className="text-xs font-semibold text-gray-500 dark:text-slate-500 mt-2">
             Complete health companion toolkit
           </p>
         </div>
 
-        <div className="relative group overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-2xl p-7 shadow-lg transition-all duration-300 hover:scale-[1.04] hover:shadow-[0_0_35px_rgba(16,185,129,0.25)]">
-          <p className="text-sm text-slate-400">Health Monitoring</p>
-          <h2 className="text-3xl font-bold mt-3 text-emerald-400">
+        <div className="relative group overflow-hidden rounded-2xl border border-white/60 dark:border-white/10 bg-white/60 dark:bg-white/[0.04] backdrop-blur-2xl p-7 shadow-lg transition-all duration-300 hover:scale-[1.04] hover:shadow-[0_0_35px_rgba(16,185,129,0.15)] dark:hover:shadow-[0_0_35px_rgba(16,185,129,0.25)]">
+          <p className="text-sm font-bold text-gray-600 dark:text-slate-400 uppercase tracking-widest">Health Monitoring</p>
+          <h2 className="text-3xl font-black mt-3 text-emerald-600 dark:text-emerald-400 drop-shadow-sm">
             {healthActive ? "Active" : "Inactive"}
           </h2>
-          <p className="text-xs text-slate-500 mt-2">
+          <p className="text-xs font-semibold text-gray-500 dark:text-slate-500 mt-2">
             Tracking logs & health insights enabled
           </p>
         </div>
@@ -206,23 +206,23 @@ export default function DashboardPage() {
 
       {/* 🚑 Emergency Card Widget */}
       {emergencyProfile && (
-        <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] backdrop-blur-3xl p-10 shadow-2xl transition-all duration-500 hover:border-red-500/40 hover:shadow-[0_0_40px_rgba(239,68,68,0.25)]">
+        <div className="relative overflow-hidden rounded-3xl border border-white/60 dark:border-white/10 bg-white/60 dark:bg-white/[0.04] backdrop-blur-3xl p-10 shadow-[0_8px_30px_rgba(0,0,0,0.05)] dark:shadow-2xl transition-all duration-500 hover:border-red-400/60 dark:hover:border-red-500/40 hover:shadow-[0_0_40px_rgba(239,68,68,0.15)] dark:hover:shadow-[0_0_40px_rgba(239,68,68,0.25)]">
           <div className="flex items-center justify-between flex-wrap gap-6">
             <div>
-              <h3 className="text-2xl font-bold text-white">
+              <h3 className="text-2xl font-black text-gray-900 dark:text-white drop-shadow-sm">
                 🚑 Emergency Medical Card
               </h3>
 
-              <p className="text-slate-400 text-sm mt-2 max-w-xl">
+              <p className="text-gray-700 dark:text-slate-400 text-sm font-medium mt-2 max-w-xl">
                 Quick access to your emergency medical information.
               </p>
 
-              <div className="flex flex-wrap gap-4 mt-5 text-sm">
-                <span className="px-4 py-2 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20 backdrop-blur">
+              <div className="flex flex-wrap gap-4 mt-5 text-sm font-bold">
+                <span className="px-4 py-2 rounded-xl bg-red-100 dark:bg-red-500/10 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-500/20 backdrop-blur shadow-sm">
                   Blood Group: {emergencyProfile.bloodGroup || "-"}
                 </span>
 
-                <span className="px-4 py-2 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20 backdrop-blur">
+                <span className="px-4 py-2 rounded-xl bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-500/20 backdrop-blur shadow-sm">
                   Contact: {emergencyProfile.contact || "-"}
                 </span>
               </div>
@@ -230,7 +230,7 @@ export default function DashboardPage() {
 
             <Link
               href="/dashboard/emergency"
-              className="inline-flex items-center justify-center bg-gradient-to-r from-red-600 to-pink-600 hover:opacity-90 transition text-white px-8 py-4 rounded-2xl font-semibold shadow-lg hover:scale-[1.04]"
+              className="inline-flex items-center justify-center bg-gradient-to-r from-red-600 to-pink-600 hover:opacity-90 transition text-white px-8 py-4 rounded-2xl font-bold shadow-[0_4px_16px_rgba(239,68,68,0.3)] hover:shadow-[0_4px_24px_rgba(239,68,68,0.4)] hover:scale-[1.04]"
             >
               View Emergency Card →
             </Link>
@@ -239,16 +239,16 @@ export default function DashboardPage() {
       )}
 
       {/* 🧠 Disease Predictor */}
-      <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] backdrop-blur-3xl p-10 shadow-2xl transition-all duration-500 hover:border-purple-500/40 hover:shadow-[0_0_40px_rgba(168,85,247,0.25)]">
+      <div className="relative overflow-hidden rounded-3xl border border-white/60 dark:border-white/10 bg-white/60 dark:bg-white/[0.04] backdrop-blur-3xl p-10 shadow-[0_8px_30px_rgba(0,0,0,0.05)] dark:shadow-2xl transition-all duration-500 hover:border-purple-400/60 dark:hover:border-purple-500/40 hover:shadow-[0_0_40px_rgba(168,85,247,0.15)] dark:hover:shadow-[0_0_40px_rgba(168,85,247,0.25)]">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(168,85,247,0.18),_transparent_40%)]" />
 
         <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
           <div>
-            <h3 className="text-2xl font-bold text-white">
+            <h3 className="text-2xl font-black text-gray-900 dark:text-white drop-shadow-sm">
               🧠 AI Disease Predictor
             </h3>
 
-            <p className="text-slate-400 text-sm mt-2 max-w-xl leading-relaxed">
+            <p className="text-gray-700 dark:text-slate-400 text-sm font-medium mt-2 max-w-xl leading-relaxed">
               Analyze symptoms using hybrid AI, clinical logic, and
               location-aware insights with optional medical Q&A.
             </p>
@@ -256,7 +256,7 @@ export default function DashboardPage() {
 
           <Link
             href="/dashboard/disease-predictor"
-            className="inline-flex items-center justify-center bg-gradient-to-r from-purple-600 to-blue-600 hover:opacity-90 transition text-white px-8 py-4 rounded-2xl font-semibold shadow-lg hover:scale-[1.04]"
+            className="inline-flex items-center justify-center bg-gradient-to-r from-purple-600 to-blue-600 hover:opacity-90 transition text-white px-8 py-4 rounded-2xl font-bold shadow-[0_4px_16px_rgba(168,85,247,0.3)] hover:shadow-[0_4px_24px_rgba(168,85,247,0.4)] hover:scale-[1.04]"
           >
             🧠 Start Analysis →
           </Link>
@@ -264,28 +264,28 @@ export default function DashboardPage() {
       </div>
 
       {/* 💊 Adherence Widget */}
-      <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] backdrop-blur-3xl p-10 shadow-2xl transition-all duration-500 hover:border-emerald-500/40 hover:shadow-[0_0_40px_rgba(16,185,129,0.25)]">
-        <p className="text-sm text-slate-400">Today’s Medication Adherence</p>
+      <div className="relative overflow-hidden rounded-3xl border border-white/60 dark:border-white/10 bg-white/60 dark:bg-white/[0.04] backdrop-blur-3xl p-10 shadow-[0_8px_30px_rgba(0,0,0,0.05)] dark:shadow-2xl transition-all duration-500 hover:border-emerald-400/60 dark:hover:border-emerald-500/40 hover:shadow-[0_0_40px_rgba(16,185,129,0.15)] dark:hover:shadow-[0_0_40px_rgba(16,185,129,0.25)]">
+        <p className="text-sm font-bold text-gray-600 dark:text-slate-400 uppercase tracking-widest">Today’s Medication Adherence</p>
 
         <div className="mt-4 flex items-center justify-between">
           <div>
-            <h2 className="text-3xl font-bold text-white">
+            <h2 className="text-3xl font-black text-gray-900 dark:text-white drop-shadow-sm">
               {adherenceData.takenToday} / {adherenceData.totalDoses}
             </h2>
-            <p className="text-xs text-slate-500 mt-1">Doses taken today</p>
+            <p className="text-xs font-bold text-gray-500 dark:text-slate-500 mt-1 uppercase tracking-wide">Doses taken today</p>
           </div>
 
           <div className="text-right">
-            <p className="text-2xl font-bold text-emerald-400">
+            <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400 drop-shadow-sm">
               {adherenceData.progressPercent}%
             </p>
-            <p className="text-xs text-slate-500">Daily consistency</p>
+            <p className="text-xs font-bold text-gray-500 dark:text-slate-500 uppercase tracking-wide">Daily consistency</p>
           </div>
         </div>
 
-        <div className="mt-5 w-full bg-white/10 rounded-full h-3 overflow-hidden">
+        <div className="mt-5 w-full bg-gray-200 dark:bg-white/10 rounded-full h-3 overflow-hidden shadow-inner">
           <div
-            className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-500"
+            className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"
             style={{
               width: `${adherenceData.progressPercent}%`,
             }}
@@ -294,12 +294,12 @@ export default function DashboardPage() {
       </div>
 
       {/* Capabilities */}
-      <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] backdrop-blur-3xl p-10 shadow-2xl">
-        <h3 className="text-2xl font-bold text-white mb-2">
+      <div className="relative overflow-hidden rounded-3xl border border-white/60 dark:border-white/10 bg-white/60 dark:bg-white/[0.04] backdrop-blur-3xl p-10 shadow-[0_8px_30px_rgba(0,0,0,0.05)] dark:shadow-2xl">
+        <h3 className="text-2xl font-black text-gray-900 dark:text-white mb-2 drop-shadow-sm">
           CareCompass Capabilities
         </h3>
 
-        <p className="text-slate-400 text-sm mb-8">
+        <p className="text-gray-700 dark:text-slate-400 font-medium text-sm mb-8">
           Explore the core features designed to simplify your health management.
         </p>
 
@@ -363,14 +363,14 @@ function FeatureCard({
 
   return (
     <Link href={route}>
-      <div className="cursor-pointer bg-white/5 border border-white/10 rounded-2xl p-5 backdrop-blur-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-xl">
+      <div className="cursor-pointer bg-white/60 dark:bg-white/5 border border-white/80 dark:border-white/10 rounded-2xl p-5 backdrop-blur-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-xl shadow-sm dark:shadow-none hover:bg-white/80 dark:hover:bg-white/10">
         <div className="flex items-start gap-4">
-          <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center text-xl">
+          <div className="w-12 h-12 rounded-xl bg-white dark:bg-white/10 flex items-center justify-center text-xl shadow-sm dark:shadow-none border border-gray-100 dark:border-transparent">
             {icon}
           </div>
           <div>
-            <p className="font-semibold text-white">{title}</p>
-            <p className="text-xs text-slate-400 mt-1">{desc}</p>
+            <p className="font-bold text-gray-900 dark:text-white drop-shadow-sm">{title}</p>
+            <p className="text-xs font-semibold text-gray-600 dark:text-slate-400 mt-1 leading-relaxed">{desc}</p>
           </div>
         </div>
       </div>
