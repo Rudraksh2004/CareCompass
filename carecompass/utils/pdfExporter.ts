@@ -8,11 +8,6 @@ function cleanText(text: string) {
 
   return (
     text
-      // Remove markdown formatting safely
-      .replace(/#+\s?/g, "")
-      .replace(/\*\*/g, "")
-      .replace(/\*/g, "")
-      .replace(/`/g, "")
 
       // FIX 1: Remove markdown separators like ---
       .replace(/-{3,}/g, "")
@@ -159,6 +154,99 @@ export const exportMedicalPDF = async (
     }
   };
 
+  // Helper: Advanced Markdown Renderer for PDF
+  const renderMarkdownText = (text: string, startX: number, startY: number, maxWidth: number) => {
+    let currentY = startY;
+    const paragraphs = text.split("\n");
+
+    for (let i = 0; i < paragraphs.length; i++) {
+      let para = paragraphs[i].trim();
+
+      if (!para) {
+        currentY += 4; // Standard paragraph spacing
+        continue;
+      }
+
+      // Check Heading
+      let isHeading = false;
+      let headingLevel = 0;
+      if (para.startsWith("# ")) { isHeading = true; headingLevel = 1; para = para.replace(/^# /, ""); }
+      else if (para.startsWith("## ")) { isHeading = true; headingLevel = 2; para = para.replace(/^## /, ""); }
+      else if (para.startsWith("### ")) { isHeading = true; headingLevel = 3; para = para.replace(/^### /, ""); }
+
+      // Check Bullet
+      let isBullet = false;
+      if (para.startsWith("- ") || para.startsWith("* ")) {
+        isBullet = true;
+        para = para.substring(2);
+      } else if (/^\d+\.\s/.test(para)) {
+        isBullet = true; // Numbered list treat like bullet indentation
+      }
+
+      // Clean bold/italic syntax from string to just render normally but structured
+      para = para.replace(/\*\*/g, "").replace(/\*/g, "").replace(/`/g, "");
+
+      // Apply Fonts
+      if (isHeading) {
+        doc.setFont("helvetica", "bold");
+        if (headingLevel === 1) doc.setFontSize(14);
+        else if (headingLevel === 2) doc.setFontSize(13);
+        else doc.setFontSize(12);
+        doc.setTextColor(30, 58, 138); // Deep Blue headers
+        currentY += 4; // Extra space before heading
+      } else {
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(10.5);
+        doc.setTextColor(55, 65, 81); // Slate 700 text
+      }
+
+      // Layout coordinates
+      const xPos = isBullet ? startX + 6 : startX;
+      if (isBullet) {
+        // Draw physical bullet or number
+        if (/^\d+\.\s/.test(paragraphs[i].trim())) {
+          doc.setFont("helvetica", "bold");
+          const numMatch = paragraphs[i].trim().match(/^(\d+\.)\s/);
+          if (numMatch) doc.text(numMatch[1], startX, currentY);
+          para = para.replace(/^\d+\.\s/, ""); // remove from content to print adjacent
+        } else {
+          doc.setFillColor(55, 65, 81);
+          doc.circle(startX + 2, currentY - 1.2, 0.8, "F");
+        }
+      }
+
+      const lines = doc.splitTextToSize(para, isBullet ? maxWidth - 6 : maxWidth);
+      for (let j = 0; j < lines.length; j++) {
+        if (currentY + LINE_HEIGHT > PAGE_HEIGHT) {
+          doc.addPage();
+          currentY = 20;
+        }
+        
+        // Slightly bolder the first few words if it looks like a label (e.g. "Medication Name:")
+        if (!isHeading && j === 0 && lines[j].includes(":")) {
+           const splitIdx = lines[j].indexOf(":");
+           if (splitIdx < 30) { 
+             const boldPart = lines[j].substring(0, splitIdx + 1);
+             const normalPart = lines[j].substring(splitIdx + 1);
+             doc.setFont("helvetica", "bold");
+             doc.text(boldPart, xPos, currentY);
+             doc.setFont("helvetica", "normal");
+             const boldWidth = doc.getTextWidth(boldPart);
+             doc.text(normalPart, xPos + boldWidth, currentY);
+             continue; // Go to next loop iteration, skip generic text print
+           }
+        }
+
+        doc.setFont("helvetica", isHeading ? "bold" : "normal");
+        doc.text(lines[j], xPos, currentY);
+        currentY += LINE_HEIGHT;
+      }
+      
+      if (isHeading) currentY += 2; // Extra pad after heading
+    }
+    y = currentY; // update global Y
+  };
+
   // 🌟 BRAND HEADER BAR
   doc.setFillColor(30, 27, 75); // Deep Indigo/Slate
   doc.rect(0, 0, 210, 40, "F");
@@ -218,7 +306,7 @@ export const exportMedicalPDF = async (
   doc.setLineWidth(0.5);
   doc.line(margin, y, 195, y);
 
-  // CHART (UNCHANGED)
+  // CHART
   if (chartImage) {
     checkPageBreak(100);
 
@@ -245,23 +333,10 @@ export const exportMedicalPDF = async (
   doc.text(sectionTitle, margin + 4, y + 0.5);
 
   y += 10;
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(10.5);
-  doc.setTextColor(55, 65, 81); // Gray 700
-
-  const originalLines = doc.splitTextToSize(
-    cleanedOriginal || "No data available.",
-    180
-  );
-
-  originalLines.forEach((line: string) => {
-    checkPageBreak(LINE_HEIGHT);
-    doc.text(line, margin, y);
-    y += LINE_HEIGHT;
-  });
+  renderMarkdownText(cleanedOriginal || "No data available.", margin, y, 180);
 
   // AI EXPLANATION SECTION
-  checkPageBreak(25);
+  checkPageBreak(30);
   y += 12;
 
   doc.setFillColor(238, 242, 255); // Indigo 50
@@ -273,20 +348,7 @@ export const exportMedicalPDF = async (
   doc.text("🧠 AI Clinical Explanation & Insights", margin + 4, y + 0.5);
 
   y += 10;
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(10.5);
-  doc.setTextColor(17, 24, 39); // Gray 900
-
-  const aiLines = doc.splitTextToSize(
-    cleanedAI || "No AI explanation generated.",
-    180
-  );
-
-  aiLines.forEach((line: string) => {
-    checkPageBreak(LINE_HEIGHT);
-    doc.text(line, margin, y);
-    y += LINE_HEIGHT;
-  });
+  renderMarkdownText(cleanedAI || "No AI explanation generated.", margin, y, 180);
 
   // DISCLAIMER
   checkPageBreak(35);
