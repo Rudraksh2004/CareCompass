@@ -1,5 +1,5 @@
 import { db } from "@/lib/firebase";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, collection, query, where, getDocs } from "firebase/firestore";
 
 interface Props {
   params: {
@@ -8,10 +8,36 @@ interface Props {
 }
 
 export default async function EmergencyPublicPage({ params }: Props) {
-  const ref = doc(db, "emergency_profiles", params.uid);
-  const snap = await getDoc(ref);
+  const uid = params.uid;
+  let data = null;
 
-  if (!snap.exists()) {
+  // 1. Try new nested structure
+  const newRef = doc(db, "users", uid, "emergency_profile", "profile");
+  const newSnap = await getDoc(newRef);
+  if (newSnap.exists()) {
+    data = newSnap.data();
+  } else {
+    // 2. Try legacy doc in emergency_profile
+    const legacyDoc1 = await getDoc(doc(db, "emergency_profile", uid));
+    if (legacyDoc1.exists()) {
+      data = legacyDoc1.data();
+    } else {
+      // 3. Try legacy doc in emergency_profiles
+      const legacyDoc2 = await getDoc(doc(db, "emergency_profiles", uid));
+      if (legacyDoc2.exists()) {
+        data = legacyDoc2.data();
+      } else {
+        // 4. Try legacy query
+        const legacyQ = query(collection(db, "emergency_profiles"), where("userId", "==", uid));
+        const legacySnap = await getDocs(legacyQ);
+        if (!legacySnap.empty) {
+          data = legacySnap.docs[0].data();
+        }
+      }
+    }
+  }
+
+  if (!data) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black text-white px-6">
         <div className="text-center">
@@ -22,7 +48,6 @@ export default async function EmergencyPublicPage({ params }: Props) {
     );
   }
 
-  const data = snap.data();
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center px-4">
