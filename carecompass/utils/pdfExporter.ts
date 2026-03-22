@@ -151,7 +151,7 @@ export const exportMedicalPDF = async (
   const risk = detectRiskLevel(cleanedAI);
   const sectionTitle = getSectionTitle(title);
 
-  // Helper: Add new page automatically
+  // Helper: Add new page automatically, including the top continuation padding
   const checkPageBreak = (requiredSpace = 20) => {
     if (y + requiredSpace > PAGE_HEIGHT) {
       doc.addPage();
@@ -159,41 +159,64 @@ export const exportMedicalPDF = async (
     }
   };
 
-  // HEADER (UNCHANGED)
+  // 🌟 BRAND HEADER BAR
+  doc.setFillColor(30, 27, 75); // Deep Indigo/Slate
+  doc.rect(0, 0, 210, 40, "F");
+
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(22);
-  doc.setTextColor(37, 99, 235);
-  doc.text("CareCompass AI", margin, y);
+  doc.setFontSize(26);
+  doc.setTextColor(255, 255, 255);
+  doc.text("CareCompass AI", margin, 22);
 
-  y += 8;
-  doc.setFontSize(14);
-  doc.setTextColor(0, 0, 0);
-  doc.text("Clinical AI Health Report", margin, y);
-
-  y += 6;
-  doc.setDrawColor(200, 200, 200);
-  doc.line(margin, y, 195, y);
-
-  // REPORT TYPE (UNCHANGED)
-  y += 12;
-  doc.setFontSize(12);
   doc.setFont("helvetica", "bold");
-  doc.text("Report Type:", margin, y);
+  doc.setFontSize(11);
+  doc.setTextColor(167, 139, 250); // Beautiful Purple-300
+  doc.text("Premium Clinical Intelligence Report", margin, 30);
+  
+  y = 55;
+
+  // REPORT TYPE & DATE
+  doc.setFontSize(11);
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(75, 85, 99); // Gray 600
+  doc.text("Report Title:", margin, y);
+  
   doc.setFont("helvetica", "normal");
-  doc.text(title, margin + 35, y);
+  doc.setTextColor(17, 24, 39); // Gray 900
+  doc.text(title, margin + 28, y);
 
-  // RISK BADGE (UNCHANGED)
-  y += 12;
   doc.setFont("helvetica", "bold");
+  doc.setTextColor(75, 85, 99);
+  doc.text("Generated:", margin + 110, y);
+  
+  doc.setFont("helvetica", "normal");
+  doc.setTextColor(17, 24, 39);
+  const dateStr = new Date().toLocaleDateString();
+  doc.text(dateStr, margin + 135, y);
+
+  // RISK BADGE
+  y += 14;
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(11);
+  doc.setTextColor(75, 85, 99);
   doc.text("AI Risk Assessment:", margin, y);
 
+  // Pill Badge
   doc.setFillColor(risk.bg[0], risk.bg[1], risk.bg[2]);
-  doc.roundedRect(margin + 55, y - 6, 65, 10, 3, 3, "F");
+  doc.roundedRect(margin + 42, y - 5.5, 55, 7.5, 3.5, 3.5, "F");
 
   doc.setTextColor(risk.color[0], risk.color[1], risk.color[2]);
-  doc.setFontSize(11);
-  doc.text(risk.label, margin + 60, y);
+  doc.setFontSize(9.5);
+  doc.setFont("helvetica", "bold");
+  // Centered text roughly inside pill
+  doc.text(risk.label, margin + 46, y);
+  
   doc.setTextColor(0, 0, 0);
+
+  y += 10;
+  doc.setDrawColor(229, 231, 235); // Gray 200
+  doc.setLineWidth(0.5);
+  doc.line(margin, y, 195, y);
 
   // CHART (UNCHANGED)
   if (chartImage) {
@@ -209,20 +232,22 @@ export const exportMedicalPDF = async (
     y += 90;
   }
 
-  // ORIGINAL TEXT SECTION (UNCHANGED)
+  // ORIGINAL TEXT SECTION
   checkPageBreak(30);
-  y += 5;
+  y += 10;
 
-  doc.setFillColor(245, 247, 250);
-  doc.roundedRect(margin, y - 6, 180, 8, 3, 3, "F");
+  doc.setFillColor(243, 244, 246); // Gray 100
+  doc.roundedRect(margin, y - 6, 180, 9, 2, 2, "F");
 
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(14);
-  doc.text(sectionTitle, margin + 2, y);
+  doc.setFontSize(12);
+  doc.setTextColor(31, 41, 55); // Gray 800
+  doc.text(sectionTitle, margin + 4, y + 0.5);
 
   y += 10;
   doc.setFont("helvetica", "normal");
-  doc.setFontSize(11);
+  doc.setFontSize(10.5);
+  doc.setTextColor(55, 65, 81); // Gray 700
 
   const originalLines = doc.splitTextToSize(
     cleanedOriginal || "No data available.",
@@ -235,20 +260,22 @@ export const exportMedicalPDF = async (
     y += LINE_HEIGHT;
   });
 
-  // AI EXPLANATION SECTION (UNCHANGED LAYOUT)
+  // AI EXPLANATION SECTION
   checkPageBreak(25);
-  y += 10;
+  y += 12;
 
-  doc.setFillColor(240, 249, 255);
-  doc.roundedRect(margin, y - 6, 180, 8, 3, 3, "F");
+  doc.setFillColor(238, 242, 255); // Indigo 50
+  doc.roundedRect(margin, y - 6, 180, 9, 2, 2, "F");
 
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(14);
-  doc.text("AI Clinical Explanation & Insights", margin + 2, y);
+  doc.setFontSize(12);
+  doc.setTextColor(67, 56, 202); // Indigo 700
+  doc.text("🧠 AI Clinical Explanation & Insights", margin + 4, y + 0.5);
 
   y += 10;
   doc.setFont("helvetica", "normal");
-  doc.setFontSize(11);
+  doc.setFontSize(10.5);
+  doc.setTextColor(17, 24, 39); // Gray 900
 
   const aiLines = doc.splitTextToSize(
     cleanedAI || "No AI explanation generated.",
@@ -261,35 +288,40 @@ export const exportMedicalPDF = async (
     y += LINE_HEIGHT;
   });
 
-  // DISCLAIMER (UNCHANGED)
+  // DISCLAIMER
   checkPageBreak(35);
-  y += 12;
+  y += 15;
 
-  doc.setDrawColor(220, 220, 220);
-  doc.setFillColor(250, 250, 250);
-  doc.roundedRect(margin, y, 180, 22, 4, 4, "FD");
+  doc.setDrawColor(254, 202, 202); // Red 200
+  doc.setFillColor(254, 242, 242); // Red 50
+  doc.roundedRect(margin, y, 180, 20, 2, 2, "FD");
 
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(11);
-  doc.text("Medical Disclaimer", margin + 3, y + 7);
+  doc.setFontSize(10);
+  doc.setTextColor(220, 38, 38); // Red 600
+  doc.text("⚠️ Medical Disclaimer", margin + 5, y + 7);
 
   doc.setFont("helvetica", "normal");
   doc.setFontSize(9);
+  doc.setTextColor(153, 27, 27); // Red 800
   doc.text(
-    "This report is generated by CareCompass AI for informational purposes only and is not a medical diagnosis. Always consult a qualified healthcare professional.",
-    margin + 3,
-    y + 14,
-    { maxWidth: 174 }
+    "This report is generated by CareCompass AI for educational purposes only. It is not a clinical diagnosis. Always consult a certified healthcare professional before making any medical decisions.",
+    margin + 5,
+    y + 13,
+    { maxWidth: 170 }
   );
 
-  // Footer (UNCHANGED)
+  // Footer
+  doc.setDrawColor(229, 231, 235);
+  doc.line(margin, 285, 195, 285);
+  
   doc.setFontSize(8);
-  doc.setTextColor(120, 120, 120);
+  doc.setTextColor(156, 163, 175); // Gray 400
   doc.text(
-    `Generated by CareCompass AI • ${new Date().toLocaleString()}`,
+    `CareCompass AI • Secure Clinical Report • ID: ${crypto.randomUUID().split("-")[0].toUpperCase()}`,
     margin,
-    290
+    291
   );
 
-  doc.save("CareCompass-AI-Clinical-Report.pdf");
+  doc.save("CareCompass-AI-Premium-Report.pdf");
 };
