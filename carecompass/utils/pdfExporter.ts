@@ -1,4 +1,4 @@
-import jsPDF from "jspdf";
+import { jsPDF } from "jspdf";
 
 const PAGE_HEIGHT = 297; // Standard A4 height
 const PAGE_WIDTH = 210;  // Standard A4 width
@@ -76,7 +76,7 @@ export const exportMedicalPDF = async (
   const doc = new jsPDF("p", "mm", "a4");
   let y = 30;
   let pageNumber = 1;
-  const reportId = crypto.randomUUID().split("-")[0].toUpperCase();
+  const reportId = Math.random().toString(36).substring(2, 10).toUpperCase();
 
   let preCleanedAI = cleanText(aiResponse);
   const risk = detectRiskLevel(preCleanedAI);

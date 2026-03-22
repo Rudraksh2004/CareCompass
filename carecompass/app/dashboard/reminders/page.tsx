@@ -164,6 +164,7 @@ export default function ReminderPage() {
       )
     );
 
+    if (!user) return;
     try {
       await markDoseTaken(
         user.uid,
