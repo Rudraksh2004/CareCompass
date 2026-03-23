@@ -111,9 +111,20 @@ export const deleteReminder = async (
 ) => {
   if (!uid || !reminderId) return;
 
-  await deleteDoc(
-    doc(db, "users", uid, "reminders", reminderId)
-  );
+  // Try deleting from new structure
+  try {
+    await deleteDoc(doc(db, "users", uid, "reminders", reminderId));
+  } catch (err) {
+    console.warn("New structure delete failed, trying legacy:", err);
+  }
+
+  // Also try deleting from legacy structure
+  try {
+    await deleteDoc(doc(db, "reminders", reminderId));
+  } catch (err) {
+    console.error("Legacy structure delete failed:", err);
+  }
+
 };
 
 // ✏️ Update Reminder
@@ -137,13 +148,24 @@ export const updateReminder = async (
       reminderId
     );
 
-    const docSnap = await getDoc(docRef);
+    let docSnap = await getDoc(docRef);
 
+    // 🔥 FALLBACK: Check Legacy Path
     if (!docSnap.exists()) {
-      console.error(
-        "Reminder document does not exist:",
-        reminderId
-      );
+      const legacyRef = doc(db, "reminders", reminderId);
+      const legacySnap = await getDoc(legacyRef);
+
+      if (legacySnap.exists()) {
+        const payload: any = {};
+        if (data.medicineName !== undefined) payload.medicineName = data.medicineName;
+        if (data.dosage !== undefined) payload.dosage = data.dosage;
+        if (data.times !== undefined) payload.times = data.times;
+
+        await updateDoc(legacyRef, payload);
+        return;
+      }
+
+      console.error("Reminder document does not exist in any collection:", reminderId);
       return;
     }
 
@@ -182,11 +204,29 @@ export const markDoseTaken = async (
       reminderId
     );
 
+    let docSnap = await getDoc(docRef);
+
+    // 🔥 FALLBACK: Check Legacy Path
+    if (!docSnap.exists()) {
+      const legacyRef = doc(db, "reminders", reminderId);
+      const legacySnap = await getDoc(legacyRef);
+
+      if (legacySnap.exists()) {
+        if (currentTaken?.includes(todayDoseKey)) return;
+        await updateDoc(legacyRef, {
+          takenTimes: arrayUnion(todayDoseKey),
+        });
+        return;
+      }
+      return;
+    }
+
     if (currentTaken?.includes(todayDoseKey)) return;
 
     await updateDoc(docRef, {
       takenTimes: arrayUnion(todayDoseKey),
     });
+
   } catch (error) {
     console.error("Error marking dose as taken:", error);
   }
