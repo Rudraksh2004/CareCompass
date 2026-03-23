@@ -1,9 +1,27 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { useAuth } from "@/context/AuthContext";
+import { 
+  Activity, 
+  MapPin, 
+  Clock, 
+  AlertTriangle, 
+  CheckCircle2, 
+  Microscope, 
+  Download, 
+  ArrowRight, 
+  Stethoscope, 
+  ChevronLeft,
+  Search,
+  History,
+  Trash2,
+  FileText
+} from "lucide-react";
+import { jsPDF } from "jspdf";
+import { toPng } from "html-to-image";
 import {
   saveDiseaseHistory,
   getDiseaseHistory,
@@ -12,72 +30,40 @@ import {
 } from "@/services/diseaseService";
 
 const SYMPTOM_CHIPS = [
-  "Fever",
-  "Cough",
-  "Headache",
-  "Fatigue",
-  "Sore Throat",
-  "Body Pain",
-  "Nausea",
-  "Vomiting",
-  "Diarrhea",
-  "Dizziness",
-  "Chest Pain",
-  "Shortness of Breath",
+  "Fever", "Cough", "Headache", "Fatigue", "Sore Throat", 
+  "Body Pain", "Nausea", "Vomiting", "Diarrhea", 
+  "Dizziness", "Chest Pain", "Shortness of Breath"
 ];
 
-// 🇮🇳 Major Indian Cities
 const INDIAN_CITIES = [
-  "Kolkata",
-  "Delhi",
-  "Mumbai",
-  "Bangalore",
-  "Chennai",
-  "Hyderabad",
-  "Pune",
-  "Ahmedabad",
-  "Jaipur",
-  "Lucknow",
-  "Bhopal",
-  "Patna",
-  "Chandigarh",
-  "Bhubaneswar",
-  "Guwahati",
-  "Kochi",
-  "Indore",
-  "Nagpur",
-  "Surat",
-  "Visakhapatnam",
+  "Kolkata", "Delhi", "Mumbai", "Bangalore", "Chennai", "Hyderabad", 
+  "Pune", "Ahmedabad", "Jaipur", "Lucknow", "Bhopal", "Patna", 
+  "Chandigarh", "Bhubaneswar", "Guwahati", "Kochi", "Indore", 
+  "Nagpur", "Surat", "Visakhapatnam"
 ];
 
 export default function DiseasePredictorPage() {
   const { user } = useAuth();
-
+  const reportRef = useRef<HTMLDivElement>(null);
+  
+  // States
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
   const [customSymptoms, setCustomSymptoms] = useState("");
   const [location, setLocation] = useState("");
-  const [useManualLocation, setUseManualLocation] = useState(false);
-
   const [allergy, setAllergy] = useState("");
   const [pastSurgery, setPastSurgery] = useState("");
   const [chronicIllness, setChronicIllness] = useState("");
-
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState("");
-  const [severity, setSeverity] = useState<
-    "Low" | "Moderate" | "High" | ""
-  >("");
-
-  // 🆕 History State (UNCHANGED)
+  const [severity, setSeverity] = useState<"Low" | "Moderate" | "High" | "">("");
   const [history, setHistory] = useState<DiseaseHistory[]>([]);
   const [expandedPrediction, setExpandedPrediction] = useState<DiseaseHistory | null>(null);
-  // 🆕 NEW: Premium Wizard States
   const [step, setStep] = useState(1);
-  const [isWorsening, setIsWorsening] = useState("No");
+  const [isWorsening, setIsWorsening] = useState("No Change");
   const [duration, setDuration] = useState("1-2 days");
   const [medications, setMedications] = useState("");
+  const [useManualLocation, setUseManualLocation] = useState(false);
 
-  // 📥 Load Prediction History (UNCHANGED)
   useEffect(() => {
     const loadHistory = async () => {
       if (!user) return;
@@ -88,21 +74,15 @@ export default function DiseasePredictorPage() {
   }, [user]);
 
   const toggleSymptom = (symptom: string) => {
-    setSelectedSymptoms((prev) =>
-      prev.includes(symptom)
-        ? prev.filter((s) => s !== symptom)
-        : [...prev, symptom]
-    );
+    setSelectedSymptoms(prev => prev.includes(symptom) ? prev.filter(s => s !== symptom) : [...prev, symptom]);
   };
 
   const handlePredict = async () => {
     if (!user) return;
-    if (selectedSymptoms.length === 0 && !customSymptoms.trim()) return;
-
     setLoading(true);
     setResult("");
     setSeverity("");
-    setStep(4); // Move to Analysis Step
+    setStep(4);
 
     try {
       const res = await fetch("/api/ai/disease-predictor", {
@@ -113,18 +93,18 @@ export default function DiseasePredictorPage() {
           customText: customSymptoms,
           location,
           qa: {
-            allergies: allergy ? true : false,
-            surgeries: pastSurgery ? true : false,
+            allergies: !!allergy,
+            surgeries: !!pastSurgery,
             chronicConditions: chronicIllness ? [chronicIllness] : [],
-            duration: duration,
-            isWorsening: isWorsening,
-            medications: medications,
+            duration,
+            isWorsening,
+            medications,
           },
         }),
       });
 
       const data = await res.json();
-      const predictionText = data?.prediction || "No analysis generated.";
+      const predictionText = data?.prediction || "Internal Error.";
       const severityLevel = data?.severity || "Low";
 
       setResult(predictionText);
@@ -134,11 +114,7 @@ export default function DiseasePredictorPage() {
         symptoms: selectedSymptoms,
         customText: customSymptoms,
         location,
-        qa: {
-          allergies: allergy ? true : false,
-          surgeries: pastSurgery ? true : false,
-          chronicConditions: chronicIllness ? [chronicIllness] : [],
-        },
+        qa: { allergies: !!allergy, surgeries: !!pastSurgery, chronicConditions: chronicIllness ? [chronicIllness] : [] },
         severity: severityLevel,
         prediction: predictionText,
       });
@@ -147,209 +123,447 @@ export default function DiseasePredictorPage() {
       setHistory(updatedHistory);
     } catch (error) {
       console.error(error);
-      setResult("Failed to generate prediction.");
+      setResult("Engine Error. Please try later.");
     }
     setLoading(false);
   };
 
-  const nextStep = () => setStep((s) => Math.min(s + 1, 3));
-  const prevStep = () => setStep((s) => Math.max(s - 1, 1));
+  const downloadReport = async () => {
+    if (!reportRef.current) return;
+    try {
+      const dataUrl = await toPng(reportRef.current, { cacheBust: true, quality: 1 });
+      const pdf = new jsPDF("p", "mm", "a4");
+      const imgWidth = 190;
+      const imgHeight = (reportRef.current.offsetHeight * imgWidth) / reportRef.current.offsetWidth;
+      pdf.addImage(dataUrl, "PNG", 10, 10, imgWidth, imgHeight);
+      pdf.save(`CareCompass_Health_Analysis_${new Date().getTime()}.pdf`);
+    } catch (err) {
+      console.error("PDF Fail", err);
+    }
+  };
+
+  const nextStep = () => setStep(s => Math.min(s + 1, 3));
+  const prevStep = () => setStep(s => Math.max(s - 1, 1));
+
+  // Visual Helper for Risk Level
+  const getRiskColor = (level: string) => {
+    if (level === "High") return "from-red-600 to-rose-600 shadow-red-500/20";
+    if (level === "Moderate") return "from-amber-600 to-orange-600 shadow-amber-500/20";
+    return "from-emerald-600 to-teal-600 shadow-emerald-500/20";
+  };
 
   return (
-    <div className="max-w-6xl mx-auto space-y-10 text-gray-900 dark:text-gray-100">
-      {/* 🌟 Premium Clinical Header */}
-      <div className="relative overflow-hidden rounded-3xl border border-white/80 border-t-white border-l-white/90 dark:border-white/[0.05] dark:border-t-white/[0.15] dark:border-l-white/[0.1] bg-white/[0.5] dark:bg-[#030712]/30 backdrop-blur-[40px] backdrop-saturate-[2] p-10 shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_40px_rgba(0,0,0,0.4)] transition-all duration-500">
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-600/10 via-purple-600/5 to-emerald-600/10 dark:from-indigo-500/10 dark:via-purple-500/5 dark:to-emerald-500/10 pointer-events-none" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(79,70,229,0.15),_transparent_40%)]" />
-        <div className="relative z-10">
-          <h1 className="text-4xl font-black bg-gradient-to-r from-indigo-600 via-purple-600 to-emerald-500 dark:from-indigo-400 dark:via-purple-400 dark:to-emerald-400 bg-clip-text text-transparent drop-shadow-sm flex items-center gap-4">
-            🧬 CareCompass Pro Predictor
-          </h1>
-          <p className="text-gray-700 dark:text-gray-300 font-bold mt-4 text-sm max-w-2xl leading-relaxed">
-            Experience our premium clinical-grade AI analysis. A multi-step diagnostic context engine optimized for precision health insights.
-          </p>
+    <div className="max-w-7xl mx-auto space-y-12 pb-20">
+      {/* 🔮 Ultra-Premium Dashboard Header */}
+      <div className="relative group overflow-hidden rounded-[2.5rem] border border-white/80 dark:border-white/[0.05] bg-white/[0.4] dark:bg-[#030712]/30 backdrop-blur-[60px] p-12 transition-all duration-700 hover:shadow-2xl">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/10 blur-[100px] -mr-48 -mt-48 transition-all group-hover:bg-indigo-500/20" />
+        <div className="absolute bottom-0 left-0 w-80 h-80 bg-emerald-500/10 blur-[100px] -ml-40 -mb-40" />
+        
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="p-3 rounded-2xl bg-indigo-600/10 dark:bg-indigo-600/20 text-indigo-600 dark:text-indigo-400">
+                <Microscope size={32} strokeWidth={2.5} />
+              </div>
+              <h1 className="text-5xl font-black tracking-tight bg-gradient-to-r from-gray-900 to-gray-500 dark:from-white dark:to-gray-400 bg-clip-text text-transparent">
+                AI Disease Predictor
+              </h1>
+            </div>
+            <p className="text-gray-600 dark:text-gray-400 font-bold max-w-xl text-lg leading-relaxed">
+              CareCompass premium clinical intelligence. Multi-vector diagnostic synthesis based on symptomatology, history, and environmental triggers.
+            </p>
+          </div>
+          
+          <div className="flex flex-wrap gap-4">
+            <div className="px-6 py-4 rounded-3xl bg-white/40 dark:bg-white/5 border border-white/60 dark:border-white/[0.05] backdrop-blur-md">
+              <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Status</p>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-sm font-black text-gray-800 dark:text-gray-200 uppercase tracking-tighter">AI Core Online</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* 🧩 Progress Indicator */}
+      {/* 🧩 Multi-Step Navigation Flow */}
       {step < 4 && (
-        <div className="flex items-center justify-between px-10 gap-4">
+        <div className="flex items-center justify-between px-16 relative">
+          <div className="absolute inset-x-24 top-1/2 -translate-y-1/2 h-[2px] bg-gray-200 dark:bg-gray-800 pointer-events-none" />
           {[1, 2, 3].map((s) => (
-            <div key={s} className="flex-1 flex flex-col items-center gap-2">
-              <div className={`h-2 w-full rounded-full transition-all duration-500 ${step >= s ? "bg-indigo-600" : "bg-gray-200 dark:bg-gray-800"}`} />
-              <span className={`text-[10px] font-black uppercase tracking-widest ${step === s ? "text-indigo-600" : "text-gray-400"}`}>
-                {s === 1 ? "Symptoms" : s === 2 ? "Context" : "Environment"}
+            <button key={s} onClick={() => s < step && setStep(s)} className={`relative z-10 w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-500 ${step >= s ? "bg-indigo-600 text-white shadow-xl shadow-indigo-500/40" : "bg-white dark:bg-gray-900 text-gray-400"}`}>
+              <span className="text-xl font-black">{s}</span>
+              <span className={`absolute -bottom-8 whitespace-nowrap text-[10px] font-black uppercase tracking-widest transition-colors ${step === s ? "text-indigo-600" : "text-gray-500"}`}>
+                {s === 1 ? "Symptoms" : s === 2 ? "Context" : "Review"}
               </span>
-            </div>
+            </button>
           ))}
         </div>
       )}
 
-      {/* 🧠 Wizard interface */}
+      {/* 🚀 Wizard Interface */}
       {step < 4 && (
-        <div className="relative border border-white/80 border-t-white border-l-white/90 dark:border-white/[0.05] dark:border-t-white/[0.15] dark:border-l-white/[0.1] bg-white/[0.65] dark:bg-[#030712]/40 backdrop-blur-[40px] backdrop-saturate-[2] p-8 rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_40px_rgba(0,0,0,0.4)] transition-all duration-500">
-          {step === 1 && (
-            <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
-              <div>
-                <h2 className="text-2xl font-black text-gray-900 dark:text-white flex items-center gap-3">
-                  <span className="w-8 h-8 rounded-lg bg-indigo-600/10 flex items-center justify-center text-indigo-600 text-lg">1</span>
-                  Select Your Symptoms
-                </h2>
-                <p className="text-sm font-bold text-gray-500 dark:text-gray-400 mt-1">What are you feeling right now?</p>
-              </div>
+        <div className="relative border border-white/80 dark:border-white/[0.05] bg-white/[0.5] dark:bg-[#030712]/40 backdrop-blur-[60px] p-12 rounded-[2.5rem] shadow-2xl transition-all duration-700 h-full min-h-[500px] flex flex-col">
+          <div className="flex-1">
+            {step === 1 && (
+              <div className="space-y-10 animate-in fade-in slide-in-from-bottom-8 duration-700">
+                <div className="space-y-2">
+                  <span className="text-indigo-600 dark:text-indigo-400 font-black uppercase tracking-[0.3em] text-[10px]">Diagnostics Phase 01</span>
+                  <h2 className="text-4xl font-black text-gray-900 dark:text-white flex items-center gap-4">
+                    Clinical Symptoms
+                  </h2>
+                </div>
 
-              <div className="flex flex-wrap gap-3">
-                {SYMPTOM_CHIPS.map((symptom) => {
-                  const active = selectedSymptoms.includes(symptom);
-                  return (
-                    <button key={symptom} onClick={() => toggleSymptom(symptom)} className={`px-5 py-2.5 rounded-xl text-sm font-black transition-all border ${active ? "bg-indigo-600 border-indigo-500 text-white shadow-lg" : "bg-white/40 dark:bg-black/20 border-white/60 dark:border-white/[0.1] text-gray-700 dark:text-gray-300 hover:bg-white/60"}`}>{symptom}</button>
-                  );
-                })}
-              </div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {SYMPTOM_CHIPS.map(s => {
+                    const active = selectedSymptoms.includes(s);
+                    return (
+                      <button key={s} onClick={() => toggleSymptom(s)} className={`group relative p-4 rounded-2xl border text-sm font-black transition-all duration-300 flex items-center justify-center gap-3 ${active ? "bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-500/20" : "bg-white/40 dark:bg-white/[0.03] border-white/80 dark:border-white/[0.05] text-gray-700 dark:text-gray-300 hover:bg-white/60 hover:-translate-y-1"}`}>
+                         {active ? <CheckCircle2 size={16} /> : <div className="w-4 h-4 rounded-full border border-gray-400/30 group-hover:border-indigo-500/50" />}
+                         {s}
+                      </button>
+                    );
+                  })}
+                </div>
 
-              <div className="space-y-3">
-                <p className="text-sm font-black text-gray-700 dark:text-gray-300">✍️ Describe in detail (Recommended)</p>
-                <textarea rows={4} value={customSymptoms} onChange={(e) => setCustomSymptoms(e.target.value)} placeholder="e.g. My head hurts in the back, and I feel slightly shaky..." className="w-full border border-white/60 dark:border-white/[0.1] bg-white/40 dark:bg-black/20 backdrop-blur-md px-5 py-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition text-sm font-bold text-gray-800 dark:text-gray-200" />
-              </div>
-            </div>
-          )}
-
-          {step === 2 && (
-            <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
-              <div>
-                <h2 className="text-2xl font-black text-gray-900 dark:text-white flex items-center gap-3">
-                  <span className="w-8 h-8 rounded-lg bg-indigo-600/10 flex items-center justify-center text-indigo-600 text-lg">2</span>
-                  Health Context
-                </h2>
-                <p className="text-sm font-bold text-gray-500 dark:text-gray-400 mt-1">Help our AI understand your broader health profile.</p>
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-8">
                 <div className="space-y-4">
-                  <div className="space-y-2">
-                    <p className="text-sm font-black text-gray-700 dark:text-gray-300">⏳ How long have you had this?</p>
-                    <select value={duration} onChange={(e) => setDuration(e.target.value)} className="w-full border border-white/60 dark:border-white/[0.1] bg-white/40 dark:bg-black/20 backdrop-blur-md px-5 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition text-sm font-bold text-gray-800 dark:text-gray-200 appearance-none">
-                      <option>Less than 24h</option>
-                      <option>1-2 days</option>
-                      <option>3-7 days</option>
-                      <option>7+ days</option>
-                    </select>
+                  <div className="flex items-center gap-2 text-sm font-black text-gray-700 dark:text-gray-300">
+                    <History size={18} className="text-indigo-600" />
+                    <span>Deep Description (Temporal/Spatial Context)</span>
                   </div>
-                  <div className="space-y-2">
-                    <p className="text-sm font-black text-gray-700 dark:text-gray-300">📈 Is it getting worse?</p>
-                    <div className="flex gap-4">
-                      {["No", "Slightly", "Yes"].map(opt => (
-                        <button key={opt} onClick={() => setIsWorsening(opt)} className={`flex-1 py-3 rounded-xl text-xs font-black transition ${isWorsening === opt ? "bg-indigo-600 text-white" : "bg-white/40 dark:bg-black/20"}`}>{opt}</button>
-                      ))}
+                  <textarea rows={5} value={customSymptoms} onChange={e => setCustomSymptoms(e.target.value)} placeholder="Elaborate on the onset, sensation, and any aggravating factors..." className="w-full border border-white/80 dark:border-white/[0.05] bg-white/40 dark:bg-black/40 backdrop-blur-md px-8 py-6 rounded-3xl focus:outline-none focus:ring-4 focus:ring-indigo-500/20 transition text-base font-bold text-gray-800 dark:text-gray-200" />
+                </div>
+              </div>
+            )}
+
+            {step === 2 && (
+              <div className="space-y-10 animate-in fade-in slide-in-from-bottom-8 duration-700">
+                <div className="space-y-2">
+                  <span className="text-indigo-600 dark:text-indigo-400 font-black uppercase tracking-[0.3em] text-[10px]">Diagnostics Phase 02</span>
+                  <h2 className="text-4xl font-black text-gray-900 dark:text-white">Health History</h2>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-12">
+                  <div className="space-y-8">
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-3 text-sm font-black text-gray-700 dark:text-gray-300">
+                        <Clock size={16} className="text-indigo-500" />
+                        <span>Symptom Duration</span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        {["< 24h", "1-2 days", "3-7 days", "7+ days"].map(d => (
+                           <button key={d} onClick={() => setDuration(d)} className={`py-4 rounded-2xl text-xs font-black transition-all border ${duration === d ? "bg-indigo-600 border-indigo-500 text-white" : "bg-white/40 dark:bg-white/[0.03] border-white/80 dark:border-white/[0.05]"}`}>{d}</button>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-3 text-sm font-black text-gray-700 dark:text-gray-300">
+                        <Activity size={16} className="text-red-500" />
+                        <span>Progression Intensity</span>
+                      </div>
+                      <div className="flex gap-4">
+                        {["No Change", "Slightly Waging", "Severely Worsening"].map(opt => (
+                          <button key={opt} onClick={() => setIsWorsening(opt)} className={`flex-1 py-4 rounded-2xl text-[10px] font-black transition-all border ${isWorsening === opt ? "bg-red-600 border-red-500 text-white" : "bg-white/40 dark:bg-white/[0.03] border-white/80 dark:border-white/[0.05]"}`}>{opt}</button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-6">
+                    <div className="space-y-3">
+                      <p className="text-sm font-black text-gray-700 dark:text-gray-300">Current Pharmacological Regimen</p>
+                      <textarea rows={4} value={medications} onChange={e => setMedications(e.target.value)} placeholder="List any drugs, vitamins, or supplements currently being consumed..." className="w-full border border-white/80 dark:border-white/[0.05] bg-white/40 dark:bg-black/40 px-6 py-4 rounded-2xl text-sm font-bold" />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <input value={allergy} onChange={e => setAllergy(e.target.value)} placeholder="Known Allergies" className="bg-white/30 dark:bg-white/[0.02] border p-4 rounded-2xl text-sm font-black" />
+                      <input value={chronicIllness} onChange={e => setChronicIllness(e.target.value)} placeholder="Chronic Conditions" className="bg-white/30 dark:bg-white/[0.02] border p-4 rounded-2xl text-sm font-black" />
                     </div>
                   </div>
                 </div>
+              </div>
+            )}
 
-                <div className="space-y-3">
-                  <p className="text-sm font-black text-gray-700 dark:text-gray-300">💊 Current Medications (Optional)</p>
-                  <textarea rows={3} value={medications} onChange={(e) => setMedications(e.target.value)} placeholder="Are you taking any medicine currently?" className="w-full border border-white/60 dark:border-white/[0.1] bg-white/40 dark:bg-black/20 backdrop-blur-md px-5 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition text-sm font-bold text-gray-800 dark:text-gray-200" />
+            {step === 3 && (
+              <div className="space-y-12 animate-in fade-in slide-in-from-bottom-8 duration-700">
+                <div className="space-y-2">
+                  <span className="text-indigo-600 dark:text-indigo-400 font-black uppercase tracking-[0.3em] text-[10px]">Diagnostics Phase 03</span>
+                  <h2 className="text-4xl font-black text-gray-900 dark:text-white">Review & Synthesis</h2>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-8">
+                  <div className="p-8 rounded-[2rem] bg-indigo-600/5 border border-indigo-600/10 space-y-6">
+                    <h3 className="text-lg font-black text-indigo-600">Contextual Summary</h3>
+                    <div className="space-y-4">
+                      <div className="flex justify-between border-b border-indigo-600/10 pb-2">
+                        <span className="text-xs font-bold text-gray-500">Core Symptoms</span>
+                        <span className="text-xs font-black">{selectedSymptoms.length} Selected</span>
+                      </div>
+                      <div className="flex justify-between border-b border-indigo-600/10 pb-2">
+                        <span className="text-xs font-bold text-gray-500">Duration</span>
+                        <span className="text-xs font-black">{duration}</span>
+                      </div>
+                      <div className="flex justify-between border-b border-indigo-600/10 pb-2">
+                        <span className="text-xs font-bold text-gray-500">Worsening</span>
+                        <span className="text-xs font-black">{isWorsening}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-8 rounded-[2rem] bg-emerald-600/5 border border-emerald-600/10 space-y-6">
+                    <h3 className="text-lg font-black text-emerald-600">Location Calibration</h3>
+                    <div className="relative group">
+                      <MapPin className="absolute left-6 top-1/2 -translate-y-1/2 text-emerald-600" size={24} />
+                      
+                      {!useManualLocation ? (
+                        <div className="space-y-4">
+                          <select 
+                            value={location} 
+                            onChange={(e) => {
+                              if (e.target.value === "manual") {
+                                setUseManualLocation(true);
+                                setLocation("");
+                              } else {
+                                setLocation(e.target.value);
+                              }
+                            }}
+                            className="w-full pl-16 pr-10 border border-white dark:border-white/5 bg-white/60 dark:bg-black/40 py-5 rounded-3xl text-base font-black outline-none focus:ring-4 focus:ring-emerald-500/20 appearance-none cursor-pointer"
+                          >
+                            <option value="">Select current city...</option>
+                            {INDIAN_CITIES.map(city => (
+                              <option key={city} value={`${city}, India`}>{city}</option>
+                            ))}
+                            <option value="manual">✎ Other (Type Manually)</option>
+                          </select>
+                          <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none text-emerald-600 opacity-40">▼</div>
+                        </div>
+                      ) : (
+                        <div className="relative">
+                          <input 
+                            value={location} 
+                            onChange={e => setLocation(e.target.value)} 
+                            placeholder="Enter your location manually..." 
+                            className="w-full pl-16 pr-6 border border-white dark:border-white/5 bg-white/60 dark:bg-black/40 py-5 rounded-3xl text-base font-black outline-none focus:ring-4 focus:ring-emerald-500/20" 
+                          />
+                          <button 
+                            onClick={() => setUseManualLocation(false)}
+                            className="absolute -bottom-8 right-2 text-[10px] font-black text-emerald-600 uppercase hover:underline"
+                          >
+                             ↩ Back to List
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                    <p className="text-[10px] font-bold text-emerald-600/60 text-center uppercase tracking-widest leading-loose">
+                      AI factors in regional viral outbreaks and environmental indices.
+                    </p>
+                  </div>
                 </div>
               </div>
+            )}
+          </div>
 
-              <div className="grid md:grid-cols-3 gap-4">
-                <input value={allergy} onChange={(e) => setAllergy(e.target.value)} placeholder="Allergies?" className="bg-white/30 dark:bg-black/20 border border-white/20 p-3 rounded-xl text-sm font-black" />
-                <input value={pastSurgery} onChange={(e) => setPastSurgery(e.target.value)} placeholder="Past Surgeries?" className="bg-white/30 dark:bg-black/20 border border-white/20 p-3 rounded-xl text-sm font-black" />
-                <input value={chronicIllness} onChange={(e) => setChronicIllness(e.target.value)} placeholder="Chronic Conditions?" className="bg-white/30 dark:bg-black/20 border border-white/20 p-3 rounded-xl text-sm font-black" />
-              </div>
-            </div>
-          )}
-
-          {step === 3 && (
-            <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500 text-center py-10">
-              <div className="max-w-md mx-auto space-y-4">
-                <h2 className="text-2xl font-black text-gray-900 dark:text-white">Environmental Sync</h2>
-                <p className="text-sm font-bold text-gray-500 dark:text-gray-400">Our AI cross-references your coordinates with seasonal illness patterns in your region.</p>
-                <div className="relative group">
-                  <span className="absolute left-6 top-1/2 -translate-y-1/2 text-xl">📍</span>
-                  <input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Enter city (e.g. Kolkata, West Bengal)" className="w-full pl-16 border border-white/60 dark:border-white/[0.1] bg-white/40 dark:bg-black/20 backdrop-blur-md px-5 py-5 rounded-3xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition text-lg font-black text-gray-800 dark:text-gray-200" />
-                </div>
-              </div>
-            </div>
-          )}
-
-          <div className="mt-10 flex gap-4">
-            {step > 1 && <button onClick={prevStep} className="flex-1 py-4 rounded-2xl font-black border border-indigo-600/30 text-indigo-600 transition hover:bg-indigo-600/5">Back</button>}
+          <div className="mt-12 flex gap-6">
+            {step > 1 && (
+              <button onClick={prevStep} className="px-10 py-5 rounded-3xl font-black border border-indigo-600/20 text-indigo-600 transition-all hover:bg-indigo-600/5 flex items-center gap-3 group">
+                <ChevronLeft size={20} className="transition-transform group-hover:-translate-x-1" />
+                Return
+              </button>
+            )}
             {step < 3 ? (
-              <button onClick={nextStep} className="flex-1 bg-indigo-600 text-white py-4 rounded-2xl font-black shadow-lg transition hover:bg-indigo-700">Continue →</button>
+              <button onClick={nextStep} className="flex-1 bg-gray-900 dark:bg-indigo-600 text-white py-5 rounded-3xl font-black shadow-2xl transition-all hover:scale-[1.02] flex items-center justify-center gap-3 group">
+                Next Diagnostic Stage
+                <ArrowRight size={20} className="transition-transform group-hover:translate-x-1" />
+              </button>
             ) : (
-              <button onClick={handlePredict} className="flex-1 bg-gradient-to-r from-indigo-600 via-purple-600 to-emerald-600 text-white py-4 rounded-2xl font-black shadow-lg transition hover:scale-[1.02]">Initialize AI Core Analysis</button>
+              <button onClick={handlePredict} className="flex-1 bg-gradient-to-r from-indigo-600 via-purple-600 to-emerald-600 text-white py-5 rounded-3xl font-black shadow-2xl transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-3 text-xl">
+                Run Multi-Vector Analysis
+                <Activity size={24} className="animate-pulse" />
+              </button>
             )}
           </div>
         </div>
       )}
 
-      {/* 🚀 Loading / Analysis Step */}
+      {/* 🧬 AI Analysis Engine State */}
       {step === 4 && loading && (
-        <div className="relative border border-white/80 border-t-white border-l-white/90 dark:border-white/[0.05] dark:border-t-white/[0.15] dark:border-l-white/[0.1] bg-white/[0.5] dark:bg-[#030712]/30 backdrop-blur-[40px] p-20 rounded-3xl text-center space-y-10">
-          <div className="relative w-32 h-32 mx-auto">
-            <div className="absolute inset-0 rounded-full border-4 border-indigo-600/20" />
-            <div className="absolute inset-0 rounded-full border-4 border-t-indigo-600 animate-spin" />
-            <div className="absolute inset-4 rounded-full border-2 border-emerald-500/20 animate-pulse duration-700" />
-            <div className="absolute inset-0 flex items-center justify-center text-3xl">🩻</div>
+        <div className="relative border border-white/80 dark:border-white/[0.05] bg-white/[0.5] dark:bg-[#030712]/30 backdrop-blur-[60px] p-24 rounded-[3rem] text-center space-y-12">
+          <div className="relative w-48 h-48 mx-auto">
+            <div className="absolute inset-0 rounded-full border-8 border-indigo-600/10" />
+            <div className="absolute inset-0 rounded-full border-8 border-t-indigo-600 animate-spin" />
+            <div className="absolute inset-8 rounded-full border-[10px] border-emerald-500/10 blur-sm" />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <Activity size={64} className="text-indigo-600 animate-pulse" />
+            </div>
           </div>
-          <div className="space-y-4">
-            <h2 className="text-3xl font-black animate-pulse">Scanning Health Vitals...</h2>
-            <p className="text-sm font-bold text-gray-500 dark:text-gray-400">Cross-referencing symptoms with clinical database & regional outbreaks</p>
+          <div className="space-y-6">
+            <h2 className="text-5xl font-black bg-gradient-to-b from-gray-900 to-gray-400 dark:from-white dark:to-gray-500 bg-clip-text text-transparent">Synthesizing Data</h2>
+            <div className="flex flex-wrap justify-center gap-3">
+              <span className="px-5 py-2 rounded-full bg-indigo-500/10 text-indigo-500 text-[10px] font-black uppercase tracking-widest animate-pulse">Scanning Bio-Log</span>
+              <span className="px-5 py-2 rounded-full bg-emerald-500/10 text-emerald-500 text-[10px] font-black uppercase tracking-widest animate-pulse delay-100">Regional Syncing</span>
+              <span className="px-5 py-2 rounded-full bg-purple-500/10 text-purple-500 text-[10px] font-black uppercase tracking-widest animate-pulse delay-200">Probability Mapping</span>
+            </div>
           </div>
         </div>
       )}
 
-      {/* 📊 Result Section */}
+      {/* 🏥 Final Clinical Report */}
       {step === 4 && !loading && result && (
-        <div className="animate-in zoom-in fade-in duration-500 space-y-6">
-          <div className="relative border border-white/80 border-t-white border-l-white/90 dark:border-white/[0.05] dark:border-t-white/[0.15] dark:border-l-white/[0.1] bg-white/[0.65] dark:bg-[#030712]/40 backdrop-blur-[40px] backdrop-saturate-[2] p-10 rounded-3xl shadow-2xl">
-            <div className="flex items-center justify-between mb-8 border-b border-indigo-600/10 pb-6">
-              <h2 className="text-3xl font-black text-gray-900 dark:text-white flex items-center gap-3">
-                <span className="p-2 rounded-xl bg-indigo-600 text-white text-xl">📋</span>
-                AI Core Diagnosis
-              </h2>
-              <div className="flex gap-2">
-                <span className={`px-5 py-2 rounded-xl border font-black text-[10px] uppercase tracking-wider ${severity === "High" ? "bg-red-500/10 text-red-600 border-red-500/20" : "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"}`}>
-                  {severity} Criticality
-                </span>
-                <button onClick={() => setStep(1)} className="px-5 py-2 rounded-xl bg-gray-100 dark:bg-white/5 font-black text-[10px] uppercase">Restart</button>
+        <div className="space-y-10 animate-in zoom-in-95 fade-in-0 duration-700">
+          <div className="flex items-center justify-between px-8">
+            <button onClick={() => setStep(1)} className="flex items-center gap-2 text-xs font-black text-gray-500 uppercase tracking-widest hover:text-indigo-600 transition-colors group">
+              <ChevronLeft size={16} className="transition-transform group-hover:-translate-x-1" />
+              New Analysis
+            </button>
+            <button onClick={downloadReport} className="flex items-center gap-2 px-8 py-4 bg-emerald-600 text-white rounded-2xl font-black text-sm transition-all hover:scale-105 active:scale-95 shadow-xl shadow-emerald-600/20">
+              <Download size={18} />
+              Export Clinical PDF
+            </button>
+          </div>
+
+          <div ref={reportRef} className="relative border border-white/80 dark:border-white/[0.05] bg-white/[0.8] dark:bg-[#030712]/60 backdrop-blur-[60px] p-16 rounded-[3rem] shadow-2xl overflow-hidden">
+            <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none">
+              <Stethoscope size={240} />
+            </div>
+            
+            <div className="relative z-10 space-y-12">
+              <div className="flex flex-col md:flex-row justify-between gap-8 border-b border-gray-100 dark:border-white/5 pb-12">
+                <div className="space-y-2">
+                  <div className="flex items-center gap-3 text-indigo-600">
+                    <CheckCircle2 size={32} />
+                    <h2 className="text-4xl font-black">AI Assessment</h2>
+                  </div>
+                  <p className="text-sm font-bold text-gray-500">Generated on: {new Date().toLocaleString()}</p>
+                </div>
+
+                <div className="flex gap-4">
+                  <div className={`px-8 py-4 rounded-[1.5rem] bg-gradient-to-br ${getRiskColor(severity)} text-white shadow-2xl`}>
+                    <p className="text-[10px] font-black uppercase tracking-widest opacity-80 mb-1">Severity Calibration</p>
+                    <span className="text-2xl font-black">{severity} Priority</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* 📊 Clinical Context Snapshot */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div className="p-6 rounded-3xl bg-gray-50 dark:bg-white/[0.02] border border-gray-100 dark:border-white/5">
+                  <p className="text-[10px] font-black text-gray-400 uppercase mb-2">Location</p>
+                  <p className="text-sm font-black text-gray-800 dark:text-gray-200">{location || "Not Provided"}</p>
+                </div>
+                <div className="p-6 rounded-3xl bg-gray-50 dark:bg-white/[0.02] border border-gray-100 dark:border-white/5">
+                  <p className="text-[10px] font-black text-gray-400 uppercase mb-2">Duration</p>
+                  <p className="text-sm font-black text-gray-800 dark:text-gray-200">{duration}</p>
+                </div>
+                <div className="p-6 rounded-3xl bg-gray-50 dark:bg-white/[0.02] border border-gray-100 dark:border-white/5">
+                  <p className="text-[10px] font-black text-gray-400 uppercase mb-2">Progression</p>
+                  <p className="text-sm font-black text-gray-800 dark:text-gray-200">{isWorsening}</p>
+                </div>
+                <div className="p-6 rounded-3xl bg-gray-50 dark:bg-white/[0.02] border border-gray-100 dark:border-white/5">
+                  <p className="text-[10px] font-black text-gray-400 uppercase mb-2">History</p>
+                  <p className="text-sm font-black text-gray-800 dark:text-gray-200">{allergy || chronicIllness ? "Active Complex" : "Nominal"}</p>
+                </div>
+              </div>
+
+              {/* ✍️ Detailed Result Body */}
+              <div className="bg-white/40 dark:bg-black/20 rounded-[2rem] p-10 border border-white dark:border-white/5 shadow-inner">
+                <div className="prose dark:prose-invert max-w-none 
+                  prose-h1:text-indigo-600 dark:prose-h1:text-indigo-400 prose-h1:font-black
+                  prose-h2:text-indigo-600 dark:prose-h2:text-indigo-400 prose-h2:font-black prose-h2:text-2xl
+                  prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-p:font-bold prose-p:leading-relaxed
+                  prose-ul:list-disc prose-li:text-gray-700 dark:prose-li:text-gray-300 prose-li:font-bold prose-li:mb-2 text-lg">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {result}
+                  </ReactMarkdown>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 p-6 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-400">
+                <AlertTriangle size={20} />
+                <p className="text-xs font-black uppercase tracking-wide">Legal: This document contains AI-generated non-diagnostic guidance.</p>
               </div>
             </div>
-
-            <div className="prose dark:prose-invert max-w-none prose-p:font-bold prose-headings:font-black prose-li:font-bold prose-headings:text-indigo-600 dark:prose-headings:text-indigo-400">
-               <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                {result}
-              </ReactMarkdown>
-            </div>
           </div>
         </div>
       )}
 
-      {/* 📚 History List - Simplified for Dashboard feel */}
+      {/* 📚 Re-Engineered Prediction History */}
       {history.length > 0 && (
-        <div className="relative border border-white/80 border-t-white border-l-white/90 dark:border-white/[0.05] dark:border-t-white/[0.15] dark:border-l-white/[0.1] bg-white/[0.5] dark:bg-[#030712]/30 backdrop-blur-[40px] p-8 rounded-3xl">
-          <h2 className="text-xl font-black mb-6">Recent Health Checks ({history.length})</h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            {history.slice(0, 6).map(item => (
-              <div key={item.id} className="relative border border-white/40 dark:border-white/[0.05] bg-white/40 dark:bg-black/20 p-5 rounded-2xl hover:bg-white/60 dark:hover:bg-black/30 transition border-l-4 border-l-indigo-600">
-                <h3 className="font-black text-sm text-gray-900 dark:text-white truncate">🩺 {item.symptoms?.join(", ") || "Analysis"}</h3>
-                <p className="text-[10px] font-bold text-gray-500 mt-1 uppercase tracking-tighter">Severity: {item.severity}</p>
-                <button onClick={() => { setResult(item.prediction); setSeverity(item.severity || ""); setStep(4); window.scrollTo({ top: 0, behavior: "smooth" }); }} className="mt-4 text-[10px] font-black text-indigo-600 hover:underline">RE-EXAMINE RESULT →</button>
+        <div className="space-y-10">
+          <div className="flex items-center gap-4 px-4">
+            <History size={24} className="text-indigo-600" />
+            <h2 className="text-3xl font-black">Diagnostic Ledger</h2>
+            <div className="flex-1 h-[1px] bg-gray-200 dark:bg-white/10" />
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {history.slice(0, 6).map((item) => (
+              <div key={item.id} className="relative group border border-white/80 dark:border-white/[0.05] bg-white/[0.4] dark:bg-white/[0.02] backdrop-blur-2xl p-8 rounded-[2rem] transition-all hover:bg-white hover:scale-[1.03] hover:shadow-xl dark:hover:bg-white/10">
+                <div className="flex justify-between items-start mb-6">
+                  <div className={`p-3 rounded-xl ${item.severity === "High" ? "bg-red-500/10 text-red-600" : item.severity === "Moderate" ? "bg-amber-500/10 text-amber-600" : "bg-emerald-500/10 text-emerald-600"}`}>
+                    <Activity size={20} />
+                  </div>
+                  <span className={`text-[10px] font-black uppercase tracking-widest ${item.severity === "High" ? "text-red-500" : item.severity === "Moderate" ? "text-amber-500" : "text-emerald-500"}`}>
+                    {item.severity} Risk
+                  </span>
+                </div>
+
+                <div className="space-y-2 mb-8">
+                  <h3 className="text-lg font-black text-gray-900 dark:text-white line-clamp-1">
+                    {item.symptoms?.join(", ") || "Case Study"}
+                  </h3>
+                  <div className="flex items-center gap-2 text-[10px] font-black text-gray-400 uppercase tracking-tighter">
+                    <MapPin size={10} />
+                    {item.location || "Undisclosed Global"}
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-4">
+                  <button onClick={() => { 
+                    setResult(item.prediction); 
+                    setSeverity(item.severity || ""); 
+                    setStep(4); 
+                    window.scrollTo({ top: 0, behavior: "smooth" }); 
+                  }} className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-indigo-600 text-white text-[10px] font-black uppercase tracking-widest shadow-lg shadow-indigo-600/20 active:scale-95 transition-all">
+                    <Search size={14} />
+                    Recall
+                  </button>
+                  <button onClick={async () => {
+                    if (!user) return;
+                    await deleteDiseaseHistory(user.uid, item.id);
+                    setHistory(await getDiseaseHistory(user.uid));
+                  }} className="p-3 rounded-xl bg-red-500/5 text-red-500 hover:bg-red-500 hover:text-white transition-all">
+                    <Trash2 size={14} />
+                  </button>
+                </div>
               </div>
             ))}
           </div>
         </div>
       )}
 
-      {/* 🔥 Modal expansion kept as simple component logic if needed... */}
+      {/* 🔮 Extended Analysis Overlay */}
       {expandedPrediction && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 isolate">
-          <div className="absolute inset-0 bg-black/40 backdrop-blur-md" onClick={() => setExpandedPrediction(null)} />
-          <div className="relative bg-white/90 dark:bg-[#030712]/90 backdrop-blur-[40px] max-w-3xl w-full max-h-[85vh] overflow-y-auto rounded-3xl p-10 shadow-2xl animate-in zoom-in duration-300">
-            <button onClick={() => setExpandedPrediction(null)} className="absolute top-6 right-6 w-10 h-10 flex items-center justify-center bg-black/5 dark:bg-white/5 rounded-full">✕</button>
-            <h2 className="text-3xl font-black mb-6">Clinical Risk Breakdown</h2>
-            <div className="prose dark:prose-invert max-w-none text-sm font-bold leading-relaxed">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>{expandedPrediction.prediction}</ReactMarkdown>
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-8 isolate">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-2xl transition-all" onClick={() => setExpandedPrediction(null)} />
+          <div className="relative bg-white/95 dark:bg-[#030712]/95 backdrop-blur-[60px] max-w-4xl w-full max-h-[90vh] overflow-y-auto rounded-[3.5rem] p-16 shadow-[0_30px_100px_rgba(0,0,0,0.5)] animate-in zoom-in-95 duration-500 border border-white/20">
+            <button onClick={() => setExpandedPrediction(null)} className="absolute top-10 right-10 w-12 h-12 flex items-center justify-center bg-gray-100 dark:bg-white/5 rounded-2xl hover:bg-red-500 hover:text-white transition-all">
+              <ChevronLeft size={24} />
+            </button>
+            
+            <div className="space-y-12">
+              <div className="flex items-center gap-6">
+                 <div className="w-20 h-20 rounded-[2rem] bg-indigo-600/10 flex items-center justify-center text-indigo-600">
+                    <FileText size={40} />
+                 </div>
+                 <div>
+                    <h2 className="text-4xl font-black">Archive Report</h2>
+                    <p className="text-sm font-bold text-gray-500 uppercase tracking-widest">{expandedPrediction.id.slice(0, 8)}</p>
+                 </div>
+              </div>
+              
+              <div className="prose dark:prose-invert max-w-none text-lg font-bold leading-relaxed">
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>{expandedPrediction.prediction}</ReactMarkdown>
+              </div>
             </div>
           </div>
         </div>
