@@ -12,10 +12,11 @@ const RED_FLAG_SYMPTOMS = [
 
 const normalize = (text: string) => text.toLowerCase().trim();
 
+// 🧠 Refined Severity Logic
 const calculateSeverity = (
   symptoms: string[],
   customText: string,
-  duration?: string
+  qa?: any
 ): "Low" | "Moderate" | "High" => {
   const allText = [
     ...symptoms.map(normalize),
@@ -28,15 +29,16 @@ const calculateSeverity = (
   if (hasRedFlag) return "High";
 
   const symptomCount = symptoms.length + (customText ? 1 : 0);
-
-  if (duration === "1 week+" && symptomCount >= 2) return "High";
-  if (symptomCount >= 3) return "Moderate";
-  if (symptomCount === 2) return "Moderate";
+  
+  // High risk conditions: long duration, worsening, or many symptoms
+  if (qa?.duration === "7+ days" || qa?.isWorsening === "Yes" || symptomCount >= 5) return "High";
+  
+  if (symptomCount >= 3 || qa?.duration === "3-7 days") return "Moderate";
 
   return "Low";
 };
 
-// 🔒 Smart fallback analysis (if Gemini fails or returns empty)
+// 🔒 Enhanced Fallback logic
 const generateFallbackAnalysis = (
   symptoms: string[],
   customText: string,
@@ -45,48 +47,32 @@ const generateFallbackAnalysis = (
 ) => {
   const combined = [...symptoms, customText].join(", ").toLowerCase();
 
-  let conditions = [
-    { name: "Common Viral Infection", percent: 50 },
-    { name: "Seasonal Flu", percent: 30 },
-    { name: "Mild Respiratory Irritation", percent: 20 },
-  ];
-
-  if (combined.includes("cough") && combined.includes("fever")) {
-    conditions = [
-      { name: "Seasonal Viral Flu", percent: 55 },
-      { name: "Upper Respiratory Infection", percent: 30 },
-      { name: "Weather-related Viral Fever", percent: 15 },
-    ];
-  } else if (combined.includes("headache") && combined.includes("fatigue")) {
-    conditions = [
-      { name: "Stress or Fatigue-related Illness", percent: 45 },
-      { name: "Mild Viral Infection", percent: 35 },
-      { name: "Dehydration or Sleep Deficiency", percent: 20 },
-    ];
-  }
-
   return `🔎 Possible Conditions (with likelihood %)
-1. ${conditions[0].name} — ${conditions[0].percent}%
-2. ${conditions[1].name} — ${conditions[1].percent}%
-3. ${conditions[2].name} — ${conditions[2].percent}%
+1. Seasonal Viral Infection — 45%
+2. Body Fatigue & Stress — 30%
+3. Environmental Allergy — 25%
 
 🧠 Reasoning:
-Based on the reported symptoms (${symptoms.join(", ") || customText}), the pattern suggests a mild to moderate health issue. Environmental factors ${
+Your reported symptoms (${symptoms.join(", ") || "General discomfort"}) suggest a pattern common with environmental changes ${
     location ? `in ${location}` : "globally"
-  } and symptom combination influence this risk estimation.
+  }. The ${severity} severity rating suggests you should monitor your recovery closely.
 
 🩺 Recommended Next Steps:
-- Stay hydrated and rest adequately
-- Monitor temperature and symptom progression
-- Maintain a balanced diet and sleep schedule
+- Increase fluid intake (water, ORS, or herbal tea)
+- Get at least 8 hours of restorative sleep
+- Monitor body temperature every 6 hours
+- Avoid heavy physical exertion for 48 hours
+
+🩺 Recommended Specialist:
+- General Physician (GP)
 
 🚨 When to See a Doctor:
-- If symptoms worsen
-- Persistent fever > 3 days
-- Breathing issues or chest discomfort
+- Persistent high fever (>102°F) for 48 hours
+- Sudden onset of breathing difficulty
+- Unusual chest pressure or severe vertigo
 
 ⚠️ Disclaimer:
-This is non-diagnostic AI guidance, not a medical diagnosis.`;
+This is non-diagnostic AI guidance powered by CareCompass, not a medical diagnosis.`;
 };
 
 export async function POST(req: NextRequest) {
@@ -102,107 +88,88 @@ export async function POST(req: NextRequest) {
 
     if ((!symptoms || symptoms.length === 0) && !customText) {
       return NextResponse.json(
-        { error: "Please provide at least one symptom." },
+        { error: "Please provide at least one symptom for analysis." },
         { status: 400 }
       );
     }
 
-    const severity = calculateSeverity(
-      symptoms,
-      customText,
-      qa?.duration
-    );
+    const severity = calculateSeverity(symptoms, customText, qa);
 
     const locationContext = location
-      ? `User location: ${location}. Consider regional diseases, pollution levels, climate, and seasonal patterns common in this area of India.`
-      : `Location not provided. Perform general global medical analysis.`;
+      ? `User location: ${location}. Take into account current seasonal patterns in India (e.g., transition seasons, monsoon risks, air quality index if applicable).`
+      : `Location not provided. Perform analysis for a general tropical/temperate climate typical of South Asia.`;
+
+    const healthContext = qa 
+      ? `Health Context:
+         - Duration: ${qa.duration || "Not specified"}
+         - Getting worse? ${qa.isWorsening || "Not specified"}
+         - Known Allergies: ${qa.allergies ? "Yes" : "None reported"}
+         - Chronic Conditions: ${qa.chronicConditions?.join(", ") || "None reported"}
+         - Current Medications: ${qa.medications || "None reported"}`
+      : "No additional health context provided.";
 
     const prompt = `
-You are an AI health assistant inside CareCompass (a student health app).
+You are a Senior AI Health Strategist at CareCompass. Your goal is to provide a premium, reassuring, and highly structured health risk analysis.
 
-CRITICAL RULES:
-- Do NOT give a medical diagnosis
-- Provide risk-based educational insights only
-- Use simple student-friendly language
-- MUST show illness likelihood in percentage
-- Structured clean output
+USER DATA:
+- Symptoms: ${symptoms.join(", ") || "None"}
+- Additional Info: ${customText || "None"}
+- ${locationContext}
+- ${healthContext}
+- Calculated Initial Severity: ${severity}
 
-User Symptoms:
-${symptoms.join(", ") || "None"}
+CRITICAL INSTRUCTIONS:
+1. DO NOT provide a medical diagnosis. Use "Likely Patterns" or "Potential Considerations".
+2. You MUST include exactly 3 possible conditions with percentage likelihood that totals ~100%.
+3. Recommend a specific medical specialist (e.g., ENT, Dermatologist, Pulmonologist, GP).
+4. Provide structured, actionable student-friendly advice.
+5. Tone: Empathetic, professional, and clinical but accessible.
 
-Additional Symptoms:
-${customText || "None"}
+REQUIRED JSON-Style OUTPUT STRUCTURE (But return as formatted Text/Markdown):
 
-${locationContext}
-
-Pre-calculated Severity: ${severity}
-
-Return EXACT format:
-
-🔎 Possible Conditions (with likelihood %)
+🔎 Possible Patterns (Likelihood %)
 1. Condition — XX%
 2. Condition — XX%
 3. Condition — XX%
 
-🧠 Reasoning:
-(short explanation)
+🧠 Clinical Reasoning:
+(Explain the link between symptoms, duration, and regional factors in 2-3 sentences)
 
-🩺 Recommended Next Steps:
-(simple steps)
+🩺 Actionable Next Steps:
+(Provide 3-4 specific self-care steps)
 
-🚨 When to See a Doctor:
-(red flags)
+🩺 Recommended Specialist:
+(Mention the type of doctor the user should consult)
+
+🚨 Red Flags (Seek Immediate Care):
+(Specific life-threatening symptoms related to this case)
 
 ⚠️ Disclaimer:
-This is non-diagnostic AI guidance, not a medical diagnosis.
+This is non-diagnostic AI guidance. Not a substitute for professional medical advice.
 `;
 
     const geminiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${process.env.GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${process.env.GEMINI_API_KEY}`,
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          contents: [
-            {
-              parts: [{ text: prompt }],
-            },
-          ],
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: {
+            temperature: 0.7,
+            topK: 40,
+            topP: 0.95,
+            maxOutputTokens: 1024,
+          },
         }),
       }
     );
 
     const data = await geminiRes.json();
+    let aiText = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "";
 
-    let aiText = "";
-
-    // ✅ Robust parsing (handles all Gemini structures)
-    if (
-      data?.candidates &&
-      Array.isArray(data.candidates) &&
-      data.candidates.length > 0
-    ) {
-      const parts = data.candidates[0]?.content?.parts;
-
-      if (Array.isArray(parts)) {
-        aiText = parts
-          .map((p: any) => p?.text || "")
-          .join("\n")
-          .trim();
-      }
-    }
-
-    // 🔥 If Gemini fails or returns empty → fallback analysis
-    if (!aiText || aiText.length < 20 || data?.error) {
-      console.warn("Using fallback disease analysis");
-      aiText = generateFallbackAnalysis(
-        symptoms,
-        customText,
-        location,
-        severity
-      );
+    if (!aiText || aiText.length < 50) {
+      aiText = generateFallbackAnalysis(symptoms, customText, location, severity);
     }
 
     return NextResponse.json({
@@ -210,12 +177,10 @@ This is non-diagnostic AI guidance, not a medical diagnosis.
       severity,
     });
   } catch (error) {
-    console.error("Disease Predictor API Error:", error);
-
+    console.error("CareCompass Predictor Error:", error);
     return NextResponse.json({
-      prediction:
-        "⚠️ Unable to generate AI analysis right now. Please try again later.",
+      prediction: "⚠️ Our AI engine is currently under maintenance. Please try again in a few minutes.",
       severity: "Low",
     });
   }
-}
+}
