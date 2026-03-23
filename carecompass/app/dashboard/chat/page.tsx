@@ -14,7 +14,6 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import {
   Plus,
-  Search,
   Trash2,
   Send,
   PanelLeft,
@@ -25,10 +24,13 @@ import {
   User as UserIcon,
   MessageSquare,
   AlertCircle,
-  MoreVertical,
   ChevronRight,
-  ShieldCheck,
-  History
+  History,
+  Stethoscope,
+  Paperclip,
+  Microscope,
+  Pill,
+  Clock
 } from "lucide-react";
 
 interface Message {
@@ -48,8 +50,8 @@ export default function ChatPage() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [initializing, setInitializing] = useState(true);
   const [suggestions, setSuggestions] = useState<string[]>([]);
-  const [expandedMessages, setExpandedMessages] = useState<Record<number, boolean>>({});
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -62,7 +64,7 @@ export default function ChatPage() {
     const data = await getChatSessions(user.uid);
     setSessions(data);
     if (data.length > 0) {
-      const latest = data[0].id;
+      const latest = data[0].id as string;
       setActiveSession(latest);
       await loadMessages(latest);
     } else {
@@ -125,7 +127,7 @@ export default function ChatPage() {
       });
       const data = await res.json();
       const title = data.title || "Health Discussion";
-      await updateChatTitle(user.uid, sessionId, title);
+      await updateChatTitle(user.uid as string, sessionId as string, title as string);
       await fetchSessions();
     } catch (err) {
       console.error("Title generation error:", err);
@@ -147,7 +149,16 @@ export default function ChatPage() {
 
   const sendMessage = async (overrideInput?: string) => {
     const messageToSend = overrideInput || input;
-    if (!messageToSend.trim() || !user || !activeSession || loading) return;
+    if (!messageToSend.trim() || !user || loading) return;
+
+    const uid = user.uid as string;
+
+    let sessionId = activeSession;
+    if (!sessionId) {
+      sessionId = await createChatSession(user.uid);
+      setActiveSession(sessionId);
+      await fetchSessions();
+    }
 
     const userMessage = messageToSend.trim();
     const isFirstMessage = messages.length === 0;
@@ -157,18 +168,18 @@ export default function ChatPage() {
     setLoading(true);
 
     try {
-      await saveMessage(user.uid, activeSession, "user", userMessage);
-      if (isFirstMessage) generateSmartTitle(userMessage, activeSession);
+      await saveMessage(uid, sessionId, "user", userMessage);
+      if (isFirstMessage) generateSmartTitle(userMessage, sessionId);
 
       const chatRes = await fetch("/api/ai/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: userMessage, uid: user.uid, sessionId: activeSession }),
+        body: JSON.stringify({ message: userMessage, uid: uid, sessionId: sessionId }),
       });
       const chatData = await chatRes.json();
-      const aiReply = chatData.reply || "I'm here to help with your health questions.";
+      const aiReply = (chatData.reply as string) || "I'm here to help with your health questions.";
       await typeMessage(aiReply);
-      await saveMessage(user.uid, activeSession, "assistant", aiReply);
+      await saveMessage(uid, sessionId, "assistant", aiReply);
 
       try {
         const suggestionRes = await fetch("/api/ai/suggestions", {
@@ -195,28 +206,14 @@ export default function ChatPage() {
     }
   };
 
-  const toggleExpand = (index: number) => {
-    setExpandedMessages((prev) => ({
-      ...prev,
-      [index]: !prev[index],
-    }));
-  };
-
   const copyMessage = (text: string, index: number) => {
     navigator.clipboard.writeText(text);
     setCopiedIndex(index);
     setTimeout(() => setCopiedIndex(null), 2000);
   };
 
-  const regenerateAnswer = async () => {
-    const lastUser = [...messages].reverse().find((m) => m.role === "user");
-    if (!lastUser) return;
-
-    setInput(lastUser.content);
-  };
-
   return (
-    <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in duration-1000">
+    <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in duration-1000 pb-12">
       {/* 🔮 Ultra-Premium Chat Header */}
       <div className="relative group overflow-hidden rounded-[2.5rem] border border-white/80 dark:border-white/[0.05] bg-white/[0.4] dark:bg-[#030712]/30 backdrop-blur-[60px] p-10 transition-all duration-700 hover:shadow-2xl">
         <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/10 blur-[100px] -mr-48 -mt-48 transition-all group-hover:bg-indigo-500/20" />
@@ -238,18 +235,11 @@ export default function ChatPage() {
           </div>
 
           <div className="flex flex-wrap gap-4">
-            <div className="px-6 py-4 rounded-3xl bg-white/40 dark:bg-white/5 border border-white/60 dark:border-white/[0.05] backdrop-blur-md">
+            <div className="px-8 py-5 rounded-[2rem] bg-white/40 dark:bg-white/5 border border-white/60 dark:border-white/[0.05] backdrop-blur-md">
               <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Status</p>
               <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
                 <span className="text-sm font-black text-gray-800 dark:text-gray-200 uppercase tracking-tighter">Diagnostic AI Online</span>
-              </div>
-            </div>
-            <div className="px-6 py-4 rounded-3xl bg-white/40 dark:bg-white/5 border border-white/60 dark:border-white/[0.05] backdrop-blur-md">
-              <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Privacy</p>
-              <div className="flex items-center gap-2 text-indigo-600">
-                <ShieldCheck size={14} />
-                <span className="text-sm font-black uppercase tracking-tighter">HIPAA Compliant Session</span>
               </div>
             </div>
           </div>
@@ -257,7 +247,7 @@ export default function ChatPage() {
       </div>
 
       {/* 🧩 IMPERATIVE CHAT INTERFACE */}
-      <div className="flex h-[80vh] rounded-[3rem] overflow-hidden border border-white/80 dark:border-white/[0.05] bg-white/[0.4] dark:bg-[#030712]/30 backdrop-blur-[60px] shadow-2xl relative">
+      <div className="flex h-[85vh] rounded-[3.5rem] overflow-hidden border border-white/80 dark:border-white/[0.05] bg-white/[0.3] dark:bg-[#030712]/30 backdrop-blur-[80px] shadow-2xl relative">
         {/* SIDEBAR */}
         {sidebarOpen && (
           <div className="w-80 border-r border-white/60 dark:border-white/[0.05] flex flex-col bg-white/30 dark:bg-black/20 backdrop-blur-3xl animate-in slide-in-from-left duration-500">
@@ -289,7 +279,7 @@ export default function ChatPage() {
                 >
                   <div className="flex items-center gap-3 flex-1 truncate">
                     <History size={16} className={activeSession === session.id ? "text-indigo-200" : "text-gray-400"} />
-                    <span className="text-xs font-black truncate">
+                    <span className="text-xs font-black truncate text-inherit">
                       {session.title || "Consultation Routine"}
                     </span>
                   </div>
@@ -319,99 +309,116 @@ export default function ChatPage() {
               </button>
 
               <div className="flex flex-col">
-                <h2 className="text-xl font-black text-gray-900 dark:text-white flex items-center gap-2">
+                <h2 className="text-2xl font-black text-gray-900 dark:text-white flex items-center gap-3">
                   CareCompass Bio-Core
-                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
                 </h2>
                 <div className="flex items-center gap-2">
-                   <span className="text-[10px] font-black text-indigo-500 uppercase tracking-widest">Active Clinical Logic</span>
+                   <div className="w-1 h-3 bg-indigo-500 rounded-full" />
+                   <span className="text-[10px] font-black text-indigo-500 uppercase tracking-widest leading-none">Active Clinical Logic Engine</span>
                 </div>
               </div>
-            </div>
-
-            <div className="hidden md:flex items-center gap-3">
-               <div className="px-5 py-2 rounded-full bg-indigo-600/10 border border-indigo-600/20 text-indigo-600 text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
-                  <ShieldCheck size={14} /> Encrypted Analysis
-               </div>
             </div>
           </div>
 
           {/* MESSAGES */}
           <div className="flex-1 overflow-y-auto p-10 space-y-10 custom-scrollbar relative">
+             <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none" />
+             
              {messages.length === 0 && !loading && (
-               <div className="h-full flex flex-col items-center justify-center text-center space-y-8 opacity-40 grayscale pointer-events-none">
-                  <div className="w-24 h-24 rounded-full border border-gray-400/20 flex items-center justify-center">
-                     <Bot size={48} />
+               <div className="h-full flex flex-col items-center justify-center text-center space-y-8 opacity-40 grayscale pointer-events-none z-10 relative">
+                  <div className="w-24 h-24 rounded-full border border-indigo-400/20 flex items-center justify-center bg-indigo-500/5">
+                     <Bot size={48} className="text-indigo-400" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-black">Neurological Core Idle</h3>
-                    <p className="text-sm font-bold">Initiate high-fidelity consultation below</p>
+                    <h3 className="text-2xl font-black text-gray-900 dark:text-white">Neurological Core Idle</h3>
+                    <p className="text-sm font-bold text-gray-500">Initiate high-fidelity consultation below</p>
                   </div>
                </div>
              )}
 
-            {messages.map((msg, index) => (
+            {messages.map((msg, index) => {
+              const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+              const userIconColor = "bg-gradient-to-br from-indigo-500 to-purple-600";
+              
+              return (
               <div
                 key={index}
-                className={`flex w-full animate-in fade-in slide-in-from-bottom-2 duration-500 ${
+                className={`flex w-full animate-in fade-in slide-in-from-bottom-8 duration-700 ease-out z-10 relative ${
                   msg.role === "user" ? "justify-end" : "justify-start"
                 }`}
+                style={{ animationDelay: `${index * 50}ms` }}
               >
-                <div className={`flex gap-4 max-w-[85%] ${msg.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
-                   <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 border shadow-md ${msg.role === "user" ? "bg-indigo-600 text-white border-indigo-500" : "bg-white dark:bg-indigo-600/20 text-indigo-600 dark:text-indigo-400 border-white dark:border-indigo-600/20"}`}>
-                      {msg.role === "user" ? <UserIcon size={20} /> : <Bot size={20} />}
+                <div className={`flex gap-5 max-w-[88%] ${msg.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
+                   <div className={`w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-2xl relative group/avatar overflow-hidden ${
+                     msg.role === "user" ? userIconColor : "bg-white dark:bg-[#0f172a] border border-indigo-500/20"
+                   }`}>
+                      {msg.role === "user" ? (
+                        <UserIcon size={24} className="text-white relative z-10" />
+                      ) : (
+                        <div className="relative flex items-center justify-center">
+                          <Bot size={24} className="text-indigo-600 dark:text-indigo-400 relative z-10 animate-pulse" />
+                          <div className="absolute inset-0 bg-indigo-500/20 blur-lg rounded-full animate-ping scale-150" />
+                        </div>
+                      )}
                    </div>
 
                    <div
-                    className={`relative p-6 rounded-[2rem] text-base leading-relaxed break-words shadow-xl group transition-all duration-300 border ${
+                    className={`relative p-7 rounded-[2.5rem] text-base leading-relaxed break-words shadow-2xl group transition-all duration-500 border overflow-hidden ${
                       msg.role === "user"
-                        ? "bg-gradient-to-br from-indigo-600 to-purple-600 text-white border-indigo-500 rounded-tr-none"
-                        : "bg-white/80 dark:bg-black/40 border-white dark:border-white/5 text-gray-800 dark:text-gray-100 backdrop-blur-2xl rounded-tl-none"
+                        ? "bg-gradient-to-br from-indigo-600 via-indigo-700 to-purple-800 text-white border-white/10 rounded-tr-none hover:shadow-indigo-500/20"
+                        : "bg-white/95 dark:bg-[#0f172a]/80 border-white/60 dark:border-white/[0.05] text-gray-800 dark:text-gray-100 backdrop-blur-3xl rounded-tl-none shadow-indigo-500/5 hover:border-indigo-500/30"
                     }`}
                   >
-                    <div className="prose dark:prose-invert max-w-none
-                      prose-li:font-bold prose-p:font-bold prose-p:leading-relaxed text-[15px]
-                      prose-h1:text-indigo-600 dark:prose-h1:text-indigo-400 prose-h1:font-black
-                      prose-strong:text-indigo-600 dark:prose-strong:text-indigo-400 prose-strong:font-black">
+                    <div className="prose dark:prose-invert max-w-none prose-li:font-bold prose-p:font-bold prose-p:leading-relaxed text-[16px] relative z-10">
                       <ReactMarkdown remarkPlugins={[remarkGfm]}>
                         {msg.content}
                       </ReactMarkdown>
                     </div>
 
-                    {msg.role === "assistant" && msg.content && (
-                      <div className="flex gap-4 mt-6 pt-4 border-t border-gray-100 dark:border-white/5 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                        <button
-                          onClick={() => copyMessage(msg.content, index)}
-                          className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-indigo-600 transition-colors"
-                        >
-                          {copiedIndex === index ? <Sparkles size={14} className="text-emerald-500" /> : <Copy size={14} />}
-                          {copiedIndex === index ? "Verified" : "Sync Data"}
-                        </button>
-
-                        <button
-                          onClick={() => sendMessage(messages.reverse().find(m => m.role === "user")?.content)}
-                          className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-purple-600 transition-colors"
-                        >
-                          <RefreshCcw size={14} />
-                          Re-Synthesize
-                        </button>
+                    <div className={`mt-4 flex items-center justify-between opacity-40 group-hover:opacity-100 transition-all duration-500 relative z-10`}>
+                      <div className="flex items-center gap-3">
+                         {msg.role === "assistant" && msg.content && (
+                           <>
+                            <button
+                              onClick={() => copyMessage(msg.content, index)}
+                              className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest hover:text-indigo-600 transition-colors"
+                            >
+                              {copiedIndex === index ? <Sparkles size={12} className="text-emerald-500" /> : <Copy size={12} />}
+                              {copiedIndex === index ? "Synced" : "Sync"}
+                            </button>
+                            <button
+                              onClick={() => {
+                                const lastUserMsg = [...messages].reverse().find(m => m.role === "user");
+                                if (lastUserMsg) sendMessage(lastUserMsg.content);
+                              }}
+                              className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest hover:text-purple-600 transition-colors"
+                            >
+                              <RefreshCcw size={12} />
+                              Re-Syn
+                            </button>
+                           </>
+                         )}
                       </div>
-                    )}
+                      <div className="flex items-center gap-1.5 text-[9px] font-mono font-black uppercase tracking-tighter">
+                         <Clock size={10} /> {timestamp}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
-            ))}
+            );})}
 
             {loading && (
-              <div className="flex items-start gap-4 animate-in slide-in-from-bottom-4 duration-500">
+              <div className="flex items-start gap-4 animate-in slide-in-from-bottom-4 duration-500 z-10 relative">
                 <div className="w-10 h-10 rounded-xl bg-indigo-600/10 dark:bg-indigo-600/20 border border-indigo-600/20 flex items-center justify-center text-indigo-600">
                    <Bot size={20} className="animate-pulse" />
                 </div>
-                <div className="px-8 py-5 bg-white/40 dark:bg-white/5 border border-white/60 dark:border-white/[0.05] rounded-[2rem] rounded-tl-none backdrop-blur-md flex items-center gap-3">
+                <div className="px-8 py-5 bg-white/90 dark:bg-white/5 border border-white/60 dark:border-white/[0.05] rounded-[2rem] rounded-tl-none backdrop-blur-md flex items-center gap-3">
                    <div className="flex gap-1.5">
-                      <div className="w-2 h-2 rounded-full bg-indigo-600 animate-bounce" />
-                      <div className="w-2 h-2 rounded-full bg-purple-600 animate-bounce delay-150" />
-                      <div className="w-2 h-2 rounded-full bg-emerald-600 animate-bounce delay-300" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-indigo-600 animate-bounce" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-purple-600 animate-bounce delay-150" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-bounce delay-300" />
                    </div>
                    <span className="text-xs font-black uppercase tracking-[0.2em] text-gray-400">Bio-Core Thinking</span>
                 </div>
@@ -423,7 +430,7 @@ export default function ChatPage() {
 
           {/* SUGGESTIONS PILLS */}
           {suggestions.length > 0 && (
-            <div className="px-10 pb-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <div className="px-10 pb-6 animate-in fade-in slide-in-from-bottom-4 duration-700 z-20 relative">
               <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400 mb-4 px-2">
                 <Sparkles size={12} className="text-amber-500" /> Neural Context Shortcuts
               </div>
@@ -433,9 +440,9 @@ export default function ChatPage() {
                   <button
                     key={i}
                     onClick={() => sendMessage(s)}
-                    className="group relative px-6 py-3 rounded-2xl bg-white/40 dark:bg-white/5 border border-white/80 dark:border-white/[0.05] text-xs font-black text-gray-700 dark:text-gray-300 hover:border-indigo-500 hover:text-indigo-600 transition-all hover:scale-105 active:scale-95 flex items-center gap-2"
+                    className="group relative px-6 py-3 rounded-2xl bg-white/60 dark:bg-white/5 border border-white/80 dark:border-white/[0.05] text-xs font-black text-gray-700 dark:text-gray-300 hover:border-indigo-500 hover:text-indigo-600 transition-all hover:scale-105 active:scale-95 flex items-center gap-2 backdrop-blur-md"
                   >
-                    {s}
+                    <span className="truncate max-w-[200px]">{s}</span>
                     <ChevronRight size={14} className="opacity-0 group-hover:opacity-100 transition-all -ml-2 group-hover:ml-0" />
                   </button>
                 ))}
@@ -444,41 +451,58 @@ export default function ChatPage() {
           )}
 
           {/* FLOATING INPUT BAR */}
-          <div className="p-8 pb-10">
-             <div className="relative group max-w-5xl mx-auto">
-                <div className="absolute -inset-1 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-3xl blur opacity-20 group-focus-within:opacity-40 transition duration-700" />
+          <div className="p-10 pb-12 z-40 relative">
+             <div className="relative group max-w-6xl mx-auto">
+                {/* 🛡️ Premium Neural Forcefield */}
+                <div className={`absolute -inset-2 bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 rounded-[3.5rem] blur-3xl transition-all duration-1000 ${input.trim() ? "opacity-30 scale-105" : "opacity-0 scale-100"}`} />
+                
+                <div className="relative flex items-center gap-4 bg-white/95 dark:bg-[#030712]/95 backdrop-blur-[60px] px-6 py-4 rounded-[3.5rem] border border-white/80 dark:border-white/[0.05] shadow-[0_40px_80px_rgba(0,0,0,0.2)] transition-all group-focus-within:border-indigo-500/50">
+                   
+                   {/* ➕ Attachment & Utility */}
+                   <button 
+                     onClick={() => fileInputRef.current?.click()}
+                     className="w-14 h-14 rounded-full bg-gray-50 dark:bg-white/5 text-gray-400 hover:text-indigo-500 hover:scale-110 transition-all flex items-center justify-center flex-shrink-0"
+                   >
+                     <Plus size={24} />
+                   </button>
+                   <input type="file" ref={fileInputRef} className="hidden" />
 
-                <div className="relative flex items-end gap-3 bg-white/80 dark:bg-[#030712]/80 backdrop-blur-3xl px-6 py-4 rounded-[2rem] border border-white/80 dark:border-white/[0.05] shadow-2xl transition-all group-focus-within:border-indigo-500/50">
                    <div className="flex-1 min-h-[50px] flex items-center">
                      <textarea
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={handleKeyDown}
-                        placeholder="Neural medical context here (reports, symptoms, patterns)..."
-                        className="w-full bg-transparent border-none focus:ring-0 text-gray-800 dark:text-gray-100 font-bold placeholder:text-gray-400/60 placeholder:font-black text-base max-h-48 resize-none py-2 custom-scrollbar"
+                        placeholder="Type a clinical inquiry..."
+                        className="w-full bg-transparent border-none focus:ring-0 text-gray-800 dark:text-gray-100 font-bold placeholder:text-gray-400/50 text-xl resize-none py-3 custom-scrollbar overflow-hidden"
                         rows={1}
                         onInput={(e) => {
                            const target = e.target as HTMLTextAreaElement;
                            target.style.height = 'auto';
-                           target.style.height = target.scrollHeight + 'px';
+                           target.style.height = (target.scrollHeight > 200 ? 200 : target.scrollHeight) + 'px';
                         }}
                      />
                    </div>
 
-                   <button
-                    onClick={() => sendMessage()}
-                    disabled={loading || !activeSession || !input.trim()}
-                    className="w-14 h-14 rounded-2xl bg-indigo-600 text-white flex items-center justify-center transition-all hover:scale-[1.1] active:scale-95 disabled:opacity-40 disabled:grayscale disabled:scale-100 shadow-xl shadow-indigo-600/20 group/btn"
-                  >
-                    <Send size={24} className="group-hover:rotate-12 transition-transform" />
-                  </button>
+                   <div className="flex items-center gap-4 pr-2">
+                     <button className="hidden sm:flex w-12 h-12 rounded-full text-gray-400 hover:text-purple-500 hover:bg-purple-500/10 transition-all items-center justify-center">
+                        <History size={20} />
+                     </button>
+                     
+                     <div className="relative">
+                        <button
+                          onClick={() => sendMessage()}
+                          disabled={loading || !input.trim()}
+                          className={`w-14 h-14 rounded-full flex items-center justify-center transition-all duration-500 ${
+                            input.trim() 
+                             ? "bg-indigo-600 text-white shadow-xl shadow-indigo-600/40 translate-x-0" 
+                             : "bg-gray-100 dark:bg-white/5 text-gray-400 scale-90 translate-x-2 opacity-50 cursor-not-allowed"
+                          }`}
+                        >
+                          <Send size={24} className={input.trim() ? "translate-x-0.5" : ""} />
+                        </button>
+                     </div>
+                   </div>
                 </div>
-             </div>
-
-             <div className="mt-4 flex items-center justify-center gap-8 text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">
-                <div className="flex items-center gap-2"><ShieldCheck size={12} /> Privacy Lock</div>
-                <div className="flex items-center gap-2"><Sparkles size={12} /> AI Core Pro</div>
-                <div className="flex items-center gap-2"><AlertCircle size={12} /> Non-Emergency Only</div>
              </div>
           </div>
         </div>
