@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/context/AuthContext";
+import { useSearchParams } from "next/navigation";
 import {
   createChatSession,
   getChatSessions,
@@ -40,6 +41,7 @@ interface Message {
 
 export default function ChatPage() {
   const { user } = useAuth();
+  const searchParams = useSearchParams();
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
   const [sessions, setSessions] = useState<any[]>([]);
@@ -198,6 +200,14 @@ export default function ChatPage() {
     }
     setLoading(false);
   };
+
+  useEffect(() => {
+    const context = searchParams.get("context");
+    const specialist = searchParams.get("specialist");
+    if (context === "briefing" && specialist && user && !initializing && messages.length === 0) {
+      sendMessage(`I was just recommended to consult a ${specialist} based on my disease prediction. Can you explain why this specialist is appropriate and what kind of questions I should prepare for our consultation?`);
+    }
+  }, [user, initializing, searchParams, sendMessage]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {

@@ -149,11 +149,11 @@ DATA PROFILE:
 
 DIAGNOSTIC ARCHITECTURE:
 1. "Likelihood Probability Synthesis": 3 distinct conditions with % probability.
-2. "Clinical Evidence Sync": High-fidelity sentences linking environmental, biometric, and symptomatic data.
-3. "Differential Logic": Reasoning based on symptom/biometric delta.
-4. "Strategic Next Steps": Pharmacological/lifestyle strategy.
-5. "Physician Referral": Recommended specialist.
-6. "Critical Red Flags": Profiling specific immediate-care indicators.
+2. "Clinical Evidence Sync": Correlate biometrics with symptoms.
+3. "Differential Logic": Explain primary condition vs alternatives.
+4. "Strategic Next Steps": Clinical and lifestyle advice.
+5. "Physician Referral": Name the category of specialist to consult.
+6. "Critical Red Flags": Profiling for the specific case.
 
 REQUIRED OUTPUT STRUCTURE (Markdown):
 
@@ -161,6 +161,8 @@ REQUIRED OUTPUT STRUCTURE (Markdown):
 1. **[Condition]** — XX%
 2. **[Condition]** — XX%
 3. **[Condition]** — XX%
+
+> 🩺 **Recommended Specialist**: [Name of Specialist Type] (e.g., Cardiologist, Pulmonologist, General Physician, etc.)
 
 ---
 

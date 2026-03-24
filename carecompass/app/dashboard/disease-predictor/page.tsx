@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { 
   Activity, 
@@ -46,6 +47,7 @@ const INDIAN_CITIES = [
 
 export default function DiseasePredictorPage() {
   const { user } = useAuth();
+  const router = useRouter();
   const reportRef = useRef<HTMLDivElement>(null);
   
   // States
@@ -188,6 +190,11 @@ export default function DiseasePredictorPage() {
     if (level === "High") return "from-red-600 to-rose-600 shadow-red-500/20";
     if (level === "Moderate") return "from-amber-600 to-orange-600 shadow-amber-500/20";
     return "from-emerald-600 to-teal-600 shadow-emerald-500/20";
+  };
+
+  const getRecommendedSpecialist = (text: string) => {
+    const match = text.match(/Recommended Specialist\*\*:\s*([^*>\n]+)/i);
+    return match ? match[1].trim() : "General Physician";
   };
 
   return (
@@ -469,10 +476,28 @@ export default function DiseasePredictorPage() {
                   <p className="text-sm font-bold text-gray-500">Generated on: {new Date().toLocaleString()}</p>
                 </div>
 
-                <div className="flex gap-4">
-                  <div className={`px-8 py-4 rounded-[1.5rem] bg-gradient-to-br ${getRiskColor(severity)} text-white shadow-2xl`}>
+                <div className="flex flex-col md:flex-row gap-4">
+                  <div className={`px-8 py-4 rounded-[1.5rem] bg-gradient-to-br ${getRiskColor(severity)} text-white shadow-2xl flex-1`}>
                     <p className="text-[10px] font-black uppercase tracking-widest opacity-80 mb-1">Severity Calibration</p>
                     <span className="text-2xl font-black">{severity} Priority</span>
+                  </div>
+                  
+                  <div className="px-8 py-4 rounded-[1.5rem] bg-indigo-500/5 dark:bg-white/5 border border-indigo-500/10 dark:border-white/[0.05] backdrop-blur-md flex-1 flex items-center justify-between gap-4">
+                    <div>
+                      <p className="text-[11px] font-black uppercase tracking-widest text-indigo-500 mb-1">Recommended Specialist</p>
+                      <div className="flex items-center gap-2">
+                        <Stethoscope size={18} className="text-emerald-500" />
+                        <span className="text-lg font-black text-gray-900 dark:text-white uppercase truncate">
+                          {getRecommendedSpecialist(result)}
+                        </span>
+                      </div>
+                    </div>
+                    <button 
+                      onClick={() => router.push(`/dashboard/chat?context=briefing&specialist=${getRecommendedSpecialist(result)}`)}
+                      className="px-6 py-3 bg-indigo-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-lg shadow-indigo-600/20 whitespace-nowrap"
+                    >
+                      Virtual Briefing
+                    </button>
                   </div>
                 </div>
               </div>
