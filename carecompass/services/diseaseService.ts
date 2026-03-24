@@ -17,6 +17,15 @@ export interface DiseaseQA {
   chronicConditions?: string[];
   duration?: string;
   medications?: string;
+  recentTravel?: string;
+  biometrics?: {
+    temperature?: string;
+    heartRate?: string;
+    spo2?: string;
+    bloodPressure?: string;
+    sleepLevel?: number;
+    stressLevel?: number;
+  };
 }
 
 export interface DiseaseHistory {

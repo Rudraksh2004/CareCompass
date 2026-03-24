@@ -32,7 +32,9 @@ import {
 const SYMPTOM_CHIPS = [
   "Fever", "Cough", "Headache", "Fatigue", "Sore Throat", 
   "Body Pain", "Nausea", "Vomiting", "Diarrhea", 
-  "Dizziness", "Chest Pain", "Shortness of Breath"
+  "Dizziness", "Chest Pain", "Shortness of Breath",
+  "Rash", "Joint Pain", "Chills", "Nasal Congestion",
+  "Loss of Taste", "Abdominal Pain", "Muscle Weakness"
 ];
 
 const INDIAN_CITIES = [
@@ -65,14 +67,25 @@ export default function DiseasePredictorPage() {
   const [useManualLocation, setUseManualLocation] = useState(false);
   const [intensity, setIntensity] = useState(0);
 
+  // Biometric States
+  const [temperature, setTemperature] = useState("98.6");
+  const [heartRate, setHeartRate] = useState("72");
+  const [systolicBP, setSystolicBP] = useState("120");
+  const [diastolicBP, setDiastolicBP] = useState("80");
+  const [spo2, setSpo2] = useState("98");
+  const [sleepLevel, setSleepLevel] = useState(7);
+  const [stressLevel, setStressLevel] = useState(3);
+  const [recentTravel, setRecentTravel] = useState("");
+
   useEffect(() => {
     let score = 0;
-    if (selectedSymptoms.length > 0) score += 25;
-    if (customSymptoms.length > 20) score += 25;
-    if (location) score += 25;
-    if (allergy || medications || chronicIllness) score += 25;
+    if (selectedSymptoms.length > 0) score += 20;
+    if (customSymptoms.length > 20) score += 20;
+    if (location) score += 20;
+    if (allergy || medications || chronicIllness) score += 20;
+    if (temperature !== "98.6" || heartRate !== "72" || spo2 !== "98") score += 20;
     setIntensity(score);
-  }, [selectedSymptoms, customSymptoms, location, allergy, medications, chronicIllness]);
+  }, [selectedSymptoms, customSymptoms, location, allergy, medications, chronicIllness, temperature, heartRate, spo2]);
 
   useEffect(() => {
     const loadHistory = async () => {
@@ -102,6 +115,14 @@ export default function DiseasePredictorPage() {
           symptoms: selectedSymptoms,
           customText: customSymptoms,
           location,
+          biometrics: {
+            temperature,
+            heartRate,
+            bloodPressure: `${systolicBP}/${diastolicBP}`,
+            spo2,
+            sleepLevel,
+            stressLevel
+          },
           qa: {
             allergies: !!allergy,
             surgeries: !!pastSurgery,
@@ -109,6 +130,7 @@ export default function DiseasePredictorPage() {
             duration,
             isWorsening,
             medications,
+            recentTravel
           },
         }),
       });
@@ -124,7 +146,13 @@ export default function DiseasePredictorPage() {
         symptoms: selectedSymptoms,
         customText: customSymptoms,
         location,
-        qa: { allergies: !!allergy, surgeries: !!pastSurgery, chronicConditions: chronicIllness ? [chronicIllness] : [] },
+        qa: { 
+          allergies: !!allergy, 
+          surgeries: !!pastSurgery, 
+          chronicConditions: chronicIllness ? [chronicIllness] : [], 
+          recentTravel,
+          biometrics: { temperature, heartRate, spo2, bloodPressure: `${systolicBP}/${diastolicBP}`, sleepLevel, stressLevel } 
+        },
         severity: severityLevel,
         prediction: predictionText,
       });
@@ -152,7 +180,7 @@ export default function DiseasePredictorPage() {
     }
   };
 
-  const nextStep = () => setStep(s => Math.min(s + 1, 3));
+  const nextStep = () => setStep(s => Math.min(s + 1, 4));
   const prevStep = () => setStep(s => Math.max(s - 1, 1));
 
   // Visual Helper for Risk Level
@@ -198,15 +226,16 @@ export default function DiseasePredictorPage() {
 
       {/* 🧩 Phase Navigation (Enhanced) */}
       {step < 4 && (
-        <div className="flex items-center justify-center gap-16 relative">
-          {[1, 2, 3].map((s) => (
+        <div className="flex items-center justify-center gap-10 md:gap-16 relative">
+          {[1, 2, 3, 4].map((s) => (
             <button key={s} onClick={() => s < step && setStep(s)} className={`relative flex flex-col items-center gap-4 group`}>
-               <div className={`w-16 h-16 rounded-2xl flex items-center justify-center transition-all duration-500 ${step >= s ? "bg-indigo-600 scale-110 shadow-xl shadow-indigo-600/30 text-white" : "bg-white/50 dark:bg-gray-900 text-gray-400 grayscale"}`}>
+               <div className={`w-14 h-14 md:w-16 md:h-16 rounded-2xl flex items-center justify-center transition-all duration-500 ${step >= s ? "bg-indigo-600 scale-110 shadow-xl shadow-indigo-600/30 text-white" : "bg-white/50 dark:bg-gray-900 text-gray-400 grayscale"}`}>
                   {s === 1 && <Stethoscope size={24} />}
-                  {s === 2 && <History size={24} />}
-                  {s === 3 && <MapPin size={24} />}
+                  {s === 2 && <Activity size={24} />}
+                  {s === 3 && <History size={24} />}
+                  {s === 4 && <MapPin size={24} />}
                </div>
-               <span className={`text-[10px] font-black uppercase tracking-widest transition-colors ${step === s ? "text-indigo-600" : "text-gray-500"}`}>
+               <span className={`text-[9px] font-black uppercase tracking-widest transition-colors ${step === s ? "text-indigo-600" : "text-gray-500"}`}>
                 Phase 0{s}
               </span>
             </button>
@@ -234,8 +263,8 @@ export default function DiseasePredictorPage() {
                   {SYMPTOM_CHIPS.map((s, idx) => {
                     const active = selectedSymptoms.includes(s);
                     return (
-                      <button key={s} onClick={() => toggleSymptom(s)} style={{ animationDelay: `${idx * 50}ms` }} className={`p-4 rounded-2xl border text-xs font-black transition-all duration-500 flex flex-col items-center gap-3 group animate-in fade-in zoom-in ${active ? "bg-indigo-600 border-indigo-500 text-white scale-105 shadow-2xl shadow-indigo-500/20" : "bg-white/40 dark:bg-white/[0.02] border-white/80 dark:border-white/[0.05] text-gray-700 dark:text-gray-400 hover:bg-white/60"}`}>
-                         <Activity size={20} className={`transition-transform duration-500 ${active ? "scale-125 rotate-12" : "group-hover:scale-110"}`} />
+                      <button key={s} onClick={() => toggleSymptom(s)} style={{ animationDelay: `${idx * 50}ms` }} className={`p-4 rounded-2xl border text-[10px] font-black transition-all duration-500 flex flex-col items-center gap-3 group animate-in fade-in zoom-in ${active ? "bg-indigo-600 border-indigo-500 text-white scale-105 shadow-2xl shadow-indigo-500/20" : "bg-white/40 dark:bg-white/[0.02] border-white/80 dark:border-white/[0.05] text-gray-700 dark:text-gray-400 hover:bg-white/60"}`}>
+                         <Activity size={18} className={`transition-transform duration-500 ${active ? "scale-125 rotate-12" : "group-hover:scale-110"}`} />
                          {s}
                       </button>
                     );
@@ -244,7 +273,7 @@ export default function DiseasePredictorPage() {
 
                 <div className="relative group/box">
                    <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-[2rem] blur opacity-0 group-hover/box:opacity-100 transition duration-500" />
-                   <textarea rows={6} value={customSymptoms} onChange={e => setCustomSymptoms(e.target.value)} placeholder="Provide qualitative data regarding onset, intensity shifts, and aggravating patterns..." className="relative w-full border border-white/80 dark:border-white/[0.05] bg-white/40 dark:bg-black/60 backdrop-blur-xl px-10 py-8 rounded-[2rem] text-lg font-bold text-gray-800 dark:text-gray-200 outline-none focus:ring-4 focus:ring-indigo-600/10 transition-all" />
+                   <textarea rows={5} value={customSymptoms} onChange={e => setCustomSymptoms(e.target.value)} placeholder="Provide qualitative data regarding onset, intensity shifts, and aggravating patterns..." className="relative w-full border border-white/80 dark:border-white/[0.05] bg-white/40 dark:bg-black/60 backdrop-blur-xl px-10 py-8 rounded-[2rem] text-lg font-bold text-gray-800 dark:text-gray-200 outline-none focus:ring-4 focus:ring-indigo-600/10 transition-all" />
                 </div>
               </div>
             )}
@@ -253,17 +282,60 @@ export default function DiseasePredictorPage() {
               <div className="space-y-12 animate-in fade-in slide-in-from-bottom-10 duration-700">
                 <div className="space-y-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-2 h-8 bg-amber-500 rounded-full" />
-                    <h2 className="text-4xl font-black tracking-tighter text-gray-900 dark:text-white">Temporal & Medical Context</h2>
+                    <div className="w-2 h-8 bg-blue-500 rounded-full" />
+                    <h2 className="text-4xl font-black tracking-tighter text-gray-900 dark:text-white">Biometric Pulse</h2>
                   </div>
-                  <p className="text-gray-500 font-bold ml-5">Calibrate the time-scale and pre-existing biometric history.</p>
+                  <p className="text-gray-500 font-bold ml-5">Calibrate vital clinical vectors for high-fidelity synthesis.</p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                  <BiometricInput label="Body Temperature" value={temperature} setValue={setTemperature} icon={<Clock size={16} />} unit="°F" />
+                  <BiometricInput label="Heart Rate" value={heartRate} setValue={setHeartRate} icon={<Activity size={16} />} unit="BPM" />
+                  <BiometricInput label="Oxygen Saturation" value={spo2} setValue={setSpo2} icon={<AlertTriangle size={16} />} unit="SpO2 %" />
+                  
+                  <div className="md:col-span-1 space-y-4">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 px-2">Blood Pressure (Systolic/Diastolic)</p>
+                    <div className="flex gap-2">
+                       <input value={systolicBP} onChange={e => setSystolicBP(e.target.value)} placeholder="120" className="w-full bg-white/40 dark:bg-white/[0.02] border border-white/80 p-5 rounded-2xl text-center font-black" />
+                       <span className="flex items-center text-gray-400 font-black">/</span>
+                       <input value={diastolicBP} onChange={e => setDiastolicBP(e.target.value)} placeholder="80" className="w-full bg-white/40 dark:bg-white/[0.02] border border-white/80 p-5 rounded-2xl text-center font-black" />
+                    </div>
+                  </div>
+
+                  <div className="md:col-span-1 space-y-4">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 px-2 flex justify-between">
+                      <span>Sleep Quality</span>
+                      <span className="text-indigo-500">{sleepLevel}/10</span>
+                    </p>
+                    <input type="range" min="1" max="10" value={sleepLevel} onChange={e => setSleepLevel(parseInt(e.target.value))} className="w-full h-2 bg-indigo-600/10 rounded-lg appearance-none cursor-pointer accent-indigo-600" />
+                  </div>
+
+                  <div className="md:col-span-1 space-y-4">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 px-2 flex justify-between">
+                      <span>Stress Level</span>
+                      <span className="text-red-500">{stressLevel}/10</span>
+                    </p>
+                    <input type="range" min="1" max="10" value={stressLevel} onChange={e => setStressLevel(parseInt(e.target.value))} className="w-full h-2 bg-red-600/10 rounded-lg appearance-none cursor-pointer accent-red-600" />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {step === 3 && (
+              <div className="space-y-12 animate-in fade-in slide-in-from-bottom-10 duration-700">
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-8 bg-amber-500 rounded-full" />
+                    <h2 className="text-4xl font-black tracking-tighter text-gray-900 dark:text-white">Clinical Artifacts</h2>
+                  </div>
+                  <p className="text-gray-500 font-bold ml-5">Synthesize pre-existing medical history and temporal progression.</p>
                 </div>
 
                 <div className="grid xl:grid-cols-2 gap-16">
                   <div className="space-y-10">
                     <div className="space-y-4">
                       <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 px-2 flex items-center gap-2">
-                        <Clock size={12} className="text-indigo-600" /> Progression Period
+                        <Clock size={12} className="text-indigo-600" /> Symptom Duration
                       </p>
                       <div className="grid grid-cols-4 gap-3">
                         {["< 24h", "1-2 days", "3-7 days", "7+ days"].map(d => (
@@ -273,7 +345,7 @@ export default function DiseasePredictorPage() {
                     </div>
                     
                     <div className="space-y-4">
-                      <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 px-2">Pathology Intensity</p>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 px-2">Diagnostic Pathway</p>
                       <div className="flex gap-4">
                         {["No Change", "Slightly Waging", "Severely Worsening"].map(opt => (
                           <button key={opt} onClick={() => setIsWorsening(opt)} className={`flex-1 py-5 rounded-xl text-[10px] font-black transition-all border ${isWorsening === opt ? "bg-red-600 border-red-500 text-white shadow-xl shadow-red-600/20" : "bg-white/40 dark:bg-white/[0.02] border-white/80"}`}>{opt}</button>
@@ -283,15 +355,16 @@ export default function DiseasePredictorPage() {
                   </div>
 
                   <div className="grid grid-cols-2 gap-6">
-                    <textarea value={medications} onChange={e => setMedications(e.target.value)} placeholder="Pharmacological History..." className="col-span-2 bg-white/40 dark:bg-white/[0.02] border border-white/80 p-6 rounded-2xl text-sm font-bold h-32" />
-                    <input value={allergy} onChange={e => setAllergy(e.target.value)} placeholder="Immunological Allergies" className="bg-white/40 dark:bg-white/[0.02] border border-white/80 p-5 rounded-2xl text-xs font-bold" />
-                    <input value={chronicIllness} onChange={e => setChronicIllness(e.target.value)} placeholder="Pre-existing Conditions" className="bg-white/40 dark:bg-white/[0.02] border border-white/80 p-5 rounded-2xl text-xs font-bold" />
+                    <textarea value={medications} onChange={e => setMedications(e.target.value)} placeholder="Pharmacological Ledger..." className="col-span-2 bg-white/40 dark:bg-white/[0.02] border border-white/80 p-6 rounded-2xl text-sm font-bold h-32" />
+                    <input value={allergy} onChange={e => setAllergy(e.target.value)} placeholder="Allergy Profile" className="bg-white/40 dark:bg-white/[0.02] border border-white/80 p-5 rounded-2xl text-[10px] font-black" />
+                    <input value={chronicIllness} onChange={e => setChronicIllness(e.target.value)} placeholder="Chronic Conditions" className="bg-white/40 dark:bg-white/[0.02] border border-white/80 p-5 rounded-2xl text-[10px] font-black" />
+                    <input value={recentTravel} onChange={e => setRecentTravel(e.target.value)} placeholder="Recent Global Travel" className="col-span-2 bg-white/40 dark:bg-white/[0.02] border border-white/80 p-5 rounded-2xl text-[10px] font-black" />
                   </div>
                 </div>
               </div>
             )}
 
-            {step === 3 && (
+            {step === 4 && (
               <div className="space-y-12 animate-in fade-in slide-in-from-bottom-10 duration-700">
                 <div className="space-y-3">
                   <div className="flex items-center gap-3">
@@ -329,7 +402,7 @@ export default function DiseasePredictorPage() {
                 PREVIOUS PHASE
               </button>
             )}
-            {step < 3 ? (
+            {step < 4 ? (
               <button onClick={nextStep} className="flex-1 bg-gray-900 dark:bg-indigo-600 text-white py-5 rounded-[1.5rem] font-black shadow-2xl transition-all hover:scale-[1.02]">
                 PROCEED TO PHASE 0{step + 1} →
               </button>
@@ -528,6 +601,25 @@ export default function DiseasePredictorPage() {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+function BiometricInput({ label, value, setValue, icon, unit }: any) {
+  return (
+    <div className="space-y-4">
+      <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 px-2 flex items-center gap-2">
+        {icon} {label}
+      </p>
+      <div className="relative group/input">
+        <input
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          className="w-full bg-white/40 dark:bg-white/[0.02] border border-white/80 dark:border-white/[0.1] px-6 py-5 rounded-2xl text-lg font-black outline-none focus:ring-4 focus:ring-indigo-600/10 transition-all"
+        />
+        <div className="absolute right-6 top-1/2 -translate-y-1/2 text-xs font-black text-gray-400 tracking-widest">
+          {unit}
+        </div>
+      </div>
     </div>
   );
 }
