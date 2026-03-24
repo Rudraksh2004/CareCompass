@@ -29,6 +29,7 @@ import {
   deleteDiseaseHistory,
   DiseaseHistory,
 } from "@/services/diseaseService";
+import { User as UserIcon } from "lucide-react";
 
 const SYMPTOM_CHIPS = [
   "Fever", "Cough", "Headache", "Fatigue", "Sore Throat", 
@@ -194,7 +195,19 @@ export default function DiseasePredictorPage() {
 
   const getRecommendedSpecialist = (text: string) => {
     const match = text.match(/Recommended Specialist\*\*:\s*([^*>\n]+)/i);
-    return match ? match[1].trim() : "General Physician";
+    if (!match) return "General Physician";
+    const parts = match[1].split("(");
+    if (parts.length > 1) {
+      return parts[1].replace(")", "").trim();
+    }
+    return parts[0].trim();
+  };
+
+  const getTopDoctorName = (text: string) => {
+    const match = text.match(/Recommended Specialist\*\*:\s*([^*>\n]+)/i);
+    if (!match) return "";
+    const name = match[1].split("(")[0].trim();
+    return name.toLowerCase().includes("consult") ? "" : name;
   };
 
   return (
@@ -484,19 +497,23 @@ export default function DiseasePredictorPage() {
                   
                   <div className="px-8 py-4 rounded-[1.5rem] bg-indigo-500/5 dark:bg-white/5 border border-indigo-500/10 dark:border-white/[0.05] backdrop-blur-md flex-1 flex items-center justify-between gap-4">
                     <div>
-                      <p className="text-[11px] font-black uppercase tracking-widest text-indigo-500 mb-1">Recommended Specialist</p>
+                      <p className="text-[11px] font-black uppercase tracking-widest text-indigo-500 mb-1">Regional Specialist Lead</p>
                       <div className="flex items-center gap-2">
-                        <Stethoscope size={18} className="text-emerald-500" />
+                        <UserIcon size={18} className="text-emerald-500" />
                         <span className="text-lg font-black text-gray-900 dark:text-white uppercase truncate">
-                          {getRecommendedSpecialist(result)}
+                          {getTopDoctorName(result) || getRecommendedSpecialist(result)}
                         </span>
                       </div>
                     </div>
                     <button 
-                      onClick={() => router.push(`/dashboard/chat?context=briefing&specialist=${getRecommendedSpecialist(result)}`)}
+                      onClick={() => {
+                        const docName = getTopDoctorName(result);
+                        const specName = getRecommendedSpecialist(result);
+                        router.push(`/dashboard/chat?context=briefing&specialist=${encodeURIComponent(specName)}&doctor=${encodeURIComponent(docName)}`);
+                      }}
                       className="px-6 py-3 bg-indigo-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-lg shadow-indigo-600/20 whitespace-nowrap"
                     >
-                      Virtual Briefing
+                      Initialize Briefing
                     </button>
                   </div>
                 </div>

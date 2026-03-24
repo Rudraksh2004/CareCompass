@@ -63,6 +63,19 @@ export default function ChatPage() {
   const initializeChat = async () => {
     if (!user) return;
     setInitializing(true);
+    
+    const context = searchParams.get("context");
+    const specialist = searchParams.get("specialist");
+
+    if (context === "briefing" && specialist) {
+      const sid = await createChatSession(user.uid);
+      setActiveSession(sid);
+      setMessages([]);
+      await fetchSessions();
+      setInitializing(false);
+      return;
+    }
+
     const data = await getChatSessions(user.uid);
     setSessions(data);
     if (data.length > 0) {
@@ -73,8 +86,7 @@ export default function ChatPage() {
       const newSessionId = await createChatSession(user.uid);
       setActiveSession(newSessionId);
       setMessages([]);
-      const updated = await getChatSessions(user.uid);
-      setSessions(updated);
+      await fetchSessions();
     }
     setInitializing(false);
   };
@@ -204,10 +216,12 @@ export default function ChatPage() {
   useEffect(() => {
     const context = searchParams.get("context");
     const specialist = searchParams.get("specialist");
-    if (context === "briefing" && specialist && user && !initializing && messages.length === 0) {
-      sendMessage(`I was just recommended to consult a ${specialist} based on my disease prediction. Can you explain why this specialist is appropriate and what kind of questions I should prepare for our consultation?`);
+    const doctor = searchParams.get("doctor");
+    if (context === "briefing" && (specialist || doctor) && user && !initializing && messages.length === 0) {
+      const doctorStr = doctor ? `Dr. ${doctor} (${specialist})` : specialist;
+      sendMessage(`I was just recommended to consult ${doctorStr} based on my disease prediction. Can you explain why this recommendation was made and what specific clinical details from my profile should I discuss with them during the visit?`);
     }
-  }, [user, initializing, searchParams, sendMessage]);
+  }, [user, initializing, searchParams, sendMessage, messages.length]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {

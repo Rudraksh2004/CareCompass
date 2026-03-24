@@ -149,11 +149,12 @@ DATA PROFILE:
 
 DIAGNOSTIC ARCHITECTURE:
 1. "Likelihood Probability Synthesis": 3 distinct conditions with % probability.
-2. "Clinical Evidence Sync": Correlate biometrics with symptoms.
-3. "Differential Logic": Explain primary condition vs alternatives.
-4. "Strategic Next Steps": Clinical and lifestyle advice.
-5. "Physician Referral": Name the category of specialist to consult.
-6. "Critical Red Flags": Profiling for the specific case.
+2. "Primary Specialist Referral": Exactly naming the type of specialist to consult.
+3. "Regional Medical Alignment": Suggest 2-3 top-tier medical facilities or highly-rated (simulated/plausible) specialist names in the user's specific location (${location || "India"}).
+4. "Clinical Evidence Sync": Correlate biometrics with symptoms.
+5. "Differential Logic": Explain primary condition vs alternatives.
+6. "Strategic Next Steps": Clinical and lifestyle advice.
+7. "Critical Red Flags": Profiling for the specific case.
 
 REQUIRED OUTPUT STRUCTURE (Markdown):
 
@@ -162,7 +163,14 @@ REQUIRED OUTPUT STRUCTURE (Markdown):
 2. **[Condition]** — XX%
 3. **[Condition]** — XX%
 
-> 🩺 **Recommended Specialist**: [Name of Specialist Type] (e.g., Cardiologist, Pulmonologist, General Physician, etc.)
+---
+
+### 🏥 Regional Medical Alignment (${location || "General India"})
+- **Primary Facility**: [Top Tier Hospital in City (e.g. Apollo, Max, etc.)]
+- **Recommended Specialist**: [Plausible High-Grade Doctor Name] ([Specialty])
+- **Secondary Facility**: [Second Hospital Option]
+
+> 🩺 **Referral Strategy**: [1 sentence on the urgency of visit]
 
 ---
 
