@@ -70,22 +70,22 @@ export default function DashboardLayout({
         <div className="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-overlay" style={{ backgroundImage: 'url("https://grainy-gradients.vercel.app/noise.svg")' }} />
       </div>
 
-      {/* SIDEBAR (Liquid Glass) */}
+      {/* SIDEBAR (Liquid Glass) - Fixed for constant visibility */}
       <aside
         className={`${
-          collapsed ? "w-20 p-4" : "w-[280px] p-6"
-        } relative z-40 border-r border-white/80 dark:border-white/[0.08] border-r-white/40 bg-white/[0.65] dark:bg-[#030712]/40 backdrop-blur-[40px] backdrop-saturate-[2] shadow-[8px_0_40px_rgba(0,0,0,0.03)] dark:shadow-[8px_0_40px_rgba(0,0,0,0.4),0_0_60px_rgba(59,130,246,0.03)] flex flex-col transition-all duration-500 ease-in-out`}
+          collapsed ? "w-20" : "w-[280px]"
+        } fixed top-0 left-0 h-screen z-50 p-6 border-r border-white/80 dark:border-white/[0.08] border-r-white/40 bg-white/[0.65] dark:bg-[#030712]/40 backdrop-blur-[40px] backdrop-saturate-[2] shadow-[8px_0_40px_rgba(0,0,0,0.03)] dark:shadow-[8px_0_40px_rgba(0,0,0,0.4),0_0_60px_rgba(59,130,246,0.03)] flex flex-col transition-all duration-500 ease-in-out`}
       >
-        {/* 🔥 Premium Edge Collapse Button (Highly Visible) */}
+        {/* 🔥 Premium Edge Collapse Button (Always Visible in Center) */}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className={`absolute -right-6 top-12 flex items-center justify-center w-12 h-12 rounded-2xl bg-white dark:bg-[#0f172a] border-2 border-blue-500 dark:border-blue-400 shadow-[0_0_25px_rgba(59,130,246,0.3)] hover:shadow-[0_0_40px_rgba(59,130,246,0.5)] hover:scale-110 transition-all duration-500 z-[100] text-blue-600 dark:text-blue-400 focus:outline-none group`}
+          className={`absolute -right-5 top-1/2 -translate-y-1/2 flex items-center justify-center w-10 h-10 rounded-xl bg-white dark:bg-[#111827] border-2 border-blue-500/30 dark:border-blue-500/50 shadow-[0_0_20px_rgba(59,130,246,0.2)] hover:shadow-[0_0_30px_rgba(59,130,246,0.4)] hover:scale-110 transition-all duration-500 z-[100] text-blue-600 dark:text-blue-400 focus:outline-none group`}
           aria-label="Toggle Sidebar"
         >
           {collapsed ? (
-            <PanelLeftOpen className="w-6 h-6 transition-transform group-hover:rotate-12" />
+            <PanelLeftOpen className="w-5 h-5 transition-transform group-hover:rotate-12" />
           ) : (
-            <PanelLeftClose className="w-6 h-6 transition-transform group-hover:-rotate-12" />
+            <PanelLeftClose className="w-5 h-5 transition-transform group-hover:-rotate-12" />
           )}
         </button>
 
@@ -237,6 +237,9 @@ export default function DashboardLayout({
           )}
         </div>
       </aside>
+
+      {/* Spacer to keep main content from going under the fixed sidebar */}
+      <div className={`shrink-0 transition-all duration-500 ${collapsed ? "w-20" : "w-[280px]"}`} />
 
       {/* MAIN CONTENT */}
       <main className="flex-1 flex flex-col">
