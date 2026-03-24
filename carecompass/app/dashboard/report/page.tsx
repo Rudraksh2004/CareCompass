@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Tesseract from "tesseract.js";
 import { extractTextFromPDF } from "@/utils/pdfExtractor";
 import { useAuth } from "@/context/AuthContext";
@@ -10,8 +10,35 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { doc, deleteDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { 
+  FileText, 
+  UploadCloud, 
+  BrainCircuit, 
+  Trash2, 
+  ChevronRight, 
+  CheckCircle2, 
+  AlertCircle, 
+  Clock, 
+  Maximize2, 
+  Minimize2, 
+  Download,
+  Stethoscope,
+  Activity,
+  ShieldCheck,
+  History,
+  Info,
+  Beaker
+} from "lucide-react";
 
 export default function ReportPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center p-20 animate-pulse text-emerald-500 font-black">SYNCING LABORATORY CORES...</div>}>
+      <ReportContent />
+    </Suspense>
+  );
+}
+
+function ReportContent() {
   const { user } = useAuth();
 
   const [reportText, setReportText] = useState("");
@@ -19,7 +46,7 @@ export default function ReportPage() {
   const [loading, setLoading] = useState(false);
   const [fileLoading, setFileLoading] = useState(false);
   const [history, setHistory] = useState<any[]>([]);
-  const [expandedId, setExpandedId] = useState<string | null>(null); // 🔥 NEW (history only)
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -32,11 +59,9 @@ export default function ReportPage() {
     if (!file) return;
 
     setFileLoading(true);
-
     try {
       if (file.type === "application/pdf") {
         const pdfResult = await extractTextFromPDF(file);
-
         if (pdfResult.text.trim().length < 30) {
           const { data } = await Tesseract.recognize(file, "eng");
           setReportText(data.text);
@@ -50,45 +75,33 @@ export default function ReportPage() {
     } catch (error) {
       console.error(error);
     }
-
     setFileLoading(false);
   };
 
   const explainReport = async () => {
     if (!reportText.trim()) return;
-
     setLoading(true);
     setResult("");
-
     try {
       const res = await fetch("/api/ai/explain", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ reportText }),
       });
-
       const data = await res.json();
       const explanation = data.explanation || "No response generated.";
-
       setResult(explanation);
-
       if (user) {
-        await saveHistory(user.uid, "reports", {
-          originalText: reportText,
-          aiResponse: explanation,
-        });
-
+        await saveHistory(user.uid, "reports", { originalText: reportText, aiResponse: explanation });
         const updated = await getHistory(user.uid, "reports");
         setHistory(updated);
       }
     } catch (error) {
       console.error(error);
     }
-
     setLoading(false);
   };
 
-  // 🔥 NEW: Delete single report (HISTORY ONLY)
   const deleteReport = async (id: string) => {
     if (!user) return;
     try {
@@ -99,193 +112,219 @@ export default function ReportPage() {
     }
   };
 
-  // 🔥 Download AI explanation as PDF
-  const downloadReportPDF = () => {
-    if (!result) return;
-
-    exportMedicalPDF("Medical Report Explanation", reportText, result);
-  };
-
   return (
-    <div className="max-w-6xl mx-auto space-y-10 text-gray-900 dark:text-gray-100">
-      {/* 🌟 Premium Clinical Header */}
-      <div className="relative overflow-hidden rounded-3xl border border-white/80 border-t-white border-l-white/90 dark:border-white/[0.05] dark:border-t-white/[0.15] dark:border-l-white/[0.1] bg-white/[0.5] dark:bg-[#030712]/30 backdrop-blur-[40px] backdrop-saturate-[2] p-10 shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_40px_rgba(0,0,0,0.4)] transition-all duration-500">
-        <div className="absolute inset-0 bg-gradient-to-br from-emerald-600/10 via-blue-600/5 to-purple-600/10 dark:from-emerald-500/10 dark:via-blue-500/5 dark:to-purple-500/10 pointer-events-none" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(16,185,129,0.15),_transparent_40%)]" />
-        <div className="relative z-10">
-          <h1 className="text-4xl font-black bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 dark:from-emerald-400 dark:via-blue-400 dark:to-purple-400 bg-clip-text text-transparent drop-shadow-sm">
-            📄 Medical Report Explainer AI
-          </h1>
-          <p className="text-gray-700 dark:text-gray-300 font-bold mt-4 text-sm max-w-2xl leading-relaxed">
-            Upload lab reports, scans, or prescriptions and get simplified,
-            structured clinical explanations powered by CareCompass AI.
-          </p>
-        </div>
-      </div>
-
-      {/* 📤 Upload Card */}
-      <div className="relative border border-white/80 border-t-white border-l-white/90 dark:border-white/[0.05] dark:border-t-white/[0.15] dark:border-l-white/[0.1] bg-white/[0.65] dark:bg-[#030712]/40 backdrop-blur-[40px] backdrop-saturate-[2] p-8 rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_40px_rgba(0,0,0,0.4)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_15px_35px_rgba(16,185,129,0.1)]">
-        <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/5 to-transparent dark:from-emerald-400/5 opacity-0 hover:opacity-100 transition-opacity duration-500 rounded-3xl pointer-events-none" />
-        <div className="relative z-10 space-y-6">
-          <div>
-            <h2 className="text-2xl font-black text-gray-900 dark:text-white drop-shadow-sm">Upload Medical Report</h2>
-            <p className="text-sm font-bold text-gray-600 dark:text-gray-400 mt-1 uppercase tracking-wide">
-              Supports images, scanned reports, and PDFs (OCR enabled)
-            </p>
-          </div>
-
-          <div className="border-2 border-dashed border-emerald-500/30 dark:border-emerald-500/20 rounded-2xl p-8 text-center bg-white/40 dark:bg-black/20 backdrop-blur-md shadow-inner transition hover:border-emerald-500/60 dark:hover:border-emerald-400 hover:bg-white/60 dark:hover:bg-white/[0.05]">
-            <input
-              type="file"
-              accept="image/*,application/pdf"
-              onChange={handleFileUpload}
-              className="text-sm font-semibold text-gray-700 dark:text-gray-300 cursor-pointer file:mr-4 file:py-2.5 file:px-6 file:rounded-xl file:border-0 file:text-sm file:font-black file:bg-emerald-50 dark:file:bg-emerald-500/10 file:text-emerald-700 dark:file:text-emerald-400 hover:file:bg-emerald-100 dark:hover:file:bg-emerald-500/20 file:transition-colors file:cursor-pointer"
-            />
-            <p className="text-xs font-bold text-gray-500 dark:text-gray-400 mt-4 leading-relaxed">
-              Upload report image or PDF for automatic AI text extraction
-            </p>
-
-            {fileLoading && (
-              <div className="mt-5 text-sm font-black text-emerald-600 dark:text-emerald-400 animate-pulse bg-emerald-50 dark:bg-emerald-500/10 py-3 px-4 rounded-xl border border-emerald-200 dark:border-emerald-500/20 inline-block shadow-sm">
-                🔍 Extracting report text using OCR & preprocessing...
+    <div className="max-w-7xl mx-auto space-y-12 pb-20">
+      {/* 🔮 Clinical Laboratory Header */}
+      <div className="relative group overflow-hidden rounded-[2.5rem] border border-white/80 dark:border-white/[0.05] bg-white/[0.4] dark:bg-[#030712]/30 backdrop-blur-[60px] p-12 transition-all duration-700 hover:shadow-2xl">
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-br from-emerald-600/20 to-blue-500/10 blur-[130px] -mr-64 -mt-64 transition-all group-hover:scale-110" />
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-10">
+          <div className="space-y-4">
+            <div className="flex items-center gap-4">
+              <div className="p-4 rounded-[1.5rem] bg-gradient-to-br from-emerald-600 to-blue-600 text-white shadow-xl shadow-emerald-500/20">
+                <Beaker size={32} strokeWidth={2.5} />
               </div>
-            )}
+              <h1 className="text-5xl font-black tracking-tighter bg-gradient-to-r from-gray-900 via-gray-700 to-gray-400 dark:from-white dark:via-gray-300 dark:to-gray-500 bg-clip-text text-transparent">
+                Report Meta-Explainer
+              </h1>
+            </div>
+            <p className="text-gray-600 dark:text-gray-400 font-bold max-w-xl text-lg leading-relaxed">
+              Algorithmic report interpretation and metadata synthesis. CareCompass AI translates complex lab result metrics into plain-language clinical insights.
+            </p>
+          </div>
+          
+          <div className="flex flex-wrap gap-4">
+             <div className="px-8 py-5 rounded-[2rem] bg-emerald-500/10 border border-emerald-500/20 backdrop-blur-md flex flex-col items-center">
+                <BrainCircuit className="text-emerald-500 mb-2" size={20} />
+                <span className="text-[10px] font-black uppercase tracking-widest text-emerald-500">Cognitive Hub</span>
+                <span className="text-xl font-black mt-1">META ACTIVE</span>
+             </div>
           </div>
         </div>
       </div>
 
-      {/* 📝 Paste Text Section */}
-      <div className="relative border border-white/80 border-t-white border-l-white/90 dark:border-white/[0.05] dark:border-t-white/[0.15] dark:border-l-white/[0.1] bg-white/[0.65] dark:bg-[#030712]/40 backdrop-blur-[40px] backdrop-saturate-[2] p-8 rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_40px_rgba(0,0,0,0.4)]">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-black text-gray-900 dark:text-white drop-shadow-sm">
-            Paste Report Text <span className="text-gray-500 text-lg font-bold">(Optional)</span>
-          </h2>
-          <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest hidden md:block">
-            Lab reports • Prescriptions • Scans
-          </span>
+      <div className="grid lg:grid-cols-3 gap-12">
+        {/* 📋 Lab Protocol Intake (Input Side) */}
+        <div className="lg:col-span-1 space-y-8">
+          <div className="relative group overflow-hidden rounded-[3rem] border border-white/60 dark:border-white/[0.05] bg-white/[0.3] dark:bg-[#030712]/30 backdrop-blur-[60px] p-8 shadow-xl transition-all">
+            <div className="relative z-10 space-y-8">
+              <div className="flex items-center gap-3">
+                <UploadCloud className="text-emerald-500" size={24} />
+                <h2 className="text-2xl font-black tracking-tighter">Lab Protocol Intake</h2>
+              </div>
+
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Digital Scan (PDF/IMG)</label>
+                  <div className="relative group/upload border-2 border-dashed border-emerald-500/20 dark:border-white/10 rounded-[2rem] p-10 text-center hover:bg-emerald-500/5 dark:hover:bg-white/5 transition-all cursor-pointer overflow-hidden">
+                    <input
+                      type="file"
+                      accept="image/*,application/pdf"
+                      onChange={handleFileUpload}
+                      className="absolute inset-0 opacity-0 cursor-pointer z-20"
+                    />
+                    <div className="relative z-10 space-y-3">
+                       <FileText className="mx-auto text-emerald-500 group-hover/upload:scale-110 transition-transform" size={40} />
+                       <div className="font-black text-sm uppercase tracking-widest">INGEST REPORT</div>
+                       <p className="text-[10px] font-bold text-gray-400 italic">OCR Enabled Pipeline</p>
+                    </div>
+                  </div>
+                  {fileLoading && (
+                    <div className="mt-4 p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center gap-3 animate-pulse">
+                      <div className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+                      <span className="text-[10px] font-black uppercase tracking-widest text-emerald-500">Parsing Laboratory Metadata...</span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Raw Clinical Payload</label>
+                  <textarea
+                    rows={8}
+                    className="w-full bg-white/40 dark:bg-black/40 border border-white/80 dark:border-white/10 p-6 rounded-[2rem] font-bold outline-none focus:ring-4 focus:ring-emerald-500/10 transition-all text-xs leading-relaxed"
+                    placeholder="Extracted technical metrics will appear here..."
+                    value={reportText}
+                    onChange={(e) => setReportText(e.target.value)}
+                  />
+                </div>
+
+                <button
+                  onClick={explainReport}
+                  disabled={loading || !reportText}
+                  className="w-full bg-gray-900 dark:bg-emerald-600 text-white py-5 rounded-[2rem] font-black text-lg hover:scale-[1.02] active:scale-95 transition-all shadow-2xl shadow-emerald-600/20 flex items-center justify-center gap-3 disabled:opacity-50"
+                >
+                  {loading ? "SYNTHESIZING..." : "GENERATE META-REPORT"} <ChevronRight size={20} />
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <div className="p-8 rounded-[3rem] bg-gradient-to-br from-emerald-600/10 to-transparent border border-emerald-500/20 backdrop-blur-md">
+             <div className="flex items-center gap-3 text-emerald-500 mb-4">
+                <Info size={20} />
+                <span className="text-xs font-black uppercase tracking-widest">Clinical Protocol</span>
+             </div>
+             <p className="text-xs font-bold text-gray-500 leading-relaxed italic">"Our AI identifies 150+ clinical lab metrics including hematology, metabolic panels, and lipid spectrums."</p>
+          </div>
         </div>
 
-        <textarea
-          rows={8}
-          className="w-full border border-white/60 dark:border-white/[0.1] bg-white/40 dark:bg-black/20 backdrop-blur-md p-5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition text-sm font-medium text-gray-800 dark:text-gray-200 leading-relaxed shadow-inner placeholder-gray-500 dark:placeholder-gray-500"
-          placeholder="Paste your medical report here for AI clinical explanation..."
-          value={reportText}
-          onChange={(e) => setReportText(e.target.value)}
-        />
+        {/* 🧠 Simplified Insight Matrix (Output Side) */}
+        <div className="lg:col-span-2 space-y-10">
+          {!result ? (
+            <div className="relative group overflow-hidden rounded-[3.5rem] border border-white/80 dark:border-white/[0.05] bg-white/[0.4] dark:bg-[#030712]/30 backdrop-blur-[60px] p-20 flex flex-col items-center justify-center text-center space-y-8 h-full min-h-[500px]">
+              <div className="w-32 h-32 rounded-full bg-gray-100 dark:bg-white/5 flex items-center justify-center text-emerald-500/30">
+                 <Stethoscope size={64} strokeWidth={1} />
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-2xl font-black tracking-tighter text-gray-400 italic">No Active Analysis Stream</h3>
+                <p className="text-xs font-bold text-gray-500 max-w-xs uppercase tracking-widest leading-loose">Ingest medical report telemetry to begin meta-explanation sequence.</p>
+              </div>
+            </div>
+          ) : (
+            <div className="relative animate-in slide-in-from-right-12 duration-700 bg-white/[0.7] dark:bg-[#030712]/50 backdrop-blur-[80px] border border-white/80 dark:border-emerald-500/20 rounded-[3.5rem] p-12 shadow-3xl overflow-hidden group/result">
+              <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none group-hover/result:opacity-10 transition-opacity">
+                 <ShieldCheck size={180} />
+              </div>
+              
+              <div className="relative z-10 space-y-10">
+                <div className="flex flex-col md:flex-row justify-between items-start gap-6 border-b border-gray-100 dark:border-white/5 pb-10">
+                   <div className="space-y-3">
+                      <div className="flex items-center gap-3">
+                         <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center shadow-lg"><CheckCircle2 size={24} /></div>
+                         <h2 className="text-3xl font-black tracking-tighter">AI Meta-Explanation</h2>
+                      </div>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-emerald-500 flex items-center gap-2">
+                         <Activity size={12} /> Diagnostic Matrix Synthesized
+                      </p>
+                   </div>
+                   <button
+                     onClick={() => exportMedicalPDF("Medical Report Explanation", reportText, result)}
+                     className="px-8 py-4 rounded-2xl bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-black text-sm hover:scale-105 transition-all shadow-xl flex items-center gap-3"
+                   >
+                     <Download size={18} /> EXPORT RECORD
+                   </button>
+                </div>
 
-        <div className="flex flex-wrap gap-4 mt-6">
-          <button
-            onClick={explainReport}
-            disabled={loading}
-            className="bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 hover:opacity-90 transition text-white px-8 py-3.5 rounded-2xl font-black shadow-[0_4px_16px_rgba(168,85,247,0.3)] hover:shadow-[0_4px_24px_rgba(168,85,247,0.5)] hover:scale-[1.02] disabled:opacity-50 disabled:scale-100 disabled:shadow-none text-lg"
-          >
-            {loading
-              ? "🧠 Analyzing Report Clinically..."
-              : "Explain Medical Report"}
-          </button>
+                <div className="p-6 rounded-3xl bg-amber-500/5 border border-amber-500/20 flex gap-4 items-start">
+                   <AlertCircle className="text-amber-500 flex-shrink-0 mt-1" size={20} />
+                   <p className="text-xs font-bold text-gray-600 dark:text-gray-400 leading-relaxed italic">
+                     <span className="text-amber-600 uppercase font-black mr-2">Advisory:</span>
+                     This meta-explanation is an AI translation of clinical data. Always verify laboratory conclusions with a licensed medical professional.
+                   </p>
+                </div>
 
-          {reportText && (
-            <button
-              onClick={() => setReportText("")}
-              className="px-6 py-3.5 rounded-2xl bg-white/60 dark:bg-white/[0.04] border border-gray-400/30 dark:border-white/[0.1] text-sm font-black text-gray-700 dark:text-gray-300 hover:bg-white/80 dark:hover:bg-white/[0.08] shadow-sm hover:scale-[1.02] transition-all"
-            >
-              Clear Text
-            </button>
+                <div className="prose prose-lg dark:prose-invert prose-headings:font-black prose-headings:text-gray-900 dark:prose-headings:text-white prose-p:font-bold prose-p:text-gray-600 dark:prose-p:text-gray-400 prose-strong:text-emerald-600 dark:prose-strong:text-emerald-400 prose-li:marker:text-blue-500 max-w-none text-sm leading-8">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {result}
+                  </ReactMarkdown>
+                </div>
+              </div>
+            </div>
           )}
         </div>
       </div>
 
-      {/* 🧠 AI Result */}
-      {result && (
-        <div className="relative border border-white/80 border-t-white border-l-white/90 dark:border-purple-500/20 dark:border-t-purple-400/30 dark:border-l-purple-500/20 bg-[rgba(255,255,255,0.85)] dark:bg-[#030712]/60 backdrop-blur-[40px] backdrop-saturate-[2] p-10 rounded-3xl shadow-[0_8px_30px_rgba(168,85,247,0.1)] dark:shadow-[0_8px_40px_rgba(168,85,247,0.15)] animate-in fade-in slide-in-from-bottom-8 duration-700">
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-blue-500/5 pointer-events-none rounded-3xl" />
-          
-          <div className="relative z-10 flex items-center justify-between mb-8 border-b border-gray-200 dark:border-gray-800/50 pb-6">
-            <h2 className="text-2xl font-black text-gray-900 dark:text-white drop-shadow-sm flex items-center gap-3">
-              <span className="text-purple-600 dark:text-purple-400">🧠</span> AI Clinical Explanation
-            </h2>
-
-            <button
-              onClick={downloadReportPDF}
-              className="bg-gradient-to-r from-emerald-600 to-teal-500 hover:opacity-90 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-[0_4px_12px_rgba(16,185,129,0.3)] hover:shadow-[0_4px_20px_rgba(16,185,129,0.4)] transition hover:scale-[1.03]"
-            >
-              Download PDF
-            </button>
-          </div>
-
-          <div className="relative z-10 prose prose-lg dark:prose-invert prose-headings:font-black prose-headings:text-gray-900 dark:prose-headings:text-white prose-p:font-medium prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-strong:text-purple-700 dark:prose-strong:text-purple-300 max-w-none text-sm leading-relaxed marker:text-purple-500">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>{result}</ReactMarkdown>
-          </div>
-        </div>
-      )}
-
-      {/* 📚 HISTORY */}
+      {/* 📚 Synthesis Archive */}
       {history.length > 0 && (
-        <div className="relative border border-white/80 border-t-white border-l-white/90 dark:border-white/[0.05] dark:border-t-white/[0.15] dark:border-l-white/[0.1] bg-white/[0.65] dark:bg-[#030712]/40 backdrop-blur-[40px] backdrop-saturate-[2] p-8 rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_40px_rgba(0,0,0,0.4)]">
-          <h2 className="text-2xl font-black text-gray-900 dark:text-white mb-6 drop-shadow-sm">
-            📚 Previous Analyses
-          </h2>
+        <div className="space-y-8">
+          <div className="flex items-center gap-4 px-6">
+             <History className="text-gray-400" size={24} />
+             <h2 className="text-3xl font-black tracking-tighter">Synthesis Archive</h2>
+          </div>
 
-          <div className="space-y-5 max-h-[600px] overflow-y-auto pr-3 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-800">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {history.map((item) => {
               const isExpanded = expandedId === item.id;
-
               return (
-                <div
-                  key={item.id}
-                  className="group relative border border-white/60 dark:border-white/[0.08] rounded-2xl p-6 bg-white/50 dark:bg-white/[0.02] backdrop-blur-xl shadow-sm hover:shadow-[0_8px_25px_rgba(0,0,0,0.05)] dark:hover:shadow-[0_8px_25px_rgba(0,0,0,0.3)] transition-all duration-300 hover:border-blue-400/50 dark:hover:border-blue-500/30"
-                >
-                  <p className="text-xs font-bold text-gray-500 dark:text-gray-500 mb-3 uppercase tracking-wide">
-                    {item.createdAt?.toDate?.().toLocaleString?.() || ""}
-                  </p>
-
-                  <p className="text-sm font-black text-gray-900 dark:text-white mb-1">📄 Report Extract</p>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400 line-clamp-2 leading-relaxed italic">
-                    "{item.originalText}"
-                  </p>
-
-                  <div className="mt-5 border-t border-gray-200 dark:border-gray-800/60 pt-4">
-                    <p className="text-sm font-black text-purple-700 dark:text-purple-400 mb-2">
-                      🧠 AI Conclusion
-                    </p>
-
-                    <div
-                      className={`prose prose-sm dark:prose-invert prose-headings:font-bold prose-p:font-medium prose-strong:text-purple-600 dark:prose-strong:text-purple-300 max-w-none text-gray-700 dark:text-gray-300 ${
-                        isExpanded ? "" : "line-clamp-3"
-                      }`}
-                    >
-                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                        {item.aiResponse}
-                      </ReactMarkdown>
+                <div key={item.id} className={`relative group border transition-all duration-500 rounded-[3rem] p-10 overflow-hidden ${isExpanded ? "md:col-span-2 lg:col-span-3 bg-white/80 dark:bg-white/5 border-emerald-500/30 shadow-2xl" : "bg-white/[0.4] dark:bg-[#030712]/30 border-white/80 dark:border-white/5 hover:bg-white/60 dark:hover:bg-white/10 shadow-xl"}`}>
+                  <div className="relative z-10 space-y-6">
+                    <div className="flex justify-between items-center">
+                       <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 flex items-center gap-2">
+                          <Clock size={12} /> {item.createdAt?.toDate?.().toLocaleDateString()}
+                       </p>
+                       <button onClick={() => deleteReport(item.id)} className="p-3 rounded-2xl bg-red-500/5 text-red-500 border border-red-500/10 hover:bg-red-500 hover:text-white transition-all">
+                          <Trash2 size={16} />
+                       </button>
                     </div>
-                  </div>
 
-                  {/* 🔥 ACTION BUTTONS */}
-                  <div className="flex flex-wrap gap-4 mt-6 pt-2">
-                    <button
-                      onClick={() => setExpandedId(isExpanded ? null : item.id)}
-                      className="px-4 py-2 rounded-xl bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 text-xs font-black hover:bg-blue-100 dark:hover:bg-blue-500/20 transition-colors shadow-sm"
-                    >
-                      {isExpanded ? "Collapse View" : "Quick Expand"}
-                    </button>
+                    <div className="space-y-4">
+                       <h4 className="text-xl font-black tracking-tighter flex items-center gap-3">
+                          <div className="p-2 rounded-xl bg-blue-500/10 text-blue-500"><FileText size={18} /></div>
+                          Diagnostic Protocol
+                       </h4>
+                       <p className={`text-xs font-bold text-gray-500 italic leading-relaxed ${isExpanded ? "" : "line-clamp-2"}`}>"{item.originalText}"</p>
+                    </div>
 
-                    <button
-                      onClick={() => {
-                        setReportText(item.originalText);
-                        setResult(item.aiResponse);
-                        window.scrollTo({ top: 0, behavior: "smooth" });
-                      }}
-                      className="px-4 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-xs font-black hover:bg-emerald-100 dark:hover:bg-emerald-500/20 transition-colors shadow-sm"
-                    >
-                      Load into Main Viewer
-                    </button>
+                    {isExpanded && (
+                       <div className="pt-8 border-t border-gray-100 dark:border-white/5 animate-in fade-in slide-in-from-top-4">
+                          <p className="text-[10px] font-black uppercase tracking-widest text-emerald-500 mb-4 flex items-center gap-2">
+                             <BrainCircuit size={12} /> Meta-Interpretation
+                          </p>
+                          <div className="prose prose-sm dark:prose-invert max-w-none text-gray-600 dark:text-gray-400 font-bold leading-7">
+                             <ReactMarkdown remarkPlugins={[remarkGfm]}>{item.aiResponse}</ReactMarkdown>
+                          </div>
+                       </div>
+                    )}
 
-                    <button
-                      onClick={() => deleteReport(item.id)}
-                      className="px-4 py-2 rounded-xl border border-red-200 dark:border-red-500/20 bg-white/50 dark:bg-transparent text-red-600 dark:text-red-400 text-xs font-bold hover:bg-red-50 dark:hover:bg-red-500/10 ml-auto transition-colors"
-                    >
-                      Delete
-                    </button>
+                    <div className="flex gap-4 pt-4">
+                       <button
+                         onClick={() => setExpandedId(isExpanded ? null : item.id)}
+                         className="flex-1 py-4 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2"
+                       >
+                         {isExpanded ? <><Minimize2 size={14} /> Collapse</> : <><Maximize2 size={14} /> Full View</>}
+                       </button>
+                       {!isExpanded && (
+                          <button
+                            onClick={() => {
+                              setReportText(item.originalText);
+                              setResult(item.aiResponse);
+                              window.scrollTo({ top: 0, behavior: "smooth" });
+                            }}
+                            className="p-4 rounded-2xl bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:scale-105 transition-all shadow-lg"
+                          >
+                             <ChevronRight size={16} />
+                          </button>
+                       )}
+                    </div>
                   </div>
                 </div>
               );
