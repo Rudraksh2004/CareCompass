@@ -53,21 +53,21 @@ export default function DashboardLayout({
     <div className="relative min-h-screen flex overflow-x-hidden bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20 dark:from-[#020617] dark:via-[#0a0f1f] dark:to-[#030b1a] text-gray-900 dark:text-gray-100 transition-colors duration-700">
       
       {/* ─── LIQUID GLASS AMBIENT BACKGROUND ─── */}
-      <div className="fixed inset-0 -z-10 pointer-events-none">
-        {/* Primary liquid orbs */}
-        <div className="absolute top-[-10%] left-[-5%] w-[600px] h-[600px] rounded-full bg-gradient-to-br from-blue-400/25 to-cyan-300/15 dark:from-blue-600/20 dark:to-cyan-400/10 blur-[100px] animate-float opacity-80" />
-        <div className="absolute bottom-[-15%] right-[-5%] w-[700px] h-[700px] rounded-full bg-gradient-to-tl from-emerald-400/20 to-teal-300/15 dark:from-emerald-600/15 dark:to-teal-500/10 blur-[110px] animate-float-reverse opacity-80" />
-        <div className="absolute top-[35%] left-[50%] -translate-x-1/2 w-[800px] h-[800px] rounded-full bg-gradient-to-br from-violet-400/15 to-purple-300/10 dark:from-violet-600/10 dark:to-purple-500/5 blur-[140px] opacity-70" />
+      <div className="fixed inset-0 -z-10 pointer-events-none overflow-hidden">
+        {/* Deep mesh gradients */}
+        <div className="absolute top-[-20%] left-[-10%] w-[1000px] h-[1000px] rounded-full bg-gradient-to-br from-blue-600/20 via-indigo-500/10 to-transparent blur-[120px] animate-float opacity-70" />
+        <div className="absolute bottom-[-20%] right-[-10%] w-[1200px] h-[1200px] rounded-full bg-gradient-to-tl from-emerald-600/15 via-teal-500/10 to-transparent blur-[130px] animate-float-reverse opacity-60" />
         
-        {/* Secondary accent orbs */}
-        <div className="absolute top-[20%] right-[10%] w-[350px] h-[350px] rounded-full bg-blue-300/20 dark:bg-blue-500/15 blur-[90px] animate-float" style={{ animationDelay: '1.5s', animationDuration: '10s' }} />
-        <div className="absolute bottom-[25%] left-[5%] w-[400px] h-[400px] rounded-full bg-emerald-300/20 dark:bg-emerald-500/15 blur-[90px] animate-float-reverse" style={{ animationDelay: '2.5s', animationDuration: '12s' }} />
+        {/* Floating Bio-Orbs */}
+        <div className="absolute top-[20%] right-[15%] w-[400px] h-[400px] rounded-full bg-indigo-500/10 blur-[100px] animate-pulse-slow" />
+        <div className="absolute bottom-[20%] left-[10%] w-[500px] h-[500px] rounded-full bg-blue-500/8 blur-[110px] animate-pulse-slow delay-1000" />
         
-        {/* Warm accent orb (dark mode depth) */}
-        <div className="absolute top-[60%] right-[25%] w-[300px] h-[300px] rounded-full bg-transparent dark:bg-amber-500/6 blur-[100px] animate-float" style={{ animationDelay: '3s', animationDuration: '10s' }} />
+        {/* Neural Grid Overlay */}
+        <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.07] [mask-image:radial-gradient(ellipse_at_center,black,transparent_80%)]" 
+             style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
         
-        {/* Dot pattern */}
-        <div className="absolute inset-0 opacity-[0.25] dark:opacity-[0.08]" style={{ backgroundImage: 'radial-gradient(circle, rgba(100,116,139,0.15) 1px, transparent 1px)', backgroundSize: '28px 28px' }} />
+        {/* Grainy Noise Overlay */}
+        <div className="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-overlay" style={{ backgroundImage: 'url("https://grainy-gradients.vercel.app/noise.svg")' }} />
       </div>
 
       {/* SIDEBAR (Liquid Glass) */}
@@ -240,23 +240,24 @@ export default function DashboardLayout({
       {/* MAIN CONTENT */}
       <main className="flex-1 flex flex-col">
         {/* Header (Liquid Glass) */}
-        <header className="h-[80px] px-8 flex items-center justify-between border-b border-white/80 border-b-white/40 dark:border-white/[0.08] backdrop-blur-[40px] backdrop-saturate-[2] bg-white/[0.65] dark:bg-[#030712]/40 sticky top-0 z-10 shadow-[0_4px_30px_rgba(0,0,0,0.02)] dark:shadow-[0_8px_40px_rgba(0,0,0,0.4),0_0_60px_rgba(59,130,246,0.03)]">
-          <div>
-            <h2 className="text-2xl font-black tracking-tight text-gray-900 dark:text-white dark:drop-shadow-[0_2px_10px_rgba(255,255,255,0.15)]">
-              Welcome back 👋
-            </h2>
-
-            <p className="text-xs font-bold uppercase tracking-wider text-gray-800 dark:text-gray-200 mt-0.5">
-              Your AI-powered health dashboard
-            </p>
+        <header className="h-[90px] px-10 flex items-center justify-between border-b border-white/80 dark:border-white/[0.08] backdrop-blur-[60px] bg-white/[0.4] dark:bg-[#030712]/40 sticky top-0 z-30 shadow-[0_4px_30px_rgba(0,0,0,0.02)] transition-all duration-700">
+          <div className="flex items-center gap-6">
+            <div className="flex flex-col">
+              <h2 className="text-3xl font-black tracking-tighter text-gray-900 dark:text-white">
+                Bio-Status <span className="text-blue-600 dark:text-blue-500">Center</span>
+              </h2>
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400 dark:text-gray-500">Operational Integrity Active</p>
+            </div>
           </div>
 
-          <div className="hidden md:flex items-center gap-2 px-4 py-2 rounded-2xl bg-white/80 dark:bg-white/[0.05] border border-white dark:border-white/[0.1] text-xs font-bold text-blue-700 dark:text-emerald-400 shadow-[0_4px_20px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.3)] backdrop-blur-3xl transition-transform hover:scale-[1.02]">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
-            </span>
-            CareCompass AI Active
+          <div className="flex items-center gap-6">
+            <div className="hidden lg:flex items-center gap-4 px-6 py-3 rounded-[2rem] bg-white/40 dark:bg-white/[0.03] border border-white dark:border-white/[0.08] backdrop-blur-3xl transition-all hover:scale-[1.05] hover:shadow-xl group">
+               <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.6)]" />
+               <div className="flex flex-col">
+                  <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">AI Link Status</span>
+                  <span className="text-[11px] font-bold text-gray-900 dark:text-white uppercase leading-none">Diagnostic Core Ready</span>
+               </div>
+            </div>
           </div>
         </header>
 
