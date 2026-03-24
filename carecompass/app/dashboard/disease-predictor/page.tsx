@@ -105,7 +105,7 @@ export default function DiseasePredictorPage() {
     setLoading(true);
     setResult("");
     setSeverity("");
-    setStep(4);
+    setStep(5);
 
     try {
       const res = await fetch("/api/ai/disease-predictor", {
@@ -225,7 +225,7 @@ export default function DiseasePredictorPage() {
       </div>
 
       {/* 🧩 Phase Navigation (Enhanced) */}
-      {step < 4 && (
+      {step <= 4 && (
         <div className="flex items-center justify-center gap-10 md:gap-16 relative">
           {[1, 2, 3, 4].map((s) => (
             <button key={s} onClick={() => s < step && setStep(s)} className={`relative flex flex-col items-center gap-4 group`}>
@@ -244,7 +244,7 @@ export default function DiseasePredictorPage() {
       )}
 
       {/* 🚀 Main Diagnostic Interface */}
-      {step < 4 && (
+      {step <= 4 && (
         <div className="relative group overflow-hidden rounded-[3rem] border border-white/60 dark:border-white/[0.05] bg-white/[0.3] dark:bg-[#030712]/30 backdrop-blur-[60px] p-16 transition-all duration-700">
           <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-indigo-500 to-transparent opacity-20" />
           
@@ -416,7 +416,7 @@ export default function DiseasePredictorPage() {
       )}
 
       {/* 🚀 AI Core Analysis (Premium Staging) */}
-      {step === 4 && loading && (
+      {step === 5 && loading && (
          <div className="relative border border-white/80 dark:border-white/[0.05] bg-white/[0.6] dark:bg-[#030712]/30 backdrop-blur-[60px] p-32 rounded-[4rem] text-center space-y-12">
             <div className="relative w-56 h-56 mx-auto">
                <div className="absolute inset-0 grayscale blur-3xl opacity-20">
@@ -441,7 +441,7 @@ export default function DiseasePredictorPage() {
       )}
 
       {/* 🏥 Final Clinical Report */}
-      {step === 4 && !loading && result && (
+      {step === 5 && !loading && result && (
         <div className="space-y-10 animate-in zoom-in-95 fade-in-0 duration-700">
           <div className="flex items-center justify-between px-8">
             <button onClick={() => setStep(1)} className="flex items-center gap-2 text-xs font-black text-gray-500 uppercase tracking-widest hover:text-indigo-600 transition-colors group">
@@ -554,7 +554,7 @@ export default function DiseasePredictorPage() {
                   <button onClick={() => { 
                     setResult(item.prediction); 
                     setSeverity(item.severity || ""); 
-                    setStep(4); 
+                    setStep(5); 
                     window.scrollTo({ top: 0, behavior: "smooth" }); 
                   }} className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-indigo-600 text-white text-[10px] font-black uppercase tracking-widest shadow-lg shadow-indigo-600/20 active:scale-95 transition-all">
                     <Search size={14} />
