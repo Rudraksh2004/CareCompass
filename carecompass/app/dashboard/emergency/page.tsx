@@ -40,6 +40,7 @@ export default function EmergencyPage() {
   const [contact, setContact] = useState("");
 
   const [saving, setSaving] = useState(false);
+  const [showQR, setShowQR] = useState(true);
   const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -179,6 +180,25 @@ export default function EmergencyPage() {
                 NOTICE: THE DATA ENTERED HERE IS FOR EMERGENCY FIRST-RESPONDER USE. MAINTAIN ACCURACY FOR OPTIMAL CLINICAL PERFORMANCE.
              </p>
           </div>
+
+          {/* QR Code Toggle Controller */}
+          <div className="relative border border-white/80 dark:border-white/[0.05] bg-white/[0.65] dark:bg-[#030712]/40 backdrop-blur-[40px] p-6 rounded-[2rem] shadow-sm flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className={`p-3 rounded-xl ${showQR ? 'bg-blue-500/10 text-blue-500' : 'bg-gray-500/10 text-gray-500'}`}>
+                <QrCode size={24} />
+              </div>
+              <div>
+                <h4 className="font-black text-gray-900 dark:text-white uppercase tracking-tighter italic">Diagnostic QR Protocol</h4>
+                <p className="text-[10px] font-bold text-gray-500 uppercase">Enable instant cloud record access</p>
+              </div>
+            </div>
+            <button 
+              onClick={() => setShowQR(!showQR)}
+              className={`relative w-14 h-8 rounded-full transition-all duration-500 ${showQR ? 'bg-blue-600 shadow-[0_0_15px_rgba(37,99,235,0.4)]' : 'bg-gray-300 dark:bg-gray-800'}`}
+            >
+              <div className={`absolute top-1 left-1 w-6 h-6 rounded-full bg-white shadow-md transition-all duration-500 ${showQR ? 'translate-x-6' : 'translate-x-0'}`} />
+            </button>
+          </div>
         </div>
 
         {/* 💳 The Premium Emergency Card (Refined Style) */}
@@ -206,48 +226,89 @@ export default function EmergencyPage() {
                   </div>
                </div>
 
-               <div className="p-8 space-y-8 flex flex-col h-[calc(100%-4rem)] justify-between">
-                  <div className="flex justify-between items-start gap-4">
-                     <div className="space-y-1 max-w-[65%]">
-                        <p className="text-[8px] font-black text-gray-500 uppercase tracking-widest">Medical Shard Identity</p>
-                        <h3 className="text-3xl font-black text-white tracking-tighter uppercase italic truncate">{name || "Awaiting Setup"}</h3>
-                     </div>
-                     <div className="shrink-0 p-3 bg-white rounded-xl shadow-[0_0_30px_rgba(255,255,255,0.1)] border border-white/20">
-                        <QRCode 
-                          value={currentUrl} 
-                          size={80} 
-                          level="M" 
-                          viewBox={`0 0 256 256`}
-                          style={{ height: "auto", maxWidth: "100%", width: "100%" }}
-                        />
-                     </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-8 pb-4">
-                     <div className="space-y-1">
-                        <p className="text-[8px] font-black text-gray-500 uppercase tracking-widest">Serology</p>
-                        <div className="flex items-center gap-2">
-                           <span className="text-3xl font-black text-red-500 tracking-tighter">{bloodGroup || "--"}</span>
-                           <Droplet size={18} className="text-red-600/40 fill-red-600" />
+                <div className="p-8 space-y-6 flex flex-col h-[calc(100%-4rem)]">
+                   {/* Primary Identity Section */}
+                   <div className="flex justify-between items-start gap-6">
+                      <div className="space-y-3 flex-1 min-w-0">
+                         <div className="space-y-0.5">
+                            <p className="text-[7px] font-black text-gray-500 uppercase tracking-widest opacity-70">Medical Shard Identity</p>
+                            <h3 className="text-2xl font-black text-white tracking-tighter uppercase italic truncate bg-gradient-to-r from-white via-white to-white/60 bg-clip-text">
+                               {name || "Awaiting Setup"}
+                            </h3>
+                         </div>
+                         
+                         <div className="flex items-center gap-6">
+                            <div className="space-y-0.5">
+                               <p className="text-[7px] font-black text-gray-500 uppercase tracking-widest opacity-70">Serology</p>
+                               <div className="flex items-center gap-1.5">
+                                  <span className="text-xl font-black text-red-500 tracking-tighter">{bloodGroup || "--"}</span>
+                                  <Droplet size={14} className="text-red-500/40 fill-red-500" />
+                               </div>
+                            </div>
+                            <div className="space-y-0.5 max-w-[140px]">
+                               <p className="text-[7px] font-black text-gray-500 uppercase tracking-widest opacity-70">Relay Link</p>
+                               <span className="text-[10px] font-black text-gray-200 truncate block tracking-tighter">{contact || "IDLE"}</span>
+                            </div>
+                         </div>
+                      </div>
+                      
+                      {showQR && (
+                        <div className="shrink-0 p-2 bg-white rounded-xl shadow-[0_0_30px_rgba(255,255,255,0.1)] border border-white/20 animate-in zoom-in duration-500">
+                           <QRCode 
+                             value={currentUrl} 
+                             size={64} 
+                             level="M" 
+                             viewBox={`0 0 256 256`}
+                             style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+                           />
                         </div>
-                     </div>
-                     <div className="space-y-1">
-                        <p className="text-[8px] font-black text-gray-500 uppercase tracking-widest">Relay Link</p>
-                        <span className="text-sm font-black text-white truncate block">{contact || "IDLE"}</span>
-                     </div>
-                  </div>
+                      )}
+                   </div>
 
-                  <div className="pt-4 border-t border-white/10 flex items-center justify-between">
-                     <div className="flex flex-col">
-                        <span className="text-[8px] font-black text-gray-600 uppercase tracking-widest">Diag-UID</span>
-                        <span className="text-[9px] font-mono text-gray-500 tracking-tighter">{user?.uid.substring(0, 14)}...</span>
-                     </div>
-                     <div className="flex items-center gap-3">
-                        <span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest">Verified by Bio-Engine</span>
-                        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                     </div>
-                  </div>
-               </div>
+                   {/* Secondary Medical Details (Multi-Column) */}
+                   <div className="grid grid-cols-3 gap-4 py-4 border-y border-white/[0.05]">
+                      <div className="space-y-0.5 group">
+                        <div className="flex items-center gap-1">
+                          <AlertCircle size={8} className="text-amber-500" />
+                          <p className="text-[7px] font-black text-gray-500 uppercase tracking-widest opacity-70">Allergies</p>
+                        </div>
+                        <p className="text-[9px] font-bold text-gray-300 line-clamp-1 leading-tight group-hover:line-clamp-none transition-all">{allergies || "None Registered"}</p>
+                      </div>
+
+                      <div className="space-y-0.5 group">
+                        <div className="flex items-center gap-1">
+                          <Stethoscope size={8} className="text-blue-500" />
+                          <p className="text-[7px] font-black text-gray-500 uppercase tracking-widest opacity-70">Conditions</p>
+                        </div>
+                        <p className="text-[9px] font-bold text-gray-300 line-clamp-1 leading-tight">{conditions || "None Registered"}</p>
+                      </div>
+
+                      <div className="space-y-0.5 group">
+                        <div className="flex items-center gap-1">
+                          <Pill size={8} className="text-purple-500" />
+                          <p className="text-[7px] font-black text-gray-500 uppercase tracking-widest opacity-70">Medications</p>
+                        </div>
+                        <p className="text-[9px] font-bold text-gray-300 line-clamp-1 leading-tight">{medications || "None Registered"}</p>
+                      </div>
+                   </div>
+
+                   {/* Professional Footer */}
+                   <div className="mt-auto pt-2 flex items-center justify-between">
+                      <div className="flex flex-col">
+                         <span className="text-[7px] font-black text-gray-600 uppercase tracking-widest">Protocol-UID</span>
+                         <span className="text-[8px] font-mono text-gray-500 tracking-tighter opacity-60">
+                            {user?.uid.substring(0, 8)}...{user?.uid.substring(user.uid.length - 8)}
+                         </span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                         <div className="flex flex-col items-end">
+                            <span className="text-[7px] font-black text-emerald-500 uppercase tracking-widest">Bio-Link Secure</span>
+                            <span className="text-[6px] font-bold text-gray-600 uppercase tracking-tighter">Verified Clinical Profile</span>
+                         </div>
+                         <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+                      </div>
+                   </div>
+                </div>
             </div>
 
             <div className="space-y-4">
