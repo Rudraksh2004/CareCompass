@@ -1,11 +1,25 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import Link from "next/link"; // ✅ NEW (safe import)
+import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { getUserReminders } from "@/services/reminderService";
 import { getHealthLogs } from "@/services/healthService";
 import { getEmergencyProfile } from "@/services/emergencyService";
+import { 
+  Activity, 
+  AlertCircle, 
+  Clock, 
+  FileText, 
+  MessageSquare, 
+  Pill, 
+  Sparkles, 
+  TrendingUp, 
+  ShieldCheck,
+  Zap,
+  Microscope,
+  Box
+} from "lucide-react";
 
 interface Reminder {
   id: string;
@@ -15,7 +29,6 @@ interface Reminder {
   takenTimes?: string[];
 }
 
-// 🔒 Local date key (IST-safe & daily reset accurate)
 const getTodayKey = () => {
   const now = new Date();
   const year = now.getFullYear();
@@ -30,14 +43,7 @@ export default function DashboardPage() {
   const [reminderCount, setReminderCount] = useState(0);
   const [healthActive, setHealthActive] = useState(false);
   const [reminders, setReminders] = useState<Reminder[]>([]);
-  const [countdowns, setCountdowns] = useState<Record<string, string>>({});
-  const [aiSummary, setAiSummary] = useState("");
-  const [loadingSummary, setLoadingSummary] = useState(false);
   const [emergencyProfile, setEmergencyProfile] = useState<any>(null);
-
-  // 🧠 AI Health Summary (NEW - SAFE)
-  const [healthScore, setHealthScore] = useState<number | null>(null);
-  const [riskLevel, setRiskLevel] = useState("");
 
   useEffect(() => {
     const loadData = async () => {
@@ -61,33 +67,6 @@ export default function DashboardPage() {
     loadData();
   }, [user]);
 
-  // 🧠 Generate AI Health Summary
-  const generateAISummary = async () => {
-    if (!user) return;
-
-    setLoadingSummary(true);
-    setAiSummary("");
-
-    try {
-      const res = await fetch("/api/ai/health-summary", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ uid: user.uid }),
-      });
-
-      const data = await res.json();
-      setAiSummary(data.summary);
-    } catch (error) {
-      console.error("AI summary error:", error);
-      setAiSummary("Failed to generate summary.");
-    }
-
-    setLoadingSummary(false);
-  };
-
-  // 💊 NEW: Calculate today's adherence (SAFE - uses existing schema)
   const adherenceData = useMemo(() => {
     const today = getTodayKey();
     let totalDoses = 0;
@@ -96,288 +75,211 @@ export default function DashboardPage() {
     reminders.forEach((reminder) => {
       const times = reminder.times || [];
       const takenTimes = reminder.takenTimes || [];
-
       totalDoses += times.length;
-
       takenToday += takenTimes.filter((t) => t.startsWith(today)).length;
     });
 
-    const progressPercent =
-      totalDoses === 0 ? 0 : Math.round((takenToday / totalDoses) * 100);
+    const progressPercent = totalDoses === 0 ? 0 : Math.round((takenToday / totalDoses) * 100);
 
-    return {
-      totalDoses,
-      takenToday,
-      progressPercent,
-    };
-  }, [reminders]);
-
-  // ⏰ Countdown for upcoming doses (Dashboard Widget)
-  useEffect(() => {
-    const calculateCountdowns = () => {
-      const updated: Record<string, string> = {};
-
-      reminders.forEach((reminder) => {
-        reminder.times?.forEach((t) => {
-          const now = new Date();
-          const [h, m] = t.split(":").map(Number);
-
-          const nextDose = new Date();
-          nextDose.setHours(h, m, 0, 0);
-
-          if (nextDose.getTime() <= now.getTime()) {
-            nextDose.setDate(nextDose.getDate() + 1);
-          }
-
-          const diff = nextDose.getTime() - now.getTime();
-          const hours = Math.floor(diff / (1000 * 60 * 60));
-          const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-
-          updated[`${reminder.id}-${t}`] = `${hours}h ${minutes}m`;
-        });
-      });
-
-      setCountdowns(updated);
-    };
-
-    calculateCountdowns();
-    const interval = setInterval(calculateCountdowns, 60000);
-    return () => clearInterval(interval);
+    return { totalDoses, takenToday, progressPercent };
   }, [reminders]);
 
   return (
-    <div className="relative space-y-10">
-      {/* Floating background gradients */}
-      <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute top-[-200px] left-[-200px] w-[500px] h-[500px] bg-blue-500/10 blur-[140px] rounded-full" />
-        <div className="absolute bottom-[-200px] right-[-200px] w-[500px] h-[500px] bg-purple-500/10 blur-[140px] rounded-full" />
-      </div>
-
-      {/* 🌟 Welcome Header */}
-      <div className="relative overflow-hidden rounded-3xl border border-white/80 border-t-white border-l-white/90 dark:border-white/[0.05] dark:border-t-white/[0.15] dark:border-l-white/[0.1] bg-white/[0.7] dark:bg-[#030712]/40 backdrop-blur-[40px] backdrop-saturate-[2] p-10 shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_40px_rgba(0,0,0,0.4)] transition-all duration-500 hover:border-blue-400/80 dark:hover:border-blue-500/40 hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(59,130,246,0.1)] dark:hover:shadow-[0_20px_40px_rgba(59,130,246,0.2)]">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(59,130,246,0.18),_transparent_40%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,_rgba(16,185,129,0.15),_transparent_40%)]" />
-
-        <div className="relative z-10">
-          <h1 className="text-3xl font-black text-gray-900 dark:text-white tracking-tight drop-shadow-sm">
-            Welcome to CareCompass 🧭
-          </h1>
-
-          <p className="text-gray-700 dark:text-slate-400 mt-3 max-w-2xl leading-relaxed font-medium">
-            Your all-in-one health companion to manage reports, prescriptions,
-            health tracking, reminders, and clinical summaries in one secure
-            platform.
-          </p>
-        </div>
-      </div>
-
-      {/* 📊 Premium Stat Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="relative group overflow-hidden rounded-3xl border border-white/80 border-t-white border-l-white/90 dark:border-white/[0.05] dark:border-t-white/[0.12] dark:border-l-white/[0.08] bg-white/[0.65] dark:bg-[#030712]/40 backdrop-blur-[40px] backdrop-saturate-[2] p-7 shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_15px_35px_rgba(59,130,246,0.15)] dark:hover:shadow-[0_15px_35px_rgba(59,130,246,0.2)]">
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-400/5 to-transparent dark:from-blue-400/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-          <p className="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest relative z-10">Active Reminders</p>
-          <h2 className="text-4xl font-black text-gray-900 dark:text-white mt-3 drop-shadow-sm relative z-10">
-            {reminderCount}
-          </h2>
-          <p className="text-xs font-bold text-gray-400 dark:text-gray-500 mt-2 relative z-10">
-            Stay consistent with your medications
-          </p>
-        </div>
-
-        <div className="relative group overflow-hidden rounded-3xl border border-white/80 border-t-white border-l-white/90 dark:border-white/[0.05] dark:border-t-white/[0.12] dark:border-l-white/[0.08] bg-white/[0.65] dark:bg-[#030712]/40 backdrop-blur-[40px] backdrop-saturate-[2] p-7 shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_15px_35px_rgba(168,85,247,0.15)] dark:hover:shadow-[0_15px_35px_rgba(168,85,247,0.2)]">
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-400/5 to-transparent dark:from-purple-400/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-          <p className="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest relative z-10">Platform Features</p>
-          <h2 className="text-lg font-black text-gray-900 dark:text-white mt-3 leading-relaxed drop-shadow-sm relative z-10">
-            Reports • Prescriptions • Chat
-          </h2>
-          <p className="text-xs font-bold text-gray-400 dark:text-gray-500 mt-2 relative z-10">
-            Complete health companion toolkit
-          </p>
-        </div>
-
-        <div className="relative group overflow-hidden rounded-3xl border border-white/80 border-t-white border-l-white/90 dark:border-white/[0.05] dark:border-t-white/[0.12] dark:border-l-white/[0.08] bg-white/[0.65] dark:bg-[#030712]/40 backdrop-blur-[40px] backdrop-saturate-[2] p-7 shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_15px_35px_rgba(16,185,129,0.15)] dark:hover:shadow-[0_15px_35px_rgba(16,185,129,0.2)]">
-          <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/5 to-transparent dark:from-emerald-400/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-          <p className="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest relative z-10">Health Monitoring</p>
-          <h2 className="text-3xl font-black mt-3 text-emerald-600 dark:text-emerald-400 drop-shadow-sm relative z-10">
-            {healthActive ? "Active" : "Inactive"}
-          </h2>
-          <p className="text-xs font-bold text-gray-400 dark:text-gray-500 mt-2 relative z-10">
-            Tracking logs & health insights enabled
-          </p>
-        </div>
-      </div>
-
-      {/* 🚑 Emergency Card Widget */}
-      {emergencyProfile && (
-        <div className="relative overflow-hidden rounded-3xl border border-white/80 border-t-white border-l-white/90 dark:border-white/[0.05] dark:border-t-white/[0.15] dark:border-l-white/[0.1] bg-white/[0.7] dark:bg-[#030712]/40 backdrop-blur-[40px] backdrop-saturate-[2] p-10 shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_40px_rgba(0,0,0,0.4)] transition-all duration-500 hover:border-red-400/80 dark:hover:border-red-500/40 hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(239,68,68,0.15)] dark:hover:shadow-[0_20px_40px_rgba(239,68,68,0.25)]">
-          <div className="flex items-center justify-between flex-wrap gap-6">
-            <div>
-              <h3 className="text-2xl font-black text-gray-900 dark:text-white drop-shadow-sm">
-                🚑 Emergency Medical Card
-              </h3>
-
-              <p className="text-gray-700 dark:text-slate-400 text-sm font-medium mt-2 max-w-xl">
-                Quick access to your emergency medical information.
+    <div className="max-w-7xl mx-auto space-y-12 pb-20">
+      {/* 🎭 Cinematic Neural Header */}
+      <div className="relative group overflow-hidden rounded-[3rem] border border-white/80 dark:border-white/[0.05] bg-white/[0.4] dark:bg-[#030712]/40 backdrop-blur-[80px] p-12 transition-all duration-700 hover:shadow-[0_40px_80px_rgba(0,0,0,0.15)] dark:hover:shadow-[0_40px_80px_rgba(0,0,0,0.4)]">
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-500/10 blur-[130px] -mr-64 -mt-64 transition-all group-hover:bg-blue-500/20" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-emerald-500/10 blur-[120px] -ml-48 -mb-48" />
+        
+        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-12">
+          <div className="space-y-8">
+            <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 text-[10px] font-black uppercase tracking-[0.2em] animate-in fade-in slide-in-from-left-4 duration-1000">
+               <span className="w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse shadow-[0_0_12px_rgba(59,130,246,0.6)]" />
+               Clinical Matrix Operational
+            </div>
+            
+            <div className="space-y-4">
+              <h1 className="text-6xl lg:text-7xl font-black tracking-tighter leading-none bg-gradient-to-br from-gray-900 via-gray-700 to-gray-500 dark:from-white dark:via-gray-300 dark:to-gray-600 bg-clip-text text-transparent">
+                CareCompass <span className="text-blue-600 dark:text-blue-500">Core</span>
+              </h1>
+              <p className="text-gray-600 dark:text-gray-400 font-bold max-w-2xl text-xl leading-relaxed">
+                Synthesizing high-fidelity health vectors, pharmaceutical adherence, and neurological predictive diagnostics in real-time.
               </p>
-
-              <div className="flex flex-wrap gap-4 mt-5 text-sm font-bold">
-                <span className="px-4 py-2 rounded-xl bg-red-100 dark:bg-red-500/10 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-500/20 backdrop-blur shadow-sm">
-                  Blood Group: {emergencyProfile.bloodGroup || "-"}
-                </span>
-
-                <span className="px-4 py-2 rounded-xl bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-500/20 backdrop-blur shadow-sm">
-                  Contact: {emergencyProfile.contact || "-"}
-                </span>
-              </div>
             </div>
 
-            <Link
-              href="/dashboard/emergency"
-              className="inline-flex items-center justify-center bg-gradient-to-r from-red-600 to-pink-600 hover:opacity-90 transition text-white px-8 py-4 rounded-2xl font-bold shadow-[0_4px_16px_rgba(239,68,68,0.3)] hover:shadow-[0_4px_24px_rgba(239,68,68,0.4)] hover:scale-[1.04]"
-            >
-              View Emergency Card →
+            <div className="flex flex-wrap gap-4">
+               <Link href="/dashboard/chat" className="px-10 py-5 rounded-[2.2rem] bg-gray-900 dark:bg-white text-white dark:text-black font-black text-xs uppercase tracking-widest transition-all hover:scale-105 active:scale-95 shadow-2xl flex items-center gap-3">
+                 <Sparkles size={18} /> Inquiry AI
+               </Link>
+               <div className="px-8 py-5 rounded-[2.2rem] bg-white/40 dark:bg-white/5 border border-white/60 dark:border-white/[0.05] backdrop-blur-md flex items-center gap-3">
+                  <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">Secure Node Connected</span>
+               </div>
+            </div>
+          </div>
+          
+          <div className="hidden lg:block relative">
+             <div className="w-64 h-64 rounded-full border-2 border-dashed border-blue-500/20 animate-[spin_20s_linear_infinite] flex items-center justify-center">
+                <div className="w-48 h-48 rounded-full border-4 border-blue-500/10 flex items-center justify-center">
+                   <Zap size={48} className="text-blue-500 opacity-20" />
+                </div>
+             </div>
+             <div className="absolute inset-0 flex items-center justify-center">
+                <Box size={80} className="text-blue-600 dark:text-blue-400 animate-pulse" />
+             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 📊 High-Performance Metric Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {[
+          { label: "Active Doses", val: reminderCount, sub: "Remaining Today", color: "blue", icon: <Pill size={24} /> },
+          { label: "Sync Integrity", val: healthActive ? "ONLINE" : "OFFLINE", sub: "Data Flux Status", color: "emerald", icon: <TrendingUp size={24} /> },
+          { label: "Protocol Ready", val: "9/9", sub: "Modular Efficiency", color: "purple", icon: <ShieldCheck size={24} /> }
+        ].map((stat, i) => (
+          <div key={i} className="group relative overflow-hidden rounded-[3rem] border border-white/80 dark:border-white/[0.05] bg-white/[0.4] dark:bg-[#030712]/40 backdrop-blur-[60px] p-10 transition-all duration-500 hover:-translate-y-3 hover:shadow-[0_30px_60px_rgba(0,0,0,0.1)] dark:hover:shadow-[0_30px_60px_rgba(0,0,0,0.3)]">
+             <div className={`absolute -inset-1 bg-gradient-to-br from-${stat.color}-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
+             
+             <div className="flex items-center justify-between mb-8">
+                <div className={`w-14 h-14 rounded-2xl bg-${stat.color}-500/10 flex items-center justify-center text-${stat.color}-600 dark:text-${stat.color}-400 shadow-inner group-hover:scale-110 transition-transform duration-500`}>
+                  {stat.icon}
+                </div>
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">{stat.label}</p>
+             </div>
+             
+             <h2 className="text-6xl font-black text-gray-900 dark:text-white tracking-tighter mb-4">{stat.val}</h2>
+             <span className="text-[11px] font-black text-gray-500 dark:text-gray-500 uppercase tracking-widest leading-none">{stat.sub}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* 🚑 Emergency Critical Path */}
+      {emergencyProfile && (
+        <div className="relative group overflow-hidden rounded-[3.5rem] bg-gradient-to-br from-red-600 to-rose-700 transition-all duration-700 hover:shadow-[0_40px_80px_rgba(239,68,68,0.3)]">
+          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none" />
+          <div className="relative z-10 p-12 flex flex-col lg:flex-row lg:items-center justify-between gap-12">
+            <div className="space-y-6">
+               <div className="flex items-center gap-4">
+                  <div className="w-16 h-16 rounded-[2rem] bg-white flex items-center justify-center text-red-600 shadow-2xl">
+                    <AlertCircle size={32} strokeWidth={2.5} />
+                  </div>
+                  <div>
+                    <h3 className="text-4xl font-black text-white tracking-tighter uppercase leading-none mb-1">Emergency Protocol</h3>
+                    <p className="text-red-100/60 text-sm font-bold tracking-widest uppercase">Verified Medical ID: {user?.uid?.slice(0, 10).toUpperCase()}</p>
+                  </div>
+               </div>
+               
+               <div className="flex flex-wrap gap-4">
+                  <div className="px-8 py-4 rounded-2xl bg-black/20 border border-white/10 backdrop-blur-md">
+                     <p className="text-[9px] font-black uppercase tracking-widest text-red-200/50 mb-1">Blood Registry</p>
+                     <span className="text-xl font-black text-white">{emergencyProfile.bloodGroup || "SYS-PEND"}</span>
+                  </div>
+                  <div className="px-8 py-4 rounded-2xl bg-black/20 border border-white/10 backdrop-blur-md">
+                     <p className="text-[9px] font-black uppercase tracking-widest text-red-200/50 mb-1">Contact Sync</p>
+                     <span className="text-xl font-black text-white">{emergencyProfile.contact || "NO-LINK"}</span>
+                  </div>
+               </div>
+            </div>
+
+            <Link href="/dashboard/emergency" className="w-full lg:w-auto px-14 py-6 rounded-[2.5rem] bg-white text-red-600 font-black text-sm uppercase tracking-widest transition-all hover:scale-105 active:scale-95 shadow-2xl">
+               Access Vault
             </Link>
           </div>
         </div>
       )}
 
-      {/* 🧠 Disease Predictor */}
-      <div className="relative overflow-hidden rounded-3xl border border-white/80 border-t-white border-l-white/90 dark:border-white/[0.05] dark:border-t-white/[0.15] dark:border-l-white/[0.1] bg-white/[0.7] dark:bg-[#030712]/40 backdrop-blur-[40px] backdrop-saturate-[2] p-10 shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_40px_rgba(0,0,0,0.4)] transition-all duration-500 hover:border-purple-400/80 dark:hover:border-purple-500/40 hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(168,85,247,0.1)] dark:hover:shadow-[0_20px_40px_rgba(168,85,247,0.2)]">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(168,85,247,0.18),_transparent_40%)]" />
+      {/* 🧠 Predictive Analysis Overlay */}
+      <div className="relative group overflow-hidden rounded-[3.5rem] border border-white/80 dark:border-white/[0.05] bg-white/[0.4] dark:bg-[#030712]/40 backdrop-blur-[80px] p-12 transition-all duration-700 hover:shadow-2xl">
+        <div className="absolute top-0 right-0 w-[500px] h-full bg-indigo-500/5 blur-[100px] pointer-events-none" />
+        
+        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-12">
+           <div className="space-y-6">
+              <div className="flex items-center gap-4">
+                 <div className="w-16 h-16 rounded-[2rem] bg-indigo-600 flex items-center justify-center text-white shadow-xl shadow-indigo-600/30">
+                   <Activity size={32} />
+                 </div>
+                 <h3 className="text-4xl font-black text-gray-900 dark:text-white tracking-tighter uppercase leading-none">AI Diagnosis</h3>
+              </div>
+              <p className="text-gray-600 dark:text-gray-400 font-bold max-w-xl text-xl leading-relaxed">
+                Advanced bio-marker extraction with regional synchronization and multi-vector diagnostic synthesis.
+              </p>
+           </div>
 
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-          <div>
-            <h3 className="text-2xl font-black text-gray-900 dark:text-white drop-shadow-sm">
-              🧠 AI Disease Predictor
-            </h3>
-
-            <p className="text-gray-700 dark:text-slate-400 text-sm font-medium mt-2 max-w-xl leading-relaxed">
-              Analyze symptoms using hybrid AI, clinical logic, and
-              location-aware insights with optional medical Q&A.
-            </p>
-          </div>
-
-          <Link
-            href="/dashboard/disease-predictor"
-            className="inline-flex items-center justify-center bg-gradient-to-r from-purple-600 to-blue-600 hover:opacity-90 transition text-white px-8 py-4 rounded-2xl font-bold shadow-[0_4px_16px_rgba(168,85,247,0.3)] hover:shadow-[0_4px_24px_rgba(168,85,247,0.4)] hover:scale-[1.04]"
-          >
-            🧠 Start Analysis →
-          </Link>
+           <Link href="/dashboard/disease-predictor" className="w-full lg:w-auto px-14 py-6 rounded-[2.5rem] bg-indigo-600 text-white font-black text-sm uppercase tracking-widest transition-all hover:scale-105 active:scale-95 shadow-2xl shadow-indigo-600/30">
+              Initiate Scan
+           </Link>
         </div>
       </div>
 
-      {/* 💊 Adherence Widget */}
-      <div className="relative overflow-hidden rounded-3xl border border-white/80 border-t-white border-l-white/90 dark:border-white/[0.05] dark:border-t-white/[0.15] dark:border-l-white/[0.1] bg-white/[0.7] dark:bg-[#030712]/40 backdrop-blur-[40px] backdrop-saturate-[2] p-10 shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_40px_rgba(0,0,0,0.4)] transition-all duration-500 hover:border-emerald-400/80 dark:hover:border-emerald-500/40 hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(16,185,129,0.1)] dark:hover:shadow-[0_20px_40px_rgba(16,185,129,0.2)]">
-        <p className="text-sm font-bold text-gray-600 dark:text-slate-400 uppercase tracking-widest">Today’s Medication Adherence</p>
+      {/* 💊 Bio-Pharmaceutical Adherence */}
+      <div className="relative group overflow-hidden rounded-[3.5rem] border border-white/80 dark:border-white/[0.05] bg-white/[0.4] dark:bg-[#030712]/40 backdrop-blur-[80px] p-14 transition-all duration-700 hover:shadow-2xl">
+        <div className="absolute -left-32 -top-32 w-80 h-80 bg-emerald-500/10 blur-[120px] pointer-events-none group-hover:bg-emerald-500/20 transition-colors" />
+        
+        <div className="relative z-10 space-y-12">
+           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+              <div className="space-y-3">
+                 <p className="text-[11px] font-black uppercase tracking-[0.3em] text-gray-500">Biological Adherence</p>
+                 <h3 className="text-5xl font-black text-gray-900 dark:text-white tracking-tighter uppercase leading-none">Molecular Integrity</h3>
+              </div>
+              <div className="text-right">
+                 <span className="text-8xl font-black text-emerald-600 dark:text-emerald-500 tracking-tighter drop-shadow-2xl leading-none">
+                   {adherenceData.progressPercent}%
+                 </span>
+              </div>
+           </div>
 
-        <div className="mt-4 flex items-center justify-between">
-          <div>
-            <h2 className="text-3xl font-black text-gray-900 dark:text-white drop-shadow-sm">
-              {adherenceData.takenToday} / {adherenceData.totalDoses}
-            </h2>
-            <p className="text-xs font-bold text-gray-500 dark:text-slate-500 mt-1 uppercase tracking-wide">Doses taken today</p>
-          </div>
+           <div className="relative w-full h-6 bg-gray-200 dark:bg-black/40 rounded-full overflow-hidden shadow-inner">
+              <div 
+                className="absolute top-0 left-0 h-full bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-500 transition-all duration-1000 shadow-[0_0_25px_rgba(16,185,129,0.5)]" 
+                style={{ width: `${adherenceData.progressPercent}%` }} 
+              />
+              <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none" />
+           </div>
 
-          <div className="text-right">
-            <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400 drop-shadow-sm">
-              {adherenceData.progressPercent}%
-            </p>
-            <p className="text-xs font-bold text-gray-500 dark:text-slate-500 uppercase tracking-wide">Daily consistency</p>
-          </div>
-        </div>
-
-        <div className="mt-5 w-full bg-gray-200 dark:bg-white/10 rounded-full h-3 overflow-hidden shadow-inner">
-          <div
-            className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"
-            style={{
-              width: `${adherenceData.progressPercent}%`,
-            }}
-          />
+           <div className="flex flex-wrap items-center justify-between gap-6 pt-4 border-t border-gray-200 dark:border-white/[0.05]">
+              <div className="flex items-center gap-4">
+                 <div className="px-6 py-3 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-black tracking-widest uppercase">
+                   Sync: {adherenceData.takenToday} / {adherenceData.totalDoses} Doses
+                 </div>
+                 <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Active Pharmacological Node</span>
+              </div>
+              <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest animate-pulse">Efficiency Optimal</p>
+           </div>
         </div>
       </div>
 
-      {/* Capabilities */}
-      <div className="relative overflow-hidden rounded-3xl border border-white/80 border-t-white border-l-white/90 dark:border-white/[0.05] dark:border-t-white/[0.15] dark:border-l-white/[0.1] bg-white/[0.7] dark:bg-[#030712]/40 backdrop-blur-[40px] backdrop-saturate-[2] p-10 shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_40px_rgba(0,0,0,0.4)]">
-        <h3 className="text-2xl font-black text-gray-900 dark:text-white mb-2 drop-shadow-sm">
-          CareCompass Capabilities
-        </h3>
+      {/* 🛠️ Multi-Vector Core Modules */}
+      <div className="space-y-12">
+        <div className="flex items-center gap-8 px-6">
+           <h3 className="text-[13px] font-black text-gray-400 uppercase tracking-[0.4em] leading-none whitespace-nowrap">Core Operatives</h3>
+           <div className="h-px w-full bg-gradient-to-r from-gray-200 via-transparent to-transparent dark:from-white/10 dark:via-transparent dark:to-transparent" />
+        </div>
 
-        <p className="text-gray-700 dark:text-slate-400 font-medium text-sm mb-8">
-          Explore the core features designed to simplify your health management.
-        </p>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <FeatureCard
-            icon="📄"
-            title="Medical Report Explainer"
-            desc="Understand complex medical reports in simple language"
-          />
-          <FeatureCard
-            icon="💊"
-            title="Prescription Simplifier"
-            desc="Supports image, PDF and handwritten prescriptions"
-          />
-          <FeatureCard
-            icon="📊"
-            title="Health Tracking & Trend Detection"
-            desc="Track weight, sugar & health metrics over time"
-          />
-          <FeatureCard
-            icon="🤖"
-            title="Health Assistant Chat"
-            desc="Conversational support for health queries"
-          />
-          <FeatureCard
-            icon="⏰"
-            title="Smart Medicine Reminders"
-            desc="Never miss your medication schedule"
-          />
-          <FeatureCard
-            icon="🧪"
-            title="Medicine Describer"
-            desc="Get AI explanation of medicines, usage, and side effects"
-          />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {[
+            { icon: <FileText size={28} />, title: "Report Explainer", desc: "Neuro-linguistic analysis of reports.", route: "/dashboard/report", color: "blue" },
+            { icon: <Pill size={28} />, title: "Prescription Sync", desc: "Handwriting & digital ciphering.", route: "/dashboard/prescription", color: "emerald" },
+            { icon: <TrendingUp size={28} />, title: "Bio-Tracker", desc: "Longitudinal health vector monitoring.", route: "/dashboard/health", color: "purple" },
+            { icon: <MessageSquare size={28} />, title: "Clinical Chat", desc: "Neural bio-core consultation.", route: "/dashboard/chat", color: "indigo" },
+            { icon: <Clock size={28} />, title: "Medicine Matrix", desc: "Pulse scheduling Node.", route: "/dashboard/reminders", color: "rose" },
+            { icon: <Microscope size={28} />, title: "Bio-Catalog", desc: "Deep pharmaceutical ledger.", route: "/dashboard/medicine", color: "amber" }
+          ].map((feature, i) => (
+            <Link key={i} href={feature.route} className="group relative overflow-hidden rounded-[3rem] border border-white/80 dark:border-white/[0.05] bg-white/[0.4] dark:bg-[#030712]/40 backdrop-blur-[60px] p-10 transition-all duration-500 hover:-translate-y-4 hover:shadow-2xl">
+               <div className={`absolute -inset-1 bg-gradient-to-br from-${feature.color}-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
+               <div className="flex flex-col gap-8 relative z-10">
+                  <div className={`w-16 h-16 rounded-[1.8rem] bg-${feature.color}-500/10 flex items-center justify-center text-${feature.color}-600 dark:text-${feature.color}-400 group-hover:scale-110 transition-transform duration-500 shadow-inner`}>
+                    {feature.icon}
+                  </div>
+                  <div className="space-y-3">
+                    <p className="text-2xl font-black text-gray-900 dark:text-white tracking-tighter leading-none mb-2">{feature.title}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed font-bold opacity-80">{feature.desc}</p>
+                  </div>
+               </div>
+            </Link>
+          ))}
         </div>
       </div>
     </div>
-  );
-}
-
-function FeatureCard({
-  icon,
-  title,
-  desc,
-}: {
-  icon: string;
-  title: string;
-  desc: string;
-}) {
-  const getRoute = (title: string) => {
-    if (title.includes("Report")) return "/dashboard/report";
-    if (title.includes("Prescription")) return "/dashboard/prescription";
-    if (title.includes("Tracking")) return "/dashboard/health";
-    if (title.includes("Chat")) return "/dashboard/chat";
-    if (title.includes("Reminders")) return "/dashboard/reminders";
-    if (title.includes("Medicine")) return "/dashboard/medicine";
-    return "/dashboard";
-  };
-
-  const route = getRoute(title);
-
-  return (
-    <Link href={route}>
-      <div className="group cursor-pointer bg-white/50 dark:bg-white/[0.02] border border-white/80 border-t-white border-l-white/90 dark:border-white/[0.06] dark:border-t-white/[0.15] dark:border-l-white/[0.1] rounded-2xl p-5 backdrop-blur-[20px] backdrop-saturate-[1.5] transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_15px_30px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_15px_30px_rgba(0,0,0,0.4)] hover:bg-white/80 dark:hover:bg-white/[0.08] hover:border-blue-400/60 dark:hover:border-blue-500/40 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-400/0 to-transparent group-hover:from-blue-400/5 transition-opacity duration-500" />
-        <div className="flex items-start gap-4 relative z-10">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-white to-gray-50 dark:from-white/10 dark:to-white/5 flex items-center justify-center text-xl shadow-[0_4px_10px_rgba(0,0,0,0.03)] dark:shadow-none border border-white/80 dark:border-white/[0.1] group-hover:scale-110 transition-transform duration-500">
-            {icon}
-          </div>
-          <div>
-            <p className="font-bold text-gray-900 dark:text-white drop-shadow-sm group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors duration-300">{title}</p>
-            <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">{desc}</p>
-          </div>
-        </div>
-      </div>
-    </Link>
   );
 }
