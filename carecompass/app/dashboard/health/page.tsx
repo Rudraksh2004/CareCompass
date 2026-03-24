@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo, useRef } from "react";
+import { useEffect, useState, useMemo, useRef, Suspense } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { addHealthLog, getHealthLogs } from "@/services/healthService";
 import { getUserProfile } from "@/services/userService";
@@ -16,16 +16,42 @@ import {
 import AIReportCard from "@/components/AIReportCard";
 import * as htmlToImage from "html-to-image";
 import { exportMedicalPDF } from "@/utils/pdfExporter";
+import { 
+  Activity, 
+  TrendingUp, 
+  BrainCircuit, 
+  Download, 
+  Plus, 
+  Search, 
+  ChevronRight, 
+  Heart, 
+  Droplet, 
+  Scale, 
+  Zap,
+  ShieldCheck,
+  Stethoscope,
+  BarChart4,
+  Info,
+  History
+} from "lucide-react";
 
 const METRIC_OPTIONS = [
-  { value: "weight", label: "Weight (kg)" },
-  { value: "blood_sugar", label: "Blood Sugar (mg/dL)" },
-  { value: "blood_pressure", label: "Blood Pressure" },
-  { value: "heart_rate", label: "Heart Rate (BPM)" },
-  { value: "custom", label: "Custom Metric" },
+  { value: "weight", label: "Weight", unit: "kg", icon: Scale, color: "blue" },
+  { value: "blood_sugar", label: "Blood Sugar", unit: "mg/dL", icon: Droplet, color: "red" },
+  { value: "blood_pressure", label: "Blood Pressure", unit: "mmHg", icon: Activity, color: "emerald" },
+  { value: "heart_rate", label: "Heart Rate", unit: "BPM", icon: Heart, color: "rose" },
+  { value: "custom", label: "Custom Metric", unit: "", icon: Plus, color: "purple" },
 ];
 
 export default function HealthPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center p-20 animate-pulse text-blue-500 font-black text-xl">SYNCING BIOMETRIC CORES...</div>}>
+      <HealthContent />
+    </Suspense>
+  );
+}
+
+function HealthContent() {
   const { user } = useAuth();
 
   const [type, setType] = useState("weight");
@@ -44,19 +70,17 @@ export default function HealthPage() {
   const chartRef = useRef<HTMLDivElement>(null);
 
   const effectiveType = type === "custom" ? customMetric : type;
+  const currentMetric = METRIC_OPTIONS.find(m => m.value === type) || METRIC_OPTIONS[4];
 
   const loadLogs = async () => {
     if (!user || !effectiveType) return;
-
     const data = await getHealthLogs(user.uid, effectiveType);
     setRawLogs(data);
-
-    setLogs(
-      data.map((log: any, index: number) => ({
-        name: `Entry ${index + 1}`,
-        value: Number(log.value),
-      }))
-    );
+    setLogs(data.map((log: any, index: number) => ({
+      name: `Entry ${index + 1}`,
+      value: Number(log.value),
+      date: log.createdAt?.seconds ? new Date(log.createdAt.seconds * 1000).toLocaleDateString() : `Entry ${index + 1}`
+    })));
   };
 
   useEffect(() => {
@@ -68,7 +92,6 @@ export default function HealthPage() {
 
   const handleAdd = async () => {
     if (!user || !value || !effectiveType) return;
-
     await addHealthLog(user.uid, effectiveType, value);
     setValue("");
     loadLogs();
@@ -76,302 +99,341 @@ export default function HealthPage() {
 
   const generateInsight = async () => {
     if (rawLogs.length === 0) return;
-
     setLoadingInsight(true);
     setInsight("");
-
     try {
       const res = await fetch("/api/ai/health-insight", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ logs: rawLogs, type: effectiveType }),
       });
-
       const data = await res.json();
       setInsight(data.insight || "No insight generated.");
     } catch (error) {
-      console.error(error);
       setInsight("Failed to generate insight.");
     }
-
     setLoadingInsight(false);
   };
 
   const detectTrend = async () => {
-    if (rawLogs.length < 2) {
-      alert("Add at least 2 logs for trend detection.");
-      return;
-    }
-
+    if (rawLogs.length < 2) return;
     setLoadingTrend(true);
     setTrendAnalysis("");
-
     try {
       const res = await fetch("/api/ai/trend-detection", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          logs: rawLogs,
-          type: effectiveType,
-          profile,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ logs: rawLogs, type: effectiveType, profile }),
       });
-
       const data = await res.json();
       setTrendAnalysis(data.analysis || "No trend analysis generated.");
     } catch (error) {
-      console.error(error);
       setTrendAnalysis("Trend detection failed.");
     }
-
     setLoadingTrend(false);
-  };
-
-  const formatHealthLogsForReport = () => {
-    if (!rawLogs || rawLogs.length === 0) return "No health logs available.";
-
-    return rawLogs
-      .map((log: any, index: number) => {
-        const date = log.createdAt?.seconds
-          ? new Date(log.createdAt.seconds * 1000).toLocaleDateString()
-          : `Entry ${index + 1}`;
-
-        return `Entry ${index + 1} (${date}): ${log.value}`;
-      })
-      .join("\n");
   };
 
   const downloadFullAIReport = async () => {
     if (!chartRef.current || rawLogs.length === 0) return;
-
     setExportingPDF(true);
-
     try {
       const isDark = document.documentElement.classList.contains("dark");
       const chartImage = await htmlToImage.toPng(chartRef.current, {
         cacheBust: true,
-        backgroundColor: isDark ? "#0f172a" : "#ffffff", // Deep slate for dark mode PDF capturing
-        style: { borderRadius: "0px" }, // Prevent visual rounded clipping artifacts in PDF
+        backgroundColor: isDark ? "#030712" : "#ffffff",
+        style: { borderRadius: "0px" },
       });
-
-      const formattedLogs = formatHealthLogsForReport();
-
-      const combinedAIReport = `
-AI Health Insight:
-${insight || "No insight generated."}
-
-AI Trend Detection:
-${trendAnalysis || "No trend analysis generated."}
-      `;
-
-      await exportMedicalPDF(
-        `AI Health Trend Report (${effectiveType.toUpperCase()})`,
-        formattedLogs,
-        combinedAIReport,
-        chartImage
-      );
+      const formattedLogs = rawLogs.map((log: any, index: number) => {
+        const date = log.createdAt?.seconds ? new Date(log.createdAt.seconds * 1000).toLocaleDateString() : `Entry ${index + 1}`;
+        return `Entry ${index + 1} (${date}): ${log.value}`;
+      }).join("\n");
+      const combinedAIReport = `AI Health Insight:\n${insight || "No insight generated."}\n\nAI Trend Detection:\n${trendAnalysis || "No trend analysis generated."}`;
+      await exportMedicalPDF(`AI Health Trend Report (${effectiveType.toUpperCase()})`, formattedLogs, combinedAIReport, chartImage);
     } catch (error) {
-      console.error("PDF Export Error:", error);
       alert("Failed to export PDF.");
     }
-
     setExportingPDF(false);
   };
 
   const processedChartData = useMemo(() => {
     if (!logs || logs.length === 0) return [];
-
     return logs.map((point, index) => {
       if (index === 0) return { ...point, status: "normal" };
-
       const prev = logs[index - 1].value;
       const current = point.value;
       const change = Math.abs(current - prev);
       const percentChange = (change / prev) * 100;
-
       let status = "normal";
       if (percentChange >= 8) status = "abnormal";
       else if (percentChange >= 4) status = "warning";
-
       return { ...point, status };
     });
   }, [logs]);
 
   return (
-    <div className="max-w-6xl mx-auto space-y-10 text-gray-900 dark:text-gray-100">
-      {/* 🌟 Premium Header */}
-      <div className="relative overflow-hidden rounded-3xl border border-white/80 border-t-white border-l-white/90 dark:border-white/[0.05] dark:border-t-white/[0.15] dark:border-l-white/[0.1] bg-white/[0.5] dark:bg-[#030712]/30 backdrop-blur-[40px] backdrop-saturate-[2] p-10 shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_40px_rgba(0,0,0,0.4)] transition-all duration-500">
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-600/10 via-blue-600/5 to-emerald-600/10 dark:from-indigo-500/10 dark:via-blue-500/5 dark:to-emerald-500/10 pointer-events-none" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(99,102,241,0.15),_transparent_40%)]" />
-        <div className="relative z-10">
-          <h1 className="text-4xl font-black bg-gradient-to-r from-indigo-600 to-emerald-500 dark:from-indigo-400 dark:to-emerald-400 bg-clip-text text-transparent drop-shadow-sm">
-            📊 AI Health Tracking & Clinical Trends
-          </h1>
-          <p className="text-gray-700 dark:text-gray-300 font-bold mt-4 text-sm max-w-2xl leading-relaxed">
-            Track multiple health metrics with predictive CareCompass AI insights and trend analysis.
-          </p>
-        </div>
-      </div>
-
-      {/* ➕ Add Log Card (Liquid Glass Style) */}
-      <div className="relative border border-white/80 border-t-white border-l-white/90 dark:border-white/[0.05] dark:border-t-white/[0.15] dark:border-l-white/[0.1] bg-white/[0.65] dark:bg-[#030712]/40 backdrop-blur-[40px] backdrop-saturate-[2] p-8 rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_40px_rgba(0,0,0,0.4)] transition-all duration-500">
-        <h2 className="text-2xl font-black text-gray-900 dark:text-white drop-shadow-sm mb-6">Record New Metric</h2>
-
-        <div className="grid md:grid-cols-3 gap-5">
-          <select
-            className="w-full border border-white/60 dark:border-white/[0.1] bg-white/40 dark:bg-black/20 backdrop-blur-md px-5 py-3.5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition text-sm font-black text-gray-800 dark:text-gray-200 shadow-inner appearance-none cursor-pointer"
-            value={type}
-            onChange={(e) => setType(e.target.value)}
-          >
-            {METRIC_OPTIONS.map((metric) => (
-              <option key={metric.value} value={metric.value} className="text-gray-900 font-bold bg-white dark:bg-gray-800">
-                {metric.label}
-              </option>
-            ))}
-          </select>
-
-          {type === "custom" && (
-            <input
-              type="text"
-              placeholder="Enter custom metric"
-              className="w-full border border-white/60 dark:border-white/[0.1] bg-white/40 dark:bg-black/20 backdrop-blur-md px-5 py-3.5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition text-sm font-bold text-gray-800 dark:text-gray-200 shadow-inner placeholder-gray-500"
-              value={customMetric}
-              onChange={(e) => setCustomMetric(e.target.value)}
-            />
-          )}
-
-          <input
-            type="number"
-            placeholder="Enter value"
-            className="w-full border border-white/60 dark:border-white/[0.1] bg-white/40 dark:bg-black/20 backdrop-blur-md px-5 py-3.5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition text-sm font-bold text-gray-800 dark:text-gray-200 shadow-inner placeholder-gray-500"
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleAdd()}
-          />
-        </div>
-
-        <button
-          onClick={handleAdd}
-          className="mt-6 bg-gradient-to-r from-indigo-600 to-purple-600 hover:scale-[1.02] hover:shadow-[0_4px_20px_rgba(99,102,241,0.4)] transition text-white px-8 py-3.5 rounded-2xl font-black shadow-lg"
-        >
-          ➕ Add Health Log
-        </button>
-      </div>
-
-      {/* 📈 PREMIUM CHART */}
-      <div className="relative border border-white/80 border-t-white border-l-white/90 dark:border-white/[0.05] dark:border-t-white/[0.15] dark:border-l-white/[0.1] bg-white/[0.65] dark:bg-[#030712]/40 backdrop-blur-[40px] backdrop-saturate-[2] p-8 rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_40px_rgba(0,0,0,0.4)]">
-        <div className="flex items-center justify-between mb-8">
-          <h2 className="text-2xl font-black text-gray-900 dark:text-white drop-shadow-sm flex items-center gap-3">
-            📈 <span className="bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent">AI-Aware Trend Graph</span>
-          </h2>
-        </div>
-
-        {logs.length === 0 ? (
-          <div className="flex items-center justify-center p-12 border-2 border-dashed border-gray-300 rounded-2xl dark:border-gray-800">
-            <p className="text-gray-500 font-bold">No health tracking data available yet. Add logs above.</p>
+    <div className="max-w-7xl mx-auto space-y-12 pb-20">
+      {/* 🔮 Clinical Power Header */}
+      <div className="relative group overflow-hidden rounded-[2.5rem] border border-white/80 dark:border-white/[0.05] bg-white/[0.4] dark:bg-[#030712]/30 backdrop-blur-[60px] p-12 transition-all duration-700 hover:shadow-2xl">
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-br from-indigo-600/20 to-emerald-500/10 blur-[130px] -mr-64 -mt-64 transition-all group-hover:scale-110" />
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-10">
+          <div className="space-y-4">
+            <div className="flex items-center gap-4">
+              <div className="p-4 rounded-[1.5rem] bg-gradient-to-br from-indigo-600 to-emerald-500 text-white shadow-xl shadow-indigo-500/20">
+                <Activity size={32} strokeWidth={2.5} />
+              </div>
+              <h1 className="text-5xl font-black tracking-tighter bg-gradient-to-r from-gray-900 via-gray-700 to-gray-400 dark:from-white dark:via-gray-300 dark:to-gray-500 bg-clip-text text-transparent">
+                Biometric Lab
+              </h1>
+            </div>
+            <p className="text-gray-600 dark:text-gray-400 font-bold max-w-xl text-lg leading-relaxed">
+              Clinical telemetry and behavioral trend synchronization. Analyze physiological variability through predictive AI modeling.
+            </p>
           </div>
-        ) : (
-          <div ref={chartRef} className="w-full h-[360px] bg-gradient-to-br from-white to-gray-50 dark:from-[#0f172a] dark:to-[#020617] rounded-2xl p-6 border border-gray-200 dark:border-white/[0.05] shadow-inner relative overflow-hidden">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={processedChartData} margin={{ top: 15, right: 15, left: -15, bottom: 5 }}>
-                <defs>
-                  <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#6366f1" stopOpacity={0.35}/>
-                    <stop offset="95%" stopColor="#6366f1" stopOpacity={0.0}/>
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="4 4" opacity={0.15} vertical={false} stroke="#64748b" />
-                <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fill: "#64748b", fontWeight: 'bold', fontSize: 12 }} dy={10} />
-                <YAxis tickLine={false} axisLine={false} tick={{ fill: "#64748b", fontWeight: 'bold', fontSize: 12 }} dx={-10} />
-                <Tooltip
-                  contentStyle={{
-                    borderRadius: "16px",
-                    border: "1px solid rgba(255,255,255,0.2)",
-                    backgroundColor: "rgba(255,255,255,0.9)",
-                    backdropFilter: "blur(12px)",
-                    fontWeight: 'bold',
-                    color: '#1e293b',
-                    boxShadow: "0 8px 30px rgba(0,0,0,0.12)",
-                    padding: "12px 16px"
-                  }}
-                  itemStyle={{ color: '#4f46e5' }}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="value"
-                  stroke="#4f46e5"
-                  strokeWidth={4}
-                  fillOpacity={1}
-                  fill="url(#colorValue)"
-                  animationDuration={1500}
-                  dot={({ cx, cy, payload }: any) => {
-                    const color =
-                      payload.status === "abnormal"
-                        ? "#ef4444"
-                        : payload.status === "warning"
-                        ? "#f59e0b"
-                        : "#4f46e5";
-
-                    return (
-                      <circle
-                        cx={cx}
-                        cy={cy}
-                        r={6.5}
-                        fill={color}
-                        stroke="#ffffff"
-                        strokeWidth={2.5}
-                        style={{ filter: "drop-shadow(0px 2px 4px rgba(0,0,0,0.3))" }}
-                      />
-                    );
-                  }}
-                  activeDot={{ r: 8, stroke: "#ffffff", strokeWidth: 3, fill: "#4f46e5", style: { filter: "drop-shadow(0 0 10px rgba(99,102,241,0.8))" } }}
-                />
-              </AreaChart>
-            </ResponsiveContainer>
+          
+          <div className="flex flex-wrap gap-4">
+             <div className="px-8 py-5 rounded-[2rem] bg-indigo-500/10 border border-indigo-500/20 backdrop-blur-md flex flex-col items-center group/pill transition-all hover:bg-indigo-500/20 cursor-default">
+                <Zap className="text-indigo-500 mb-2 group-hover/pill:scale-125 transition-transform" size={20} />
+                <span className="text-[10px] font-black uppercase tracking-widest text-indigo-500">Telemetry Sync</span>
+                <span className="text-xl font-black mt-1">REAL-TIME</span>
+             </div>
           </div>
-        )}
+        </div>
       </div>
 
-      {/* 🔥 AI ACTIONS (GLASS PILLS) */}
-      <div className="flex flex-wrap gap-4">
-        <button
-          onClick={generateInsight}
-          disabled={loadingInsight || rawLogs.length === 0}
-          className="bg-emerald-500/90 dark:bg-emerald-500/20 text-white dark:text-emerald-300 border border-emerald-400 dark:border-emerald-500/30 hover:bg-emerald-500 dark:hover:bg-emerald-500/40 backdrop-blur-md px-6 py-3.5 rounded-2xl font-black shadow-[0_4px_16px_rgba(16,185,129,0.3)] hover:shadow-[0_4px_24px_rgba(16,185,129,0.4)] disabled:opacity-50 transition-all hover:-translate-y-1"
-        >
-          {loadingInsight ? "Analyzing Engine..." : "🧠 Generate AI Insight"}
-        </button>
+      <div className="grid lg:grid-cols-4 gap-12">
+        {/* 📋 Telemetry Injection (Add Log) */}
+        <div className="lg:col-span-1 space-y-8">
+          <div className="relative group overflow-hidden rounded-[3rem] border border-white/60 dark:border-white/[0.05] bg-white/[0.3] dark:bg-[#030712]/30 backdrop-blur-[60px] p-8 shadow-xl transition-all">
+            <div className="relative z-10 space-y-8">
+              <div className="flex items-center gap-3">
+                <BrainCircuit className="text-indigo-500" size={24} />
+                <h2 className="text-2xl font-black tracking-tighter">Metric Ingress</h2>
+              </div>
 
-        <button
-          onClick={detectTrend}
-          disabled={loadingTrend || rawLogs.length < 2}
-          className="bg-indigo-500/90 dark:bg-indigo-500/20 text-white dark:text-indigo-300 border border-indigo-400 dark:border-indigo-500/30 hover:bg-indigo-500 dark:hover:bg-indigo-500/40 backdrop-blur-md px-6 py-3.5 rounded-2xl font-black shadow-[0_4px_16px_rgba(99,102,241,0.3)] hover:shadow-[0_4px_24px_rgba(99,102,241,0.4)] disabled:opacity-50 transition-all hover:-translate-y-1"
-        >
-          {loadingTrend ? "Scanning Series..." : "📈 Detect AI Trend"}
-        </button>
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Modality Select</label>
+                  <div className="grid grid-cols-2 gap-2">
+                     {METRIC_OPTIONS.slice(0, 4).map((m) => (
+                        <button
+                          key={m.value}
+                          onClick={() => setType(m.value)}
+                          className={`p-4 rounded-2xl flex flex-col items-center gap-2 transition-all border ${type === m.value ? "bg-indigo-600 text-white border-transparent shadow-lg" : "bg-white/40 dark:bg-white/5 border-white/60 dark:border-white/10 text-gray-400 hover:bg-white dark:hover:bg-white/10"}`}
+                        >
+                           <m.icon size={20} />
+                           <span className="text-[10px] font-black uppercase">{m.label}</span>
+                        </button>
+                     ))}
+                  </div>
+                  <button
+                    onClick={() => setType("custom")}
+                    className={`w-full mt-2 py-3 rounded-2xl border text-[10px] font-black uppercase tracking-widest transition-all ${type === "custom" ? "bg-purple-600 text-white border-transparent outline-none" : "bg-white/40 dark:bg-white/5 border-white/60 dark:border-white/10 text-gray-400 hover:bg-white dark:hover:bg-white/10"}`}
+                  >
+                    + Custom Modality
+                  </button>
+                </div>
 
-        <button
-          onClick={downloadFullAIReport}
-          disabled={exportingPDF || rawLogs.length === 0}
-          className="bg-gray-800/90 dark:bg-white/10 text-white border border-gray-600 dark:border-white/20 hover:bg-gray-900 dark:hover:bg-white/20 backdrop-blur-md px-6 py-3.5 rounded-2xl font-black shadow-[0_4px_16px_rgba(0,0,0,0.2)] disabled:opacity-50 transition-all hover:-translate-y-1"
-        >
-          {exportingPDF
-            ? "Building Blueprint..."
-            : "📥 Download Full PDF Blueprint"}
-        </button>
+                {type === "custom" && (
+                  <div className="space-y-2 animate-in slide-in-from-top-4">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Custom Label</label>
+                    <input
+                      className="w-full bg-white/40 dark:bg-black/40 border border-white/80 dark:border-white/10 px-6 py-4 rounded-2xl font-bold outline-none focus:ring-4 focus:ring-purple-500/10 transition-all text-sm"
+                      placeholder="e.g., Blood Oxygen..."
+                      value={customMetric}
+                      onChange={(e) => setCustomMetric(e.target.value)}
+                    />
+                  </div>
+                )}
+
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Value ({currentMetric.unit})</label>
+                  <div className="relative">
+                    <Activity className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                    <input
+                      type="number"
+                      className="w-full bg-white/40 dark:bg-black/40 border border-white/80 dark:border-white/10 pl-12 pr-6 py-4 rounded-2xl font-bold outline-none focus:ring-4 focus:ring-indigo-500/10 transition-all text-sm"
+                      placeholder="0.00"
+                      value={value}
+                      onChange={(e) => setValue(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && handleAdd()}
+                    />
+                  </div>
+                </div>
+
+                <button
+                  onClick={handleAdd}
+                  className="w-full bg-gray-900 dark:bg-indigo-600 text-white py-5 rounded-2xl font-black text-lg hover:scale-[1.02] active:scale-95 transition-all shadow-2xl shadow-indigo-600/20 flex items-center justify-center gap-3"
+                >
+                  COMMIT LOG <ChevronRight size={20} />
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <div className="p-8 rounded-[3rem] bg-gradient-to-br from-indigo-600/10 to-transparent border border-indigo-500/20 backdrop-blur-md">
+             <div className="flex items-center gap-3 text-indigo-500 mb-4">
+                <Info size={20} />
+                <span className="text-xs font-black uppercase tracking-widest">Protocol Tip</span>
+             </div>
+             <p className="text-xs font-bold text-gray-500 leading-relaxed italic">"Consistent daily logging at similar times reduces noise in AI trend detection."</p>
+          </div>
+        </div>
+
+        {/* 📈 Visualization Central */}
+        <div className="lg:col-span-3 space-y-12">
+          {/* Chart Header */}
+          <div className="flex items-center justify-between px-6">
+             <div className="flex items-center gap-4">
+                <BarChart4 className="text-indigo-600" size={24} />
+                <h2 className="text-3xl font-black tracking-tighter">Variability Spectrum</h2>
+             </div>
+             <div className="flex items-center gap-2 px-6 py-2 rounded-full bg-white/40 dark:bg-white/5 border border-white/60 dark:border-white/[0.05] backdrop-blur-md">
+                <Stethoscope className="text-blue-500" size={14} />
+                <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">{currentMetric.label} Tracking</span>
+             </div>
+          </div>
+
+          <div className="relative group rounded-[3.5rem] border border-white/80 dark:border-white/[0.05] bg-white/[0.6] dark:bg-[#030712]/40 backdrop-blur-[60px] p-10 shadow-3xl overflow-hidden transition-all duration-700">
+            <div className="absolute inset-0 bg-gradient-to-t from-indigo-500/5 to-transparent pointer-events-none" />
+            
+            {logs.length === 0 ? (
+              <div className="flex flex-col items-center justify-center p-20 text-center space-y-6 opacity-40">
+                <div className="w-24 h-24 rounded-full bg-gray-100 dark:bg-white/5 flex items-center justify-center">
+                   <TrendingUp size={48} />
+                </div>
+                <p className="font-bold text-xl italic max-w-xs">Waiting for telemetry data injection to map trend spectrum.</p>
+              </div>
+            ) : (
+              <div ref={chartRef} className="w-full h-[450px] relative">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={processedChartData} margin={{ top: 20, right: 20, left: 0, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="metricGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="#4f46e5" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="8 8" opacity={0.05} vertical={false} />
+                    <XAxis 
+                      dataKey="date" 
+                      tickLine={false} 
+                      axisLine={false} 
+                      tick={{ fill: "#64748b", fontWeight: "900", fontSize: 10 }} 
+                      dy={10}
+                    />
+                    <YAxis 
+                      tickLine={false} 
+                      axisLine={false} 
+                      tick={{ fill: "#64748b", fontWeight: "900", fontSize: 10 }} 
+                    />
+                    <Tooltip
+                      content={({ active, payload }: any) => {
+                        if (active && payload && payload.length) {
+                          const data = payload[0].payload;
+                          const color = data.status === "abnormal" ? "text-red-500" : data.status === "warning" ? "text-amber-500" : "text-blue-500";
+                          return (
+                            <div className="px-6 py-4 rounded-3xl bg-white/90 dark:bg-[#030712]/90 backdrop-blur-2xl border border-white/20 shadow-2xl transform -translate-y-4 transition-all animate-in zoom-in-95">
+                              <p className="text-[10px] font-black uppercase text-gray-400 mb-1">{data.date}</p>
+                              <div className="flex items-baseline gap-2">
+                                <span className={`text-4xl font-black ${color}`}>{data.value}</span>
+                                <span className="text-xs font-black text-gray-500">{currentMetric.unit}</span>
+                              </div>
+                              <div className="mt-2 text-[10px] font-black uppercase flex items-center gap-2">
+                                 <div className={`w-2 h-2 rounded-full ${data.status === "abnormal" ? "bg-red-500" : data.status === "warning" ? "bg-amber-500" : "bg-emerald-500"}`} />
+                                 {data.status} Deviation
+                              </div>
+                            </div>
+                          );
+                        }
+                        return null;
+                      }}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="value"
+                      stroke="#4f46e5"
+                      strokeWidth={6}
+                      fillOpacity={1}
+                      fill="url(#metricGradient)"
+                      animationDuration={2000}
+                      dot={({ cx, cy, payload }: any) => {
+                        const color = payload.status === "abnormal" ? "#ef4444" : payload.status === "warning" ? "#f59e0b" : "#4f46e5";
+                        return (
+                          <g>
+                            <circle cx={cx} cy={cy} r={8} fill={color} stroke="white" strokeWidth={3} className="shadow-lg" />
+                            {payload.status === "abnormal" && <circle cx={cx} cy={cy} r={12} fill="transparent" stroke={color} strokeWidth={2} className="animate-ping" />}
+                          </g>
+                        );
+                      }}
+                      activeDot={{ r: 10, stroke: "#ffffff", strokeWidth: 4, fill: "#4f46e5" }}
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+          </div>
+
+          {/* ⚡ AI Analytical Engine Pills */}
+          <div className="grid md:grid-cols-3 gap-6">
+            <button
+              onClick={generateInsight}
+              disabled={loadingInsight || rawLogs.length === 0}
+              className="group relative overflow-hidden px-8 py-6 rounded-3xl bg-emerald-500/10 dark:bg-emerald-500/5 border border-emerald-500/20 text-emerald-600 dark:text-emerald-300 transition-all hover:bg-emerald-500 hover:text-white disabled:opacity-50"
+            >
+               <div className="relative z-10 flex flex-col items-center gap-3">
+                  {loadingInsight ? <Activity className="animate-spin" size={24} /> : <BrainCircuit size={24} />}
+                  <span className="text-xs font-black uppercase tracking-widest">Generate Insights</span>
+               </div>
+               <div className="absolute inset-0 bg-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+            </button>
+
+            <button
+              onClick={detectTrend}
+              disabled={loadingTrend || rawLogs.length < 2}
+              className="group relative overflow-hidden px-8 py-6 rounded-3xl bg-indigo-500/10 dark:bg-indigo-500/5 border border-indigo-500/20 text-indigo-600 dark:text-indigo-300 transition-all hover:bg-indigo-500 hover:text-white disabled:opacity-50"
+            >
+               <div className="relative z-10 flex flex-col items-center gap-3">
+                  {loadingTrend ? <Activity className="animate-spin" size={24} /> : <TrendingUp size={24} />}
+                  <span className="text-xs font-black uppercase tracking-widest">Detect Trends</span>
+               </div>
+               <div className="absolute inset-0 bg-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+            </button>
+
+            <button
+              onClick={downloadFullAIReport}
+              disabled={exportingPDF || rawLogs.length === 0}
+              className="group relative overflow-hidden px-8 py-6 rounded-3xl bg-gray-900/10 dark:bg-white/5 border border-gray-900/20 dark:border-white/10 text-gray-900 dark:text-white transition-all hover:bg-gray-900 hover:text-white dark:hover:bg-white dark:hover:text-black disabled:opacity-50"
+            >
+               <div className="relative z-10 flex flex-col items-center gap-3">
+                  {exportingPDF ? <Activity className="animate-spin" size={24} /> : <Download size={24} />}
+                  <span className="text-xs font-black uppercase tracking-widest">Download PDF</span>
+               </div>
+            </button>
+          </div>
+        </div>
       </div>
 
-      {/* UNTOUCHED EXISTING COMPONENTS */}
-      <AIReportCard title="AI Health Insight" content={insight} />
-      <AIReportCard
-        title="AI Trend Detection"
-        content={trendAnalysis}
-        variant="trend"
-      />
+      {/* 🧬 AI Report Intersection */}
+      <div className="grid lg:grid-cols-2 gap-12 pt-8 border-t border-gray-100 dark:border-white/5">
+        <div className="space-y-6">
+           <div className="flex items-center gap-3 px-2">
+              <ShieldCheck className="text-emerald-500" size={20} />
+              <h3 className="text-xl font-black italic tracking-tight uppercase tracking-widest text-gray-500">Stability Analysis</h3>
+           </div>
+           <AIReportCard title="Laboratory Insight" content={insight} />
+        </div>
+        <div className="space-y-6">
+           <div className="flex items-center gap-3 px-2">
+              <History className="text-indigo-500" size={20} />
+              <h3 className="text-xl font-black italic tracking-tight uppercase tracking-widest text-gray-500">Predictive Modeling</h3>
+           </div>
+           <AIReportCard
+             title="Trend Detection Matrix"
+             content={trendAnalysis}
+             variant="trend"
+           />
+        </div>
+      </div>
     </div>
   );
 }
