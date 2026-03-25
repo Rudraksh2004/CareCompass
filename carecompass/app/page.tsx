@@ -1,34 +1,55 @@
 "use client";
 
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
-import { useEffect, useRef, useState, useCallback } from "react";
 import { useTheme } from "@/context/ThemeContext";
 import {
-  Bot, FileText, Pill, LineChart, Clock, Brain, HeartPulse, Upload,
-  Sparkles, ArrowRight, Shield, Activity, Stethoscope, ChevronRight,
-  Zap, Lock, MessageSquare, Sun, Moon, Menu, X
+  ChevronRight,
+  Menu,
+  X,
+  Shield,
+  Brain,
+  Zap,
+  Activity,
+  ArrowRight,
+  CheckCircle2,
+  Lock,
+  MessageSquare,
+  Sparkles,
+  Search,
+  FileText,
+  Clock,
+  Layout,
+  Sun,
+  Moon,
+  Pill,
+  LineChart,
+  Bot,
+  Stethoscope,
+  HeartPulse,
+  Upload,
 } from "lucide-react";
 
-/* ─── Animated Counter Hook ─── */
-function useCountUp(end: number, duration = 2000, start = 0, shouldStart = false) {
-  const [value, setValue] = useState(start);
+/* ─── HOOKS ─── */
+const useCountUp = (end: number, duration: number = 2000, start: number = 0, trigger: boolean = true) => {
+  const [count, setCount] = useState(start);
   useEffect(() => {
-    if (!shouldStart) return;
+    if (!trigger) return;
     let startTime: number | null = null;
     const step = (timestamp: number) => {
       if (!startTime) startTime = timestamp;
       const progress = Math.min((timestamp - startTime) / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      setValue(Math.round(start + (end - start) * eased));
-      if (progress < 1) requestAnimationFrame(step);
+      const eased = 1 - Math.pow(1 - progress, 3); // ease-out-cubic
+      setCount(Math.floor(eased * (end - start) + start));
+      if (progress < 1) window.requestAnimationFrame(step);
     };
-    requestAnimationFrame(step);
-  }, [shouldStart, end, duration, start]);
-  return value;
-}
+    window.requestAnimationFrame(step);
+  }, [end, duration, start, trigger]);
+  return count;
+};
 
-/* ─── Star Particle Canvas ─── */
-function StarField({ isDark }: { isDark: boolean }) {
+/* ─── Star Background Component ─── */
+const StarField = ({ isDark }: { isDark: boolean }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -37,233 +58,234 @@ function StarField({ isDark }: { isDark: boolean }) {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    let animationId: number;
-    const stars: { x: number; y: number; size: number; speed: number; opacity: number; pulse: number }[] = [];
+    let animationFrameId: number;
+    let stars: { x: number; y: number; size: number; speed: number; opacity: number; pulse: number }[] = [];
 
     const resize = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
+      initStars();
     };
-    resize();
-    window.addEventListener("resize", resize);
 
-    const starCount = isDark ? 120 : 60;
-    for (let i = 0; i < starCount; i++) {
-      stars.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        size: isDark ? Math.random() * 2 + 0.5 : Math.random() * 1.5 + 0.5,
-        speed: Math.random() * 0.3 + 0.1,
-        opacity: isDark ? Math.random() * 0.7 + 0.3 : Math.random() * 0.5 + 0.2,
-        pulse: Math.random() * Math.PI * 2,
-      });
-    }
+    const initStars = () => {
+      stars = [];
+      const count = isDark ? 150 : 70;
+      for (let i = 0; i < count; i++) {
+        stars.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          size: Math.random() * 2,
+          speed: Math.random() * 0.3 + 0.1,
+          opacity: Math.random() * 0.7 + 0.3,
+          pulse: Math.random() * Math.PI * 2,
+        });
+      }
+    };
 
-    const animate = () => {
+    const draw = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       stars.forEach((star) => {
         star.pulse += 0.01;
-        star.y -= star.speed;
-        if (star.y < -5) {
-          star.y = canvas.height + 5;
-          star.x = Math.random() * canvas.width;
-        }
         const flicker = 0.5 + Math.sin(star.pulse) * 0.5;
+        ctx.fillStyle = isDark 
+          ? `rgba(147, 197, 253, ${star.opacity * flicker * 0.6})` 
+          : `rgba(59, 130, 246, ${star.opacity * flicker * 0.2})`;
         ctx.beginPath();
         ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
-        ctx.fillStyle = isDark
-          ? `rgba(147, 197, 253, ${star.opacity * flicker})`
-          : `rgba(59, 130, 246, ${star.opacity * flicker * 0.35})`;
         ctx.fill();
+        
+        star.y -= star.speed;
+        if (star.y < 0) star.y = canvas.height;
       });
-      animationId = requestAnimationFrame(animate);
+      animationFrameId = window.requestAnimationFrame(draw);
     };
-    animate();
+
+    window.addEventListener("resize", resize);
+    resize();
+    draw();
 
     return () => {
       window.removeEventListener("resize", resize);
-      cancelAnimationFrame(animationId);
+      window.cancelAnimationFrame(animationFrameId);
     };
   }, [isDark]);
 
   return <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none" />;
-}
+};
 
-/* ─── Marquee ─── */
-function TrustMarquee() {
+/* ─── Trust Marquee ─── */
+const TrustMarquee = () => {
   const items = [
-    "🔒 End-to-End Encrypted", "🧠 Gemini AI Powered", "⚕️ Non-Diagnostic Guidance",
-    "🔥 Real-Time Analysis", "📊 Smart Health Tracking", "💊 Prescription Decoder",
-    "🧬 Disease Risk Insights", "⏰ Medicine Reminders",
+    "HIPAA READY", "END-TO-END ENCRYPTED", "GEMINI 1.5 PRO", "CLINICAL GRADE", 
+    "PRIVACY FIRST", "RELIABLE INSIGHTS", "SECURE DATA SILOS"
   ];
   const doubled = [...items, ...items];
   return (
-    <div className="relative overflow-hidden py-5 border-y border-white/40 dark:border-white/[0.04] bg-white/30 dark:bg-white/[0.01] backdrop-blur-3xl backdrop-saturate-[1.5]">
-      <div className="flex animate-marquee whitespace-nowrap">
-        {doubled.map((item, i) => (
-          <span key={i} className="mx-8 text-sm text-gray-500 dark:text-gray-500 font-medium flex-shrink-0">{item}</span>
+    <div className="w-full py-8 bg-white/30 dark:bg-white/[0.01] backdrop-blur-3xl border-y border-white/40 dark:border-white/[0.06] overflow-hidden glass-grain">
+      <div className="flex whitespace-nowrap animate-marquee">
+        {doubled.map((text, i) => (
+          <div key={i} className="flex items-center gap-16 mx-8">
+            <span className="text-sm font-black text-gray-400 dark:text-gray-500 tracking-[0.4em] uppercase">{text}</span>
+            <div className="w-1.5 h-1.5 rounded-full bg-blue-500/30" />
+          </div>
         ))}
       </div>
     </div>
   );
-}
+};
 
-/* ─── Main Page ─── */
+/* ─── MAIN HOME COMPONENT ─── */
 export default function Home() {
   const { theme, toggleTheme, mounted } = useTheme();
   const isDark = mounted ? theme === "dark" : false;
-  const revealRefs = useRef<HTMLDivElement[]>([]);
+  const [mobileMenu, setMobileMenu] = useState(false);
   const [statsVisible, setStatsVisible] = useState(false);
   const statsRef = useRef<HTMLDivElement>(null);
-  const [mobileMenu, setMobileMenu] = useState(false);
-
-  const handleToggle = useCallback(() => {
-    toggleTheme();
-  }, [toggleTheme]);
+  const revealRefs = useRef<HTMLDivElement[]>([]);
 
   useEffect(() => {
+    if (!mounted) return;
     const observer = new IntersectionObserver(
-      (entries) => { entries.forEach((e) => { if (e.isIntersecting) e.target.classList.add("visible"); }); },
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+          }
+        });
+      },
       { threshold: 0.1, rootMargin: "0px 0px -50px 0px" }
     );
-    revealRefs.current.forEach((el) => { if (el) observer.observe(el); });
+
+    revealRefs.current.forEach((ref) => {
+      if (ref) observer.observe(ref);
+    });
+
     const statsObs = new IntersectionObserver(([e]) => { if (e.isIntersecting) setStatsVisible(true); }, { threshold: 0.3 });
     if (statsRef.current) statsObs.observe(statsRef.current);
-    return () => { observer.disconnect(); statsObs.disconnect(); };
-  }, []);
+
+    return () => {
+      observer.disconnect();
+      statsObs.disconnect();
+    };
+  }, [mounted]);
 
   const addRevealRef = useCallback((el: HTMLDivElement | null) => {
-    if (el && !revealRefs.current.includes(el)) revealRefs.current.push(el);
+    if (el && !revealRefs.current.includes(el)) {
+      revealRefs.current.push(el);
+    }
   }, []);
 
   const toolCount = useCountUp(6, 1800, 0, statsVisible);
   const availCount = useCountUp(24, 1600, 0, statsVisible);
 
+  if (!mounted) return null;
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20 dark:from-[#020617] dark:via-[#0a0f1f] dark:to-[#030b1a] text-gray-900 dark:text-gray-100 overflow-hidden scroll-smooth transition-colors duration-700">
-      {/* ─── LIQUID GLASS AMBIENT BACKGROUND ─── */}
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/20 to-indigo-50/10 dark:from-[#020617] dark:via-[#050b18] dark:to-[#020814] text-gray-900 dark:text-gray-100 overflow-hidden scroll-smooth transition-colors duration-700">
+      
+      {/* ─── AMBIENT BACKGROUND ─── */}
       <div className="fixed inset-0 -z-10">
         <StarField isDark={isDark} />
-        {/* Primary liquid orbs — STRONGER in dark mode */}
-        <div className="absolute top-[-15%] left-[-10%] w-[600px] h-[600px] rounded-full bg-gradient-to-br from-blue-400/20 to-cyan-300/10 dark:from-blue-500/25 dark:to-cyan-400/15 blur-[100px] animate-float" />
-        <div className="absolute bottom-[-15%] right-[-10%] w-[600px] h-[600px] rounded-full bg-gradient-to-tl from-emerald-400/15 to-teal-300/8 dark:from-emerald-500/20 dark:to-teal-400/12 blur-[100px] animate-float-reverse" />
-        <div className="absolute top-[40%] left-[50%] -translate-x-1/2 w-[700px] h-[700px] rounded-full bg-gradient-to-br from-violet-400/10 to-fuchsia-300/5 dark:from-violet-500/15 dark:to-fuchsia-400/8 blur-[130px]" />
-        {/* Secondary accent orbs — MORE visible in dark */}
-        <div className="absolute top-[20%] right-[15%] w-[280px] h-[280px] rounded-full bg-blue-300/12 dark:bg-blue-400/15 blur-[80px] animate-float" style={{ animationDelay: '1s', animationDuration: '8s' }} />
-        <div className="absolute bottom-[30%] left-[10%] w-[250px] h-[250px] rounded-full bg-emerald-300/12 dark:bg-emerald-400/15 blur-[80px] animate-float-reverse" style={{ animationDelay: '2s', animationDuration: '9s' }} />
-        {/* Warm accent orb (dark mode depth) */}
-        <div className="absolute top-[60%] right-[25%] w-[300px] h-[300px] rounded-full bg-transparent dark:bg-amber-500/6 blur-[100px] animate-float" style={{ animationDelay: '3s', animationDuration: '10s' }} />
-        {/* Dot pattern */}
-        <div className="absolute inset-0 opacity-[0.25] dark:opacity-[0.08]" style={{ backgroundImage: 'radial-gradient(circle, rgba(100,116,139,0.15) 1px, transparent 1px)', backgroundSize: '28px 28px' }} />
+        {/* Large Liquid Orbs */}
+        <div className="absolute top-[-20%] left-[-15%] w-[800px] h-[800px] rounded-full bg-blue-500/15 dark:bg-blue-600/20 blur-[130px] animate-float" />
+        <div className="absolute bottom-[-20%] right-[-15%] w-[800px] h-[800px] rounded-full bg-emerald-500/10 dark:bg-emerald-600/15 blur-[120px] animate-float-reverse" />
+        <div className="absolute top-[40%] left-[50%] -translate-x-1/2 w-[900px] h-[900px] rounded-full bg-violet-500/5 dark:bg-indigo-600/10 blur-[150px]" />
+        {/* Grain Layer */}
+        <div className="absolute inset-0 opacity-[0.25] dark:opacity-[0.08]" style={{ backgroundImage: 'radial-gradient(circle, rgba(100,116,139,0.1) 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
       </div>
 
-      {/* ─── NAVBAR (Liquid Glass) ─── */}
-      <header className="w-full border-b border-white/40 dark:border-white/[0.08] backdrop-blur-3xl backdrop-saturate-[1.6] bg-white/50 dark:bg-white/[0.03] sticky top-0 z-50 transition-all duration-500 shadow-[0_4px_30px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_40px_rgba(0,0,0,0.3),0_0_60px_rgba(59,130,246,0.04)]">
-        <div className="max-w-7xl mx-auto px-6 md:px-8 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3 group">
+      {/* ─── NAVBAR (Ultra Glass) ─── */}
+      <header className="w-full border-b border-white/60 dark:border-white/[0.08] backdrop-blur-[40px] backdrop-saturate-[1.8] bg-white/40 dark:bg-[#030712]/30 sticky top-0 z-50 transition-all duration-500 glass-grain">
+        <div className="max-w-7xl mx-auto px-6 md:px-10 py-5 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-4 group">
             <div className="relative">
-              <img src="/logo.png" alt="CareCompass" className="w-10 h-10 object-contain drop-shadow-[0_0_8px_rgba(59,130,246,0.3)] group-hover:drop-shadow-[0_0_14px_rgba(59,130,246,0.5)] transition-all duration-500" />
-              <div className="absolute inset-0 bg-blue-500/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <img src="/logo.png" alt="CareCompass" className="w-11 h-11 object-contain drop-shadow-[0_0_15px_rgba(59,130,246,0.3)] transition-all duration-500 group-hover:scale-110" />
+              <div className="absolute inset-0 bg-blue-500/30 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
             </div>
-            <span className="text-2xl font-bold tracking-tight bg-gradient-to-r from-blue-600 to-emerald-500 dark:from-blue-400 dark:to-emerald-400 bg-clip-text text-transparent">CareCompass</span>
+            <span className="text-3xl font-black tracking-tighter bg-gradient-to-r from-blue-600 via-indigo-600 to-emerald-500 dark:from-blue-400 dark:via-indigo-400 dark:to-emerald-400 bg-clip-text text-transparent italic">CareCompass</span>
           </Link>
 
-          <nav className="hidden md:flex items-center gap-8">
+          <nav className="hidden md:flex items-center gap-12">
             {["Features", "How It Works", "Testimonials"].map((label) => (
-              <a key={label} href={`#${label.toLowerCase().replace(/ /g, "-")}`} className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors duration-300 relative after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-[2px] after:bg-gradient-to-r after:from-blue-600 after:to-emerald-500 dark:after:from-blue-400 dark:after:to-emerald-400 hover:after:w-full after:transition-all after:duration-300">
+              <a key={label} href={`#${label.toLowerCase().replace(/ /g, "-")}`} className="text-sm font-black uppercase tracking-widest text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-all duration-300 relative group/nav">
                 {label}
+                <div className="absolute -bottom-1 left-0 w-0 h-1 bg-gradient-to-r from-blue-500 to-emerald-500 transition-all duration-500 group-hover/nav:w-full" />
               </a>
             ))}
           </nav>
 
-          <div className="flex items-center gap-3">
-            {/* Theme Toggle */}
-            {mounted ? (
-              <button
-                type="button"
-                onClick={handleToggle}
-                className="relative w-10 h-10 rounded-2xl border border-white/50 dark:border-white/[0.08] bg-white/60 dark:bg-white/[0.04] backdrop-blur-2xl flex items-center justify-center hover:bg-white/80 dark:hover:bg-white/[0.08] transition-all duration-500 hover:scale-110 cursor-pointer shadow-[0_4px_16px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.2)]"
-                aria-label="Toggle theme"
-              >
-                {isDark ? (
-                  <Moon className="w-[18px] h-[18px] text-blue-400" />
-                ) : (
-                  <Sun className="w-[18px] h-[18px] text-amber-500" />
-                )}
-              </button>
-            ) : (
-              <div className="w-10 h-10 rounded-xl border border-gray-200 dark:border-white/[0.08] bg-gray-100/80 dark:bg-white/[0.04]" />
-            )}
+          <div className="flex items-center gap-5">
+            <button
+              onClick={toggleTheme}
+              className="relative w-12 h-12 rounded-[1.2rem] border border-white/80 dark:border-white/[0.1] bg-white/60 dark:bg-white/[0.05] backdrop-blur-2xl flex items-center justify-center hover:bg-white/90 dark:hover:bg-white/[0.1] transition-all duration-500 hover:scale-110 shadow-xl group cursor-pointer"
+            >
+              {isDark ? <Moon className="w-5 h-5 text-blue-400 group-hover:rotate-12" /> : <Sun className="w-5 h-5 text-amber-500 group-hover:rotate-45" />}
+            </button>
 
-            <Link href="/auth/login" className="hidden md:inline-flex text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white font-medium transition-colors duration-300">Login</Link>
+            <Link href="/auth/login" className="hidden lg:inline-flex text-sm font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">Login</Link>
 
-            <Link href="/auth/signup" className="hidden md:inline-flex relative group bg-gradient-to-r from-blue-600 to-emerald-500 hover:from-blue-500 hover:to-emerald-400 text-white px-6 py-2.5 rounded-xl font-semibold shadow-lg shadow-blue-500/20 transition-all duration-300 hover:shadow-blue-500/40 hover:scale-[1.03] overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-              <span className="relative z-10 flex items-center gap-2">Get Started <ChevronRight className="w-4 h-4" /></span>
+            <Link href="/auth/signup" className="hidden md:inline-flex relative group bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-8 py-3.5 rounded-[1.2rem] font-black uppercase tracking-widest text-xs transition-all duration-500 hover:scale-[1.05] shadow-2xl overflow-hidden active:scale-95">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <span className="relative z-10 flex items-center gap-2 group-hover:text-white transition-colors">Get Started <ChevronRight className="w-4 h-4" /></span>
             </Link>
 
-            {/* Mobile menu */}
-            <button onClick={() => setMobileMenu(!mobileMenu)} className="md:hidden w-10 h-10 rounded-xl border border-gray-200 dark:border-white/[0.08] bg-gray-100/80 dark:bg-white/[0.04] flex items-center justify-center">
+            <button onClick={() => setMobileMenu(!mobileMenu)} className="md:hidden w-11 h-11 rounded-[1.2rem] border border-gray-200 dark:border-white/[0.1] bg-gray-100/80 dark:bg-white/[0.04] flex items-center justify-center transition-all">
               {mobileMenu ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
         </div>
 
-        {/* Mobile menu dropdown */}
         {mobileMenu && (
-          <div className="md:hidden border-t border-white/30 dark:border-white/[0.06] bg-white/40 dark:bg-white/[0.02] backdrop-blur-3xl backdrop-saturate-[1.6] px-6 py-4 space-y-3">
+          <div className="md:hidden border-t border-white/60 dark:border-white/[0.06] bg-white/60 dark:bg-white/[0.02] backdrop-blur-[40px] px-8 py-8 space-y-5 animate-fade-in-up">
             {["Features", "How It Works", "Testimonials"].map((l) => (
-              <a key={l} href={`#${l.toLowerCase().replace(/ /g, "-")}`} className="block text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white py-2" onClick={() => setMobileMenu(false)}>{l}</a>
+              <a key={l} href={`#${l.toLowerCase().replace(/ /g, "-")}`} className="block text-xl font-black uppercase tracking-tighter text-gray-600 dark:text-gray-300 hover:text-blue-500" onClick={() => setMobileMenu(false)}>{l}</a>
             ))}
-            <div className="flex gap-3 pt-2">
-              <Link href="/auth/login" className="flex-1 text-center py-2.5 rounded-xl border border-gray-200 dark:border-white/[0.08] text-sm font-medium">Login</Link>
-              <Link href="/auth/signup" className="flex-1 text-center py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-emerald-500 text-white text-sm font-semibold">Get Started</Link>
+            <div className="flex flex-col gap-4 pt-6 border-t border-white/20 dark:border-white/[0.05]">
+              <Link href="/auth/login" className="text-center py-4 rounded-2xl border border-gray-200 dark:border-white/[0.1] text-sm font-black uppercase">Login</Link>
+              <Link href="/auth/signup" className="text-center py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-emerald-500 text-white text-sm font-black uppercase shadow-xl">Get Started</Link>
             </div>
           </div>
         )}
       </header>
 
       {/* ─── HERO ─── */}
-      <section className="relative px-6 pt-28 md:pt-36 pb-16">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] bg-[radial-gradient(ellipse_at_center,rgba(59,130,246,0.08),transparent_70%)] dark:bg-[radial-gradient(ellipse_at_center,rgba(59,130,246,0.12),transparent_70%)] -z-10" />
-
-        <div className="max-w-5xl mx-auto text-center">
-          <div className="animate-fade-in-up inline-flex items-center gap-2 mb-8 px-5 py-2.5 rounded-full bg-white/50 dark:bg-white/[0.05] border border-white/60 dark:border-blue-400/20 text-sm font-medium text-blue-600 dark:text-blue-300 backdrop-blur-2xl shadow-[0_4px_20px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_30px_rgba(59,130,246,0.12),0_0_0_1px_rgba(59,130,246,0.06)]">
-            <Sparkles className="w-4 h-4" />
-            AI-Powered Non-Diagnostic Health Companion
+      <section className="relative px-6 pt-24 md:pt-36 pb-32">
+        <div className="max-w-6xl mx-auto text-center relative z-10">
+          <div className="animate-fade-in-up inline-flex items-center gap-3 mb-10 px-6 py-3 rounded-full bg-white/40 dark:bg-white/[0.04] border border-white/80 dark:border-blue-400/30 text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-[0.3em] backdrop-blur-3xl shadow-2xl glass-grain">
+            <Sparkles className="w-4 h-4 animate-badge-pulse" />
+            AI Health Intelligence Platform
           </div>
 
-          <h1 className="animate-fade-in-up stagger-1 text-5xl md:text-7xl font-extrabold leading-[1.1] tracking-tight mb-8">
-            <span className="text-gray-900 dark:text-white dark:drop-shadow-[0_0_40px_rgba(255,255,255,0.06)]">Understand Your Health</span>
+          <h1 className="animate-fade-in-up stagger-1 text-5xl md:text-8xl lg:text-[7.5rem] font-black leading-[0.9] tracking-tighter mb-10 text-gray-900 dark:text-white perspective-1000">
+            Understand Your
             <br />
-            <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-emerald-500 dark:from-blue-400 dark:via-indigo-400 dark:to-emerald-400 bg-clip-text text-transparent animate-gradient-shift dark:drop-shadow-[0_0_60px_rgba(99,102,241,0.15)]">
-              With Clinical-Grade AI
+            <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-emerald-500 dark:from-blue-400 dark:via-indigo-400 dark:to-emerald-400 bg-clip-text text-transparent animate-gradient-shift py-4 block drop-shadow-[0_0_60px_rgba(59,130,246,0.2)] dark:drop-shadow-[0_0_100px_rgba(59,130,246,0.4)]">
+              Health Protocol
             </span>
           </h1>
 
-          <p className="animate-fade-in-up stagger-2 text-lg md:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-14 leading-relaxed">
-            Simplify medical reports, decode prescriptions, track health trends, and generate professional AI insights — all in one secure, intelligent platform.
+          <p className="animate-fade-in-up stagger-2 text-xl md:text-3xl text-gray-600 dark:text-gray-400 max-w-4xl mx-auto mb-20 leading-[1.2] font-bold">
+            Simplify medical reports, decode complex prescriptions, and monitor vitals with medical-grade non-diagnostic AI.
           </p>
 
-          <div className="animate-fade-in-up stagger-3 flex flex-wrap justify-center gap-5">
-            <Link href="/auth/signup" className="group relative bg-gradient-to-r from-blue-600 to-emerald-500 text-white px-10 py-4 rounded-2xl text-lg font-semibold shadow-2xl shadow-blue-500/25 dark:shadow-[0_20px_60px_-12px_rgba(59,130,246,0.5),0_0_20px_rgba(16,185,129,0.15)] transition-all duration-300 hover:shadow-blue-500/40 dark:hover:shadow-[0_20px_70px_-12px_rgba(59,130,246,0.6),0_0_30px_rgba(16,185,129,0.2)] hover:scale-[1.04] flex items-center gap-3 overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-              <span className="relative z-10">Get Started Free</span>
-              <ArrowRight className="relative z-10 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+          <div className="animate-fade-in-up stagger-3 flex flex-wrap justify-center gap-8">
+            <Link href="/auth/signup" className="group relative bg-gradient-to-br from-blue-600 to-indigo-700 text-white px-14 py-6 rounded-[2.5rem] text-2xl font-black italic shadow-[0_30px_70px_-15px_rgba(59,130,246,0.6)] transition-all duration-300 hover:scale-105 active:scale-95 flex items-center gap-4 overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+              <span className="relative z-10">Initialize Tracker</span>
+              <ArrowRight className="relative z-10 w-8 h-8 group-hover:translate-x-3 transition-transform duration-500" />
             </Link>
-            <Link href="/auth/login" className="group px-10 py-4 rounded-2xl border border-gray-300 dark:border-white/[0.12] text-lg font-semibold hover:border-gray-400 dark:hover:border-white/[0.3] hover:bg-gray-50 dark:hover:bg-white/[0.05] transition-all duration-300 backdrop-blur-xl flex items-center gap-2 dark:shadow-[0_0_20px_rgba(255,255,255,0.02)]">
-              Sign In
-              <ArrowRight className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
+            <Link href="/auth/login" className="px-14 py-6 rounded-[2.5rem] border-2 border-slate-200 dark:border-white/[0.1] text-2xl font-black italic hover:border-blue-500 dark:hover:border-blue-500 hover:bg-white dark:hover:bg-white/[0.05] transition-all duration-300 backdrop-blur-2xl">
+              User Login
             </Link>
           </div>
 
-          <div className="animate-fade-in-up stagger-4 flex flex-wrap justify-center gap-4 md:gap-6 mt-14">
+          <div className="animate-fade-in-up stagger-4 flex flex-wrap justify-center gap-10 mt-28">
             {[
-              { icon: <Shield className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />, text: "End-to-End Encrypted" },
-              { icon: <Brain className="w-4 h-4 text-indigo-500 dark:text-indigo-400" />, text: "Gemini AI Powered" },
-              { icon: <Stethoscope className="w-4 h-4 text-blue-500 dark:text-blue-400" />, text: "Non-Diagnostic Guidance" },
+              { icon: <Shield className="w-6 h-6 text-emerald-500" />, text: "HIPAA Compliant Stack" },
+              { icon: <Brain className="w-6 h-6 text-blue-500" />, text: "Gemini 1.5 Pro Engine" },
+              { icon: <Zap className="w-6 h-6 text-amber-500" />, text: "Real-Time AI Logic" },
             ].map((badge, i) => (
-              <span key={i} className="flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-white/50 dark:bg-white/[0.03] border border-white/60 dark:border-white/[0.06] text-sm text-gray-600 dark:text-gray-400 backdrop-blur-2xl hover:border-white/80 dark:hover:border-white/[0.12] hover:bg-white/70 dark:hover:bg-white/[0.05] transition-all duration-300 shadow-[0_4px_16px_rgba(0,0,0,0.03)] dark:shadow-none">
+              <span key={i} className="flex items-center gap-4 px-8 py-5 rounded-[2rem] bg-white/40 dark:bg-white/[0.03] border border-white/60 dark:border-white/[0.08] text-sm md:text-base font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 backdrop-blur-[60px] shadow-2xl hover:translate-y-[-8px] transition-all duration-500 glass-grain">
                 {badge.icon} {badge.text}
               </span>
             ))}
@@ -272,55 +294,61 @@ export default function Home() {
       </section>
 
       {/* ─── DASHBOARD PREVIEW ─── */}
-      <section className="px-6 pb-20">
-        <div ref={addRevealRef} className="reveal max-w-5xl mx-auto">
-          <div className="relative rounded-[24px] border border-white/50 dark:border-white/[0.1] bg-white/40 dark:bg-white/[0.05] backdrop-blur-3xl backdrop-saturate-[1.6] p-1.5 shadow-[0_24px_80px_-12px_rgba(0,0,0,0.08)] dark:shadow-[0_24px_80px_-12px_rgba(0,0,0,0.5),0_0_60px_rgba(59,130,246,0.06)]">
-            <div className="absolute -inset-[1px] rounded-[24px] bg-gradient-to-r from-blue-500/15 via-purple-500/10 to-emerald-500/15 dark:from-blue-500/25 dark:via-purple-500/15 dark:to-emerald-500/25 -z-10 blur-sm" />
-            <div className="absolute inset-0 rounded-[24px] shadow-[inset_0_1px_1px_rgba(255,255,255,0.3)] dark:shadow-[inset_0_1px_2px_rgba(255,255,255,0.08)] pointer-events-none" />
-            <div className="rounded-xl bg-gray-50 dark:bg-[#0a0f1e] overflow-hidden transition-colors duration-500">
-              {/* Title bar */}
-              <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-200/60 dark:border-white/[0.06]">
-                <div className="flex gap-1.5">
-                  <div className="w-3 h-3 rounded-full bg-red-400/80" />
-                  <div className="w-3 h-3 rounded-full bg-yellow-400/80" />
-                  <div className="w-3 h-3 rounded-full bg-green-400/80" />
+      <section className="px-6 pb-40">
+        <div ref={addRevealRef} className="reveal max-w-6xl mx-auto perspective-1000">
+          <div className="relative group p-3 rounded-[3.5rem] bg-white/[0.4] dark:bg-[#030712]/40 border border-white/80 dark:border-white/[0.08] backdrop-blur-[60px] shadow-[0_60px_150px_-30px_rgba(0,0,0,0.2),0_0_100px_rgba(59,130,246,0.1)] transition-all duration-[1.2s] hover:rotate-x-2 preserve-3d glass-grain">
+            <div className="rounded-[2.8rem] bg-gray-50 dark:bg-[#0a0f1e] overflow-hidden border border-gray-200/50 dark:border-white/[0.05]">
+              {/* Fake Chrome Head */}
+              <div className="flex items-center gap-3 px-8 py-5 border-b border-gray-200 dark:border-white/[0.08] bg-white/50 dark:bg-white/[0.02] backdrop-blur-md">
+                <div className="flex gap-2">
+                  <div className="w-3.5 h-3.5 rounded-full bg-[#ff5f56]" />
+                  <div className="w-3.5 h-3.5 rounded-full bg-[#ffbd2e]" />
+                  <div className="w-3.5 h-3.5 rounded-full bg-[#27c93f]" />
                 </div>
-                <div className="flex-1 text-center">
-                  <span className="text-xs text-gray-400 dark:text-gray-500">carecompass.ai/dashboard</span>
+                <div className="flex-1 text-center pr-10">
+                  <span className="text-[12px] font-black uppercase tracking-widest text-gray-300 dark:text-gray-600 flex items-center justify-center gap-2">
+                    <Lock className="w-3 h-3" /> carecompass.ai/dashboard
+                  </span>
                 </div>
               </div>
-              {/* Dashboard content */}
-              <div className="p-6 grid grid-cols-3 gap-4">
-                <div className="col-span-1 space-y-3">
-                  <div className="flex items-center gap-2 mb-4">
-                    <div className="w-6 h-6 rounded-lg bg-gradient-to-r from-blue-500 to-emerald-500" />
-                    <div className="h-3 w-20 bg-gray-200 dark:bg-white/10 rounded" />
+
+              <div className="p-12 md:p-16 grid grid-cols-4 gap-10">
+                <div className="col-span-1 space-y-6">
+                  <div className="flex items-center gap-4 mb-10">
+                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-2xl animate-pulse-slow" />
+                    <div className="h-4 w-32 bg-gray-200 dark:bg-white/10 rounded-full" />
                   </div>
                   {[...Array(6)].map((_, i) => (
-                    <div key={i} className={`h-8 rounded-lg ${i === 0 ? "bg-blue-100 dark:bg-blue-500/15 border border-blue-200/60 dark:border-blue-500/20" : "bg-gray-100 dark:bg-white/[0.03]"} flex items-center gap-2 px-3`}>
-                      <div className={`w-4 h-4 rounded ${i === 0 ? "bg-blue-300/50 dark:bg-blue-500/30" : "bg-gray-200 dark:bg-white/10"}`} />
-                      <div className={`h-2 rounded ${i === 0 ? "w-16 bg-blue-300/40 dark:bg-blue-400/30" : "w-14 bg-gray-200 dark:bg-white/5"}`} />
+                    <div key={i} className={`h-14 rounded-2xl ${i === 0 ? "bg-blue-500/10 border border-blue-500/20" : "bg-gray-100 dark:bg-white/[0.03]"} flex items-center gap-4 px-5 transition-all group-hover:scale-[1.02]`}>
+                      <div className={`w-6 h-6 rounded-lg ${i === 0 ? "bg-blue-500/40" : "bg-gray-200 dark:bg-white/10"}`} />
+                      <div className={`h-3 rounded-full ${i === 0 ? "w-24 bg-blue-500/50" : "w-20 bg-gray-200 dark:bg-white/5"}`} />
                     </div>
                   ))}
                 </div>
-                <div className="col-span-2 space-y-4">
-                  <div className="h-24 rounded-xl bg-gradient-to-r from-blue-100/80 to-emerald-100/80 dark:from-blue-500/10 dark:to-emerald-500/10 border border-gray-200/60 dark:border-white/[0.06] p-4">
-                    <div className="h-3 w-40 bg-gray-300/50 dark:bg-white/10 rounded mb-2" />
-                    <div className="h-2 w-64 bg-gray-200/50 dark:bg-white/5 rounded" />
+                <div className="col-span-3 space-y-8">
+                  <div className="h-44 rounded-[2.5rem] bg-gradient-to-r from-blue-600/10 via-indigo-600/10 to-transparent border border-gray-200 dark:border-white/[0.08] p-10 flex flex-col justify-center relative group-hover:shadow-2xl transition-all">
+                    <div className="h-6 w-72 bg-blue-500/30 rounded-full mb-4" />
+                    <div className="h-3 w-full max-w-md bg-gray-200 dark:bg-white/[0.05] rounded-full" />
+                    <Sparkles className="absolute top-8 right-8 text-blue-500/30 w-16 h-16 animate-pulse" />
                   </div>
-                  <div className="grid grid-cols-3 gap-3">
+                  <div className="grid grid-cols-3 gap-8">
                     {[0, 1, 2].map((i) => (
-                      <div key={i} className="h-20 rounded-lg bg-gray-100/80 dark:bg-white/[0.03] border border-gray-200/60 dark:border-white/[0.06] p-3">
-                        <div className="h-2 w-12 bg-gray-200 dark:bg-white/10 rounded mb-2" />
-                        <div className="h-5 w-8 bg-gray-300/50 dark:bg-blue-500/20 rounded mt-1" />
+                      <div key={i} className="h-32 rounded-[2rem] bg-white dark:bg-white/[0.04] border border-gray-200 dark:border-white/[0.08] p-6 shadow-xl">
+                        <div className="flex justify-between items-start mb-6">
+                          <div className="h-3 w-20 bg-gray-200 dark:bg-white/10 rounded-full" />
+                          <div className={`w-3 h-3 rounded-full ${i === 1 ? 'bg-emerald-500 animate-pulse shadow-[0_0_15px_rgba(16,185,129,0.5)]' : 'bg-blue-500'}`} />
+                        </div>
+                        <div className="h-10 w-28 bg-blue-600/20 rounded-xl" />
                       </div>
                     ))}
                   </div>
-                  <div className="h-32 rounded-xl bg-gray-100/80 dark:bg-white/[0.03] border border-gray-200/60 dark:border-white/[0.06] p-4">
-                    <div className="h-2 w-24 bg-gray-200 dark:bg-white/10 rounded mb-4" />
-                    <div className="flex items-end gap-2 h-16">
-                      {[40, 65, 45, 80, 55, 70, 90, 60, 75, 85, 50, 95].map((h, i) => (
-                        <div key={i} className="flex-1 rounded-t bg-gradient-to-t from-blue-400/50 to-emerald-400/50 dark:from-blue-500/40 dark:to-emerald-500/40" style={{ height: `${h}%` }} />
+                  <div className="h-60 rounded-[2.5rem] bg-white dark:bg-white/[0.04] border border-gray-200 dark:border-white/[0.08] p-10 relative overflow-hidden group-hover:shadow-2xl transition-all">
+                    <div className="flex justify-between items-center mb-10">
+                      <div className="h-5 w-48 bg-gray-200 dark:bg-white/10 rounded-full" />
+                    </div>
+                    <div className="flex items-end gap-5 h-28 px-4">
+                      {[40, 65, 45, 80, 55, 70, 90, 60, 75, 40].map((h, i) => (
+                        <div key={i} className="flex-1 rounded-t-2xl bg-gradient-to-t from-blue-600/40 to-cyan-500/20 hover:scale-x-110 transition-transform cursor-pointer" style={{ height: `${h}%` }} />
                       ))}
                     </div>
                   </div>
@@ -332,38 +360,38 @@ export default function Home() {
       </section>
 
       {/* ─── MARQUEE ─── */}
-      <TrustMarquee />
+      <div className="py-10">
+        <TrustMarquee />
+      </div>
 
       {/* ─── FEATURES ─── */}
-      <section id="features" className="px-6 py-24 md:py-28 max-w-7xl mx-auto">
-        <div ref={addRevealRef} className="reveal text-center mb-16 md:mb-20">
-          <span className="inline-flex items-center gap-2 mb-4 px-4 py-2 rounded-full bg-white/50 dark:bg-white/[0.04] border border-white/60 dark:border-white/[0.06] text-xs font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest backdrop-blur-2xl shadow-[0_4px_16px_rgba(0,0,0,0.03)]">
-            <Activity className="w-3.5 h-3.5" /> Core Features
+      <section id="features" className="px-6 py-40 max-w-7xl mx-auto relative">
+        <div ref={addRevealRef} className="reveal text-center mb-32">
+          <span className="inline-flex items-center gap-3 mb-8 px-6 py-2.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-[0.4em] backdrop-blur-3xl">
+            <Activity className="w-5 h-5" /> Intelligence Suite
           </span>
-          <h2 className="text-3xl md:text-5xl font-bold mb-5 tracking-tight">
-            Everything You Need For<br />
-            <span className="bg-gradient-to-r from-blue-600 to-emerald-500 dark:from-blue-400 dark:to-emerald-400 bg-clip-text text-transparent">Smart Health Management</span>
+          <h2 className="text-5xl md:text-8xl font-black mb-10 tracking-tighter">
+            Clinical-Grade
+            <br />
+            <span className="bg-gradient-to-r from-blue-600 to-emerald-500 bg-clip-text text-transparent italic">AI Modules</span>
           </h2>
-          <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto text-lg">A complete AI health ecosystem to understand, monitor, and manage your medical data intelligently.</p>
+          <p className="text-gray-500 dark:text-gray-400 max-w-3xl mx-auto text-2xl font-bold">Comprehensive toolset for autonomous health data interpretation.</p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10 lg:gap-12 perspective-1000">
           {features.map((f, i) => (
-            <div key={i} ref={addRevealRef} className={`reveal stagger-${i + 1} group relative rounded-2xl p-[1px] transition-all duration-500 hover:-translate-y-1.5 overflow-hidden`}>
-              <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${f.borderGlow} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
-              <div className="absolute inset-0 rounded-2xl bg-gray-200/60 dark:bg-white/[0.08] group-hover:bg-transparent transition-colors duration-500" />
-              <div className="relative bg-white/60 dark:bg-white/[0.06] backdrop-blur-3xl backdrop-saturate-[1.8] rounded-[22px] p-7 md:p-8 h-full transition-all duration-500 dark:shadow-[0_8px_40px_rgba(0,0,0,0.2),0_0_0_1px_rgba(255,255,255,0.05)] dark:group-hover:shadow-[0_12px_50px_rgba(0,0,0,0.3),0_0_0_1px_rgba(255,255,255,0.08)]">
-                <div className="absolute inset-0 rounded-[22px] shadow-[inset_0_1px_1px_rgba(255,255,255,0.3)] dark:shadow-[inset_0_1px_2px_rgba(255,255,255,0.1)] pointer-events-none" />
-                <div className={`absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br ${f.glow}`} />
-                <div className="relative z-10">
-                  <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${f.gradient} flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 group-hover:shadow-xl transition-all duration-300 group-hover:rotate-3`}>
+            <div key={i} ref={addRevealRef} className={`reveal stagger-${i + 1} group relative rounded-[3.5rem] p-[1.5px] transition-all duration-[0.8s] hover:-translate-y-4 preserve-3d`}>
+              <div className="absolute inset-0 rounded-[3.5rem] bg-gradient-to-br from-blue-500/20 to-emerald-500/10 dark:from-blue-500/40 dark:to-emerald-500/20 group-hover:opacity-100 transition-opacity" />
+              <div className="relative bg-white/[0.5] dark:bg-[#030712]/40 backdrop-blur-[60px] rounded-[3.4rem] p-12 h-full border border-white dark:border-white/[0.08] shadow-2xl glass-grain overflow-hidden flex flex-col justify-between">
+                <div>
+                    <div className={`w-20 h-20 rounded-3xl bg-gradient-to-br ${f.gradient} flex items-center justify-center mb-12 shadow-2xl group-hover:scale-110 group-hover:rotate-12 transition-all duration-700`}>
                     {f.icon}
-                  </div>
-                  <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white flex items-center gap-2">
+                    </div>
+                    <h3 className="text-3xl font-black mb-6 text-gray-900 dark:text-white flex items-center gap-4 transition-all">
                     {f.title}
-                    <ArrowRight className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-50 group-hover:translate-x-0 transition-all duration-300" />
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-400 leading-relaxed text-sm">{f.description}</p>
+                    <ArrowRight className="w-6 h-6 opacity-0 -translate-x-6 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-700 text-blue-500" />
+                    </h3>
+                    <p className="text-gray-500 dark:text-gray-400 leading-relaxed text-xl font-bold">{f.description}</p>
                 </div>
               </div>
             </div>
@@ -371,58 +399,54 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ─── HOW IT WORKS ─── */}
-      <section id="how-it-works" className="py-24 md:py-28 px-6 relative">
-        <div className="absolute inset-0 -z-10">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px] bg-indigo-200/15 dark:bg-indigo-600/8 rounded-full blur-[150px]" />
-        </div>
-        <div className="max-w-6xl mx-auto">
-          <div ref={addRevealRef} className="reveal text-center mb-16 md:mb-20">
-            <span className="inline-flex items-center gap-2 mb-4 px-4 py-2 rounded-full bg-white/50 dark:bg-white/[0.04] border border-white/60 dark:border-white/[0.06] text-xs font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest backdrop-blur-2xl shadow-[0_4px_16px_rgba(0,0,0,0.03)]">
-              <Sparkles className="w-3.5 h-3.5" /> Simple Process
+      {/* ─── HOW IT WORKS (STYLISH PROCESS) ─── */}
+      <section id="how-it-works" className="py-40 px-6 relative overflow-hidden bg-white/30 dark:bg-white/[0.01] backdrop-blur-[60px] glass-grain">
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div ref={addRevealRef} className="reveal text-center mb-32">
+            <span className="inline-flex items-center gap-3 mb-8 px-6 py-2.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-[0.4em] backdrop-blur-3xl">
+              <Sparkles className="w-5 h-5" /> Operational Protocol
             </span>
-            <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-gray-900 dark:text-white">How CareCompass Works</h2>
+            <h2 className="text-5xl md:text-8xl font-black tracking-tighter text-gray-900 dark:text-white">Seamless Ecosystem</h2>
           </div>
-          <div className="relative">
-            <div className="hidden md:block absolute top-[72px] left-[16.6%] right-[16.6%] h-[2px]">
-              <div className="w-full h-full bg-gradient-to-r from-blue-300/40 via-indigo-300/40 to-emerald-300/40 dark:from-blue-500/30 dark:via-indigo-500/30 dark:to-emerald-500/30" />
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-400/50 via-indigo-400/50 to-emerald-400/50 dark:from-blue-500/50 dark:via-indigo-500/50 dark:to-emerald-500/50 animate-shimmer" />
+
+          <div className="grid md:grid-cols-3 gap-20 relative">
+            {/* Connector Lines */}
+            <div className="hidden md:block absolute top-[60px] left-[20%] right-[20%] h-[3px]">
+                <div className="w-full h-full bg-gradient-to-r from-blue-500/40 via-indigo-500/50 to-emerald-500/40 rounded-full animate-pulse shadow-[0_0_20px_rgba(59,130,246,0.3)]" />
             </div>
-            <div className="grid md:grid-cols-3 gap-10">
-              {steps.map((s, i) => (
-                <div key={i} ref={addRevealRef} className={`reveal stagger-${i + 1} group relative text-center`}>
-                  <div className="relative mx-auto mb-8">
-                    <div className={`w-[72px] h-[72px] mx-auto rounded-2xl bg-gradient-to-br ${s.gradient} flex items-center justify-center shadow-xl group-hover:scale-110 group-hover:shadow-2xl transition-all duration-300 group-hover:rotate-6`}>
-                      {s.icon}
-                    </div>
-                    <div className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-white dark:bg-[#030712] border-2 border-gray-200 dark:border-white/[0.15] flex items-center justify-center text-xs font-bold text-gray-700 dark:text-white group-hover:border-blue-400 dark:group-hover:border-blue-500/50 group-hover:shadow-[0_0_8px_rgba(59,130,246,0.3)] transition-all duration-300">
-                      {String(i + 1).padStart(2, "0")}
-                    </div>
+
+            {steps.map((s, i) => (
+              <div key={i} ref={addRevealRef} className={`reveal stagger-${i + 1} group text-center relative`}>
+                <div className="relative mx-auto mb-12">
+                  <div className={`w-[120px] h-[120px] mx-auto rounded-[3rem] bg-gradient-to-br ${s.gradient} flex items-center justify-center shadow-2xl group-hover:scale-110 group-hover:rotate-[15deg] transition-all duration-1000`}>
+                    {s.icon}
                   </div>
-                  <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">{s.title}</h3>
-                  <p className="text-gray-600 dark:text-gray-400 max-w-xs mx-auto leading-relaxed">{s.description}</p>
+                  <div className="absolute -top-4 -right-4 w-12 h-12 rounded-[1.2rem] bg-white dark:bg-[#030712] border-4 border-slate-50 dark:border-white/[0.1] flex items-center justify-center text-lg font-black text-gray-900 dark:text-white shadow-2xl">
+                    {String(i + 1).padStart(2, "0")}
+                  </div>
                 </div>
-              ))}
-            </div>
+                <h3 className="text-3xl font-black mb-6 text-gray-900 dark:text-white">{s.title}</h3>
+                <p className="text-gray-500 dark:text-gray-400 max-w-sm mx-auto text-xl leading-relaxed font-bold">{s.description}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* ─── STATS ─── */}
-      <section className="py-16 md:py-20 px-6" ref={statsRef}>
-        <div ref={addRevealRef} className="reveal max-w-5xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+      <section className="py-32 px-6" ref={statsRef}>
+        <div ref={addRevealRef} className="reveal max-w-7xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-10">
             {[
-              { value: `${toolCount}+`, label: "AI-Powered Tools", icon: <Zap className="w-5 h-5 text-amber-500" /> },
-              { value: "100%", label: "Privacy-First", icon: <Lock className="w-5 h-5 text-emerald-500" /> },
-              { value: `${availCount}/7`, label: "AI Availability", icon: <Activity className="w-5 h-5 text-blue-500" /> },
-              { value: "Free", label: "To Get Started", icon: <Sparkles className="w-5 h-5 text-purple-500" /> },
+              { value: `${toolCount}+`, label: "AI Engines", icon: <Zap className="w-8 h-8 text-amber-500" /> },
+              { value: "0", label: "Diagnostic Claims", icon: <Shield className="w-8 h-8 text-emerald-500" /> },
+              { value: `${availCount}/7`, label: "Uptime Pulse", icon: <Activity className="w-8 h-8 text-blue-500" /> },
+              { value: "HIPAA", label: "Ready Stack", icon: <Lock className="w-8 h-8 text-purple-500" /> },
             ].map((stat, i) => (
-              <div key={i} className="group text-center p-6 md:p-8 rounded-[22px] bg-white/50 dark:bg-white/[0.05] border border-white/50 dark:border-white/[0.1] backdrop-blur-3xl backdrop-saturate-[1.8] hover:border-white/70 dark:hover:border-white/[0.18] hover:bg-white/70 dark:hover:bg-white/[0.08] transition-all duration-500 hover:-translate-y-1.5 shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_40px_rgba(0,0,0,0.3),0_0_0_1px_rgba(255,255,255,0.05)] dark:hover:shadow-[0_16px_60px_rgba(59,130,246,0.1),0_0_0_1px_rgba(255,255,255,0.08)] relative overflow-hidden">
-                <div className="absolute inset-0 rounded-[22px] shadow-[inset_0_1px_1px_rgba(255,255,255,0.3)] dark:shadow-[inset_0_1px_2px_rgba(255,255,255,0.1)] pointer-events-none" />
-                <div className="flex justify-center mb-3 opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300">{stat.icon}</div>
-                <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-emerald-500 dark:from-blue-400 dark:to-emerald-400 bg-clip-text text-transparent mb-2">{stat.value}</div>
-                <div className="text-sm text-gray-500 dark:text-gray-400">{stat.label}</div>
+              <div key={i} className="group text-center p-12 rounded-[3rem] bg-white/40 dark:bg-white/[0.03] border border-white dark:border-white/[0.1] backdrop-blur-[60px] hover:border-blue-500/40 transition-all duration-700 hover:-translate-y-4 shadow-2xl glass-grain">
+                <div className="flex justify-center mb-10 opacity-30 group-hover:opacity-100 group-hover:scale-125 transition-all duration-1000 drop-shadow-[0_0_20px_currentColor]">{stat.icon}</div>
+                <div className="text-5xl md:text-6xl font-black bg-gradient-to-r from-blue-600 via-indigo-600 to-emerald-500 dark:from-blue-400 dark:via-indigo-400 dark:to-emerald-400 bg-clip-text text-transparent mb-4 italic italic">{stat.value}</div>
+                <div className="text-xs font-black uppercase tracking-[0.3em] text-gray-400 dark:text-gray-500">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -430,39 +454,32 @@ export default function Home() {
       </section>
 
       {/* ─── TESTIMONIALS ─── */}
-      <section id="testimonials" className="py-24 md:py-28 px-6 relative">
-        <div className="absolute inset-0 -z-10">
-          <div className="absolute top-1/2 left-1/4 w-[500px] h-[300px] bg-rose-200/10 dark:bg-blue-600/6 rounded-full blur-[120px]" />
-        </div>
-        <div className="max-w-6xl mx-auto">
-          <div ref={addRevealRef} className="reveal text-center mb-14 md:mb-16">
-            <span className="inline-flex items-center gap-2 mb-4 px-4 py-2 rounded-full bg-white/50 dark:bg-white/[0.04] border border-white/60 dark:border-white/[0.06] text-xs font-semibold text-rose-500 dark:text-rose-400 uppercase tracking-widest backdrop-blur-2xl shadow-[0_4px_16px_rgba(0,0,0,0.03)]">
-              <MessageSquare className="w-3.5 h-3.5" /> Testimonials
+      <section id="testimonials" className="py-40 px-6 relative">
+        <div className="max-w-7xl mx-auto">
+          <div ref={addRevealRef} className="reveal text-center mb-32">
+            <span className="inline-flex items-center gap-3 mb-8 px-6 py-2.5 rounded-full bg-rose-500/10 border border-rose-500/20 text-[10px] font-black text-rose-500 dark:text-rose-400 uppercase tracking-[0.4em] backdrop-blur-3xl">
+              <MessageSquare className="w-5 h-5" /> Clinical Feedback
             </span>
-            <h2 className="text-3xl md:text-5xl font-bold tracking-tight">
-              <span className="text-gray-900 dark:text-white">Loved by Health-Conscious</span><br />
-              <span className="bg-gradient-to-r from-rose-500 to-orange-500 dark:from-rose-400 dark:to-orange-400 bg-clip-text text-transparent">Users Everywhere</span>
-            </h2>
+            <h2 className="text-5xl md:text-8xl font-black tracking-tighter mb-10 text-gray-900 dark:text-white">Professional Consensus</h2>
           </div>
-          <div className="grid md:grid-cols-3 gap-5 md:gap-6">
+
+          <div className="grid md:grid-cols-3 gap-10">
             {testimonials.map((t, i) => (
-              <div key={i} ref={addRevealRef} className={`reveal stagger-${i + 1} group relative rounded-2xl p-[1px]`}>
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-gray-200/80 to-gray-100/40 dark:from-white/[0.1] dark:to-white/[0.04] group-hover:from-gray-300/80 group-hover:to-gray-200/40 dark:group-hover:from-white/[0.15] dark:group-hover:to-white/[0.06] transition-all duration-500" />
-                <div className="relative bg-white/60 dark:bg-white/[0.06] backdrop-blur-3xl backdrop-saturate-[1.8] rounded-[22px] p-7 md:p-8 h-full transition-all duration-500 dark:shadow-[0_8px_40px_rgba(0,0,0,0.2),0_0_0_1px_rgba(255,255,255,0.04)]">
-                  <div className="absolute inset-0 rounded-[22px] shadow-[inset_0_1px_1px_rgba(255,255,255,0.3)] dark:shadow-[inset_0_1px_2px_rgba(255,255,255,0.08)] pointer-events-none" />
-                  <div className="flex gap-1 mb-4">
+              <div key={i} ref={addRevealRef} className={`reveal stagger-${i + 1} group relative rounded-[3.5rem] p-[1.5px]`}>
+                <div className="relative bg-white/[0.6] dark:bg-[#030712]/40 backdrop-blur-[60px] rounded-[3.4rem] p-12 h-full border border-white dark:border-white/[0.08] shadow-2xl glass-grain">
+                  <div className="flex gap-2 mb-10">
                     {[...Array(5)].map((_, j) => (
-                      <svg key={j} className="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+                      <svg key={j} className="w-6 h-6 text-amber-500 drop-shadow-[0_0_10px_rgba(245,158,11,0.4)]" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                       </svg>
                     ))}
                   </div>
-                  <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed mb-6 italic">&ldquo;{t.quote}&rdquo;</p>
-                  <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${t.avatarGradient} flex items-center justify-center text-white text-sm font-bold shadow-md`}>{t.initials}</div>
+                  <p className="text-gray-600 dark:text-gray-300 text-2xl leading-relaxed mb-12 font-bold italic">&ldquo;{t.quote}&rdquo;</p>
+                  <div className="flex items-center gap-6 pt-10 border-t border-gray-100 dark:border-white/[0.05]">
+                    <div className={`w-16 h-16 rounded-3xl bg-gradient-to-br ${t.avatarGradient} flex items-center justify-center text-white text-xl font-black shadow-2xl`}>{t.initials}</div>
                     <div>
-                      <div className="text-sm font-semibold text-gray-900 dark:text-white">{t.name}</div>
-                      <div className="text-xs text-gray-500">{t.role}</div>
+                      <div className="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tighter">{t.name}</div>
+                      <div className="text-xs font-black text-gray-400 uppercase tracking-[0.2em]">{t.role}</div>
                     </div>
                   </div>
                 </div>
@@ -472,64 +489,74 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ─── CTA ─── */}
-      <section className="px-6 py-24 md:py-28">
-        <div ref={addRevealRef} className="reveal relative max-w-4xl mx-auto overflow-hidden rounded-3xl border border-transparent dark:border-white/[0.08]">
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-indigo-600 to-emerald-500 animate-gradient-shift" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.2),transparent_60%)]" />
-          <div className="absolute top-[-50px] right-[-30px] w-[200px] h-[200px] bg-white/10 rounded-full blur-3xl animate-float" />
-          <div className="absolute bottom-[-60px] left-[-40px] w-[180px] h-[180px] bg-white/10 rounded-full blur-3xl animate-float-reverse" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-white/5 rounded-full blur-3xl" />
-          <div className="relative z-10 p-12 md:p-20 text-center">
-            <div className="inline-flex items-center gap-2 mb-6 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-sm text-white/90">
-              <Zap className="w-4 h-4" /> Start in under 30 seconds
+      {/* ─── CTA (MASSIVE GLASS CARD) ─── */}
+      <section className="px-6 py-40">
+        <div ref={addRevealRef} className="reveal relative max-w-7xl mx-auto overflow-hidden rounded-[4.5rem] border border-white/20 dark:border-white/[0.1] shadow-[0_100px_180px_-40px_rgba(0,0,0,0.3)] glass-grain bg-blue-600">
+            {/* Animated BG for CTA */}
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-indigo-600 to-emerald-500 animate-gradient-shift opacity-90" />
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.2),transparent_70%)]" />
+            
+            <div className="relative z-10 p-16 md:p-32 text-center flex flex-col items-center">
+                <div className="inline-flex items-center gap-3 mb-12 px-8 py-3 rounded-full bg-white/10 border border-white/20 text-xs font-black text-white uppercase tracking-[0.4em] backdrop-blur-3xl">
+                    <Zap className="w-6 h-6 fill-white" /> Access Operational Dashboard
+                </div>
+                <h2 className="text-5xl md:text-[6rem] lg:text-[7.5rem] font-black mb-14 text-white leading-[0.85] tracking-tighter uppercase italic">
+                    Decode Your
+                    <br />
+                    Future Health
+                </h2>
+                <p className="text-white/80 text-2xl md:text-3xl mb-20 max-w-4xl mx-auto leading-relaxed font-bold">Secure your medical baseline with clinical AI interpretations.</p>
+                
+                <div className="flex flex-wrap justify-center gap-8">
+                    <Link href="/auth/signup" className="group relative bg-white text-gray-900 px-[4.5rem] py-8 rounded-[3rem] text-[2.2rem] font-black uppercase tracking-tighter shadow-2xl hover:scale-105 active:scale-95 transition-all duration-700 hover:shadow-white/20">
+                        Initialize Tracking
+                        <div className="absolute -top-10 -right-10 w-32 h-32 bg-white/20 blur-3xl rounded-full transition-all group-hover:scale-150" />
+                    </Link>
+                </div>
             </div>
-            <h2 className="text-3xl md:text-5xl font-bold mb-6 text-white">Start Your AI Health<br />Journey Today</h2>
-            <p className="text-blue-100/80 text-lg mb-10 max-w-2xl mx-auto leading-relaxed">Generate clinical AI reports, detect health trends, and understand your medical data with intelligent, secure, non-diagnostic insights.</p>
-            <Link href="/auth/signup" className="group inline-flex items-center gap-3 bg-white text-gray-900 px-12 py-4 rounded-2xl text-lg font-bold hover:scale-[1.04] transition-all duration-300 shadow-2xl animate-pulse-glow">
-              Create Free Account
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </Link>
-          </div>
         </div>
-        <p className="text-sm text-gray-500 mt-10 max-w-2xl mx-auto text-center">CareCompass provides AI-generated health insights for informational purposes only and does not replace professional medical advice.</p>
+        <div className="mt-20 flex flex-col items-center gap-6">
+          <p className="text-sm font-black text-gray-400 dark:text-gray-600 flex items-center gap-3 uppercase tracking-[0.3em]">
+            <Shield className="w-5 h-5" /> PRIVACY FIRST • NON-DIAGNOSTIC • SECURE PROTOCOL
+          </p>
+        </div>
       </section>
 
-      {/* ─── FOOTER ─── */}
-      <footer className="border-t border-white/40 dark:border-white/[0.06] bg-white/30 dark:bg-white/[0.01] backdrop-blur-3xl backdrop-saturate-[1.5] transition-all duration-500">
-        <div className="max-w-7xl mx-auto px-6 md:px-8 py-14">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
-            <div className="md:col-span-2">
-              <div className="flex items-center gap-3 mb-4">
-                <img src="/logo.png" alt="CareCompass" className="w-9 h-9 object-contain" />
-                <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-emerald-500 dark:from-blue-400 dark:to-emerald-400 bg-clip-text text-transparent">CareCompass</span>
+      {/* ─── FOOTER (Dashboard Style) ─── */}
+      <footer className="border-t border-slate-200 dark:border-white/[0.08] bg-white/40 dark:bg-white/[0.02] backdrop-blur-[60px] transition-all duration-700 glass-grain">
+        <div className="max-w-7xl mx-auto px-6 md:px-12 py-32">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-24">
+            <div className="md:col-span-2 space-y-12">
+              <div className="flex items-center gap-5">
+                <img src="/logo.png" alt="CareCompass" className="w-16 h-16 object-contain filter drop-shadow-[0_0_15px_rgba(59,130,246,0.2)]" />
+                <span className="text-4xl font-black tracking-tighter bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent italic">CareCompass</span>
               </div>
-              <p className="text-gray-500 text-sm max-w-sm leading-relaxed mb-6">Your AI-powered health companion for smarter medical insights. Secure, intelligent, and privacy-first.</p>
-              <div className="flex gap-3">
-                {["🏥", "🔬", "💡"].map((e, i) => (
-                  <div key={i} className="w-9 h-9 rounded-lg bg-gray-100 dark:bg-white/[0.04] border border-gray-200/60 dark:border-white/[0.06] flex items-center justify-center text-sm hover:bg-gray-200 dark:hover:bg-white/[0.08] hover:border-gray-300 dark:hover:border-white/[0.12] transition-all duration-300 cursor-pointer">{e}</div>
-                ))}
-              </div>
+              <p className="text-gray-500 dark:text-gray-400 text-2xl max-w-md leading-relaxed font-bold uppercase tracking-tight">Revolutionizing health data intelligence with secure, private clinical-grade AI.</p>
             </div>
-            <div>
-              <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wider">Platform</h4>
-              <ul className="space-y-3 text-sm text-gray-500">
-                <li><Link href="/auth/signup" className="hover:text-gray-900 dark:hover:text-white transition-colors duration-300 flex items-center gap-1 group"><ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />Get Started</Link></li>
-                <li><Link href="/auth/login" className="hover:text-gray-900 dark:hover:text-white transition-colors duration-300 flex items-center gap-1 group"><ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />Sign In</Link></li>
+            <div className="space-y-10">
+              <h4 className="text-xs font-black text-gray-900 dark:text-white uppercase tracking-[0.4em]">Technology Stack</h4>
+              <ul className="space-y-6 text-xl font-bold text-gray-400 dark:text-gray-500">
+                <li><a href="#features" className="hover:text-blue-600 transition-all uppercase tracking-tight">Gemini 1.5 Pro</a></li>
+                <li><a href="#features" className="hover:text-blue-600 transition-all uppercase tracking-tight">Temporal Engine</a></li>
+                <li><a href="#features" className="hover:text-blue-600 transition-all uppercase tracking-tight">Protocol Sync</a></li>
               </ul>
             </div>
-            <div>
-              <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wider">Features</h4>
-              <ul className="space-y-3 text-sm text-gray-500">
-                <li><a href="#features" className="hover:text-gray-900 dark:hover:text-white transition-colors duration-300 flex items-center gap-1 group"><ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />AI Report Explainer</a></li>
-                <li><a href="#features" className="hover:text-gray-900 dark:hover:text-white transition-colors duration-300 flex items-center gap-1 group"><ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />Health Tracking</a></li>
-                <li><a href="#features" className="hover:text-gray-900 dark:hover:text-white transition-colors duration-300 flex items-center gap-1 group"><ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />Disease Predictor</a></li>
+            <div className="space-y-10">
+              <h4 className="text-xs font-black text-gray-900 dark:text-white uppercase tracking-[0.4em]">Infrastructure</h4>
+              <ul className="space-y-6 text-xl font-bold text-gray-400 dark:text-gray-500">
+                <li><Link href="/" className="hover:text-blue-600 transition-all uppercase tracking-tight">E2E Privacy</Link></li>
+                <li><Link href="/" className="hover:text-blue-600 transition-all uppercase tracking-tight">HIPAA Specs</Link></li>
+                <li><Link href="/" className="hover:text-blue-600 transition-all uppercase tracking-tight">Global Care</Link></li>
               </ul>
             </div>
           </div>
-          <div className="mt-12 pt-8 border-t border-gray-200/60 dark:border-white/[0.06] flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-sm text-gray-400 dark:text-gray-600">© {new Date().getFullYear()} CareCompass AI. All rights reserved.</p>
-            <p className="text-xs text-gray-400 dark:text-gray-600 flex items-center gap-2">Built with <span className="text-gray-500">Next.js</span> • <span className="text-gray-500">Firebase</span> • <span className="text-gray-500">Gemini AI</span></p>
+          <div className="mt-32 pt-12 border-t border-slate-200 dark:border-white/[0.08] flex flex-col md:flex-row items-center justify-between gap-10">
+            <p className="text-sm font-black text-gray-400 dark:text-gray-600 uppercase tracking-widest italic">© {new Date().getFullYear()} CareCompass Intel Bureau. All rights reserved.</p>
+            <div className="flex gap-4">
+               {["🏥", "🔬", "💡", "🛡️"].map((e, i) => (
+                  <div key={i} className="w-14 h-14 rounded-2xl bg-gray-100 dark:bg-white/[0.03] border border-gray-200/50 dark:border-white/[0.08] flex items-center justify-center text-2xl hover:bg-blue-600 hover:text-white transition-all cursor-pointer shadow-xl">{e}</div>
+                ))}
+            </div>
           </div>
         </div>
       </footer>
@@ -539,22 +566,22 @@ export default function Home() {
 
 /* ─── Data ─── */
 const features = [
-  { icon: <FileText className="w-6 h-6 text-white" />, title: "AI Report Explainer", description: "Upload medical reports (PDF, images, handwritten) and receive simplified AI explanations instantly.", gradient: "from-blue-500 to-blue-600", glow: "from-blue-500/10 to-transparent", borderGlow: "from-blue-500/40 via-blue-400/20 to-transparent" },
-  { icon: <Pill className="w-6 h-6 text-white" />, title: "Prescription Simplifier", description: "Decode complex prescriptions and medicine instructions into clear, easy-to-understand insights.", gradient: "from-violet-500 to-purple-600", glow: "from-violet-500/10 to-transparent", borderGlow: "from-violet-500/40 via-purple-400/20 to-transparent" },
-  { icon: <LineChart className="w-6 h-6 text-white" />, title: "AI Trend Detection", description: "Track weight, blood sugar, blood pressure, and custom health metrics with intelligent analysis.", gradient: "from-emerald-500 to-teal-600", glow: "from-emerald-500/10 to-transparent", borderGlow: "from-emerald-500/40 via-teal-400/20 to-transparent" },
-  { icon: <Bot className="w-6 h-6 text-white" />, title: "AI Health Assistant", description: "Chat with an AI health companion for personalized non-diagnostic guidance and wellness awareness.", gradient: "from-sky-500 to-blue-600", glow: "from-sky-500/10 to-transparent", borderGlow: "from-sky-500/40 via-blue-400/20 to-transparent" },
-  { icon: <Clock className="w-6 h-6 text-white" />, title: "Smart Reminders", description: "Manage medicine schedules and never miss a dose with intelligent reminder tracking and alerts.", gradient: "from-amber-500 to-orange-600", glow: "from-amber-500/10 to-transparent", borderGlow: "from-amber-500/40 via-orange-400/20 to-transparent" },
-  { icon: <Brain className="w-6 h-6 text-white" />, title: "Disease Predictor", description: "Analyze symptoms using hybrid AI and clinical logic to get non-diagnostic disease risk insights.", gradient: "from-rose-500 to-pink-600", glow: "from-rose-500/10 to-transparent", borderGlow: "from-rose-500/40 via-pink-400/20 to-transparent" },
+  { icon: <FileText className="w-12 h-12 text-white" />, title: "Report Explainer", description: "Decode complex medical reports with autonomous clinical-grade interpretative logic.", gradient: "from-blue-600 to-blue-800" },
+  { icon: <Pill className="w-12 h-12 text-white" />, title: "Precision Scan", description: "Identify pharmacological risks and schedule complexity through AI visual recognition.", gradient: "from-violet-600 to-purple-800" },
+  { icon: <LineChart className="w-12 h-12 text-white" />, title: "Vitals Analytics", description: "Monitor glucose, BP, and biomarkers with high-fidelity temporal trend detection.", gradient: "from-emerald-600 to-teal-800" },
+  { icon: <Bot className="w-12 h-12 text-white" />, title: "Health Intel", description: "Continuous AI companion for Wellness Awareness (Non-Diagnostic) and protocol adherence.", gradient: "from-sky-600 to-blue-800" },
+  { icon: <Clock className="w-12 h-12 text-white" />, title: "Temporal Keeper", description: "Dynamic medication cycles synchronized with your metabolic schedule for continuity.", gradient: "from-amber-600 to-orange-800" },
+  { icon: <Brain className="w-12 h-12 text-white" />, title: "Risk Forensics", description: "Evaluate symptom clusters through hybrid diagnostic-modeling for preventive awareness.", gradient: "from-rose-600 to-pink-800" },
 ];
 
 const steps = [
-  { icon: <Upload className="w-7 h-7 text-white" />, title: "Upload Medical Data", description: "Securely upload reports, prescriptions, and health logs to your private dashboard.", gradient: "from-blue-500 to-indigo-600" },
-  { icon: <Brain className="w-7 h-7 text-white" />, title: "AI Clinical Analysis", description: "Advanced AI models analyze your data and extract meaningful health insights in seconds.", gradient: "from-indigo-500 to-purple-600" },
-  { icon: <HeartPulse className="w-7 h-7 text-white" />, title: "Smart Health Insights", description: "Receive simplified explanations, trend detection, and preventive guidance for better health.", gradient: "from-emerald-500 to-teal-600" },
+  { icon: <Upload className="w-14 h-14 text-white" />, title: "Data Ingest", description: "Inject reports and vitals into your encrypted private healthcare bureau.", gradient: "from-blue-700 to-indigo-900" },
+  { icon: <Brain className="w-14 h-14 text-white" />, title: "Core Analysis", description: "Gemini 1.5 Pro interpretative logic processes raw medical datasets.", gradient: "from-indigo-700 to-purple-900" },
+  { icon: <HeartPulse className="w-14 h-14 text-white" />, title: "Protocol Output", description: "Actionable non-diagnostic insights delivered for informed medical collaboration.", gradient: "from-emerald-700 to-teal-900" },
 ];
 
 const testimonials = [
-  { quote: "CareCompass made understanding my blood test results so much easier. The AI explanations are incredibly clear and helpful.", name: "Priya Sharma", role: "Health Enthusiast", initials: "PS", avatarGradient: "from-blue-500 to-indigo-600" },
-  { quote: "I love the prescription simplifier. As a caregiver for my parents, it helps me understand their medications without confusion.", name: "Rahul Mehta", role: "Family Caregiver", initials: "RM", avatarGradient: "from-emerald-500 to-teal-600" },
-  { quote: "The health tracking and trend detection caught an upward pattern in my blood sugar before it became concerning. Truly invaluable.", name: "Ananya Gupta", role: "Fitness Tracker", initials: "AG", avatarGradient: "from-rose-500 to-pink-600" },
+  { quote: "The interpretative logic of CareCompass provides a clarity previously inaccessible to patients.", name: "Dr. Elena Vance", role: "Bureau Chief of Medicine", initials: "EV", avatarGradient: "from-blue-700 to-indigo-900" },
+  { quote: "Finally, a medical-grade interface for managing complex family pharmacological schedules.", name: "Marcus Thorne", role: "Health Architect", initials: "MT", avatarGradient: "from-emerald-700 to-teal-900" },
+  { quote: "Autonomous trend detection identified a cycle of sodium imbalance before symptomatology occurred.", name: "Sarah Chen", role: "Biotech Analyst", initials: "SC", avatarGradient: "from-rose-700 to-pink-900" },
 ];
