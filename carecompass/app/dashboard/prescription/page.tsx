@@ -128,7 +128,7 @@ function PrescriptionContent() {
                 Prescription Decoder
               </h1>
             </div>
-            <p className="text-gray-600 dark:text-gray-400 font-bold max-w-xl text-lg leading-relaxed">
+            <p className="text-gray-700 dark:text-gray-400 font-bold max-w-xl text-lg leading-relaxed">
               Clinical-grade OCR and pharmacological simplification. CareCompass AI interprets handwritten data into patient-centric instructions.
             </p>
           </div>
@@ -155,7 +155,7 @@ function PrescriptionContent() {
 
               <div className="space-y-6">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Document Scan</label>
+                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-600 dark:text-gray-500 ml-2">Document Scan</label>
                   <div className="relative group/upload border-2 border-dashed border-indigo-500/20 dark:border-white/10 rounded-[2rem] p-10 text-center hover:bg-indigo-500/5 dark:hover:bg-white/5 transition-all cursor-pointer overflow-hidden">
                     <input
                       type="file"
@@ -166,7 +166,7 @@ function PrescriptionContent() {
                     <div className="relative z-10 space-y-3">
                        <UploadCloud className="mx-auto text-indigo-500 group-hover/upload:scale-110 transition-transform" size={40} />
                        <div className="font-black text-sm uppercase tracking-widest">DRAG & DROP SCAN</div>
-                       <p className="text-[10px] font-bold text-gray-400 italic">Supports Scanned PDFs & JPEGs</p>
+                       <p className="text-[10px] font-bold text-gray-600 dark:text-gray-400 italic">Supports Scanned PDFs & JPEGs</p>
                     </div>
                   </div>
                   {fileLoading && (
@@ -178,7 +178,7 @@ function PrescriptionContent() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Raw Clinical Data</label>
+                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-600 dark:text-gray-500 ml-2">Raw Clinical Data</label>
                   <textarea
                     rows={8}
                     className="w-full bg-white/40 dark:bg-black/40 border border-white/80 dark:border-white/10 p-6 rounded-[2rem] font-bold outline-none focus:ring-4 focus:ring-indigo-500/10 transition-all text-xs leading-relaxed"
@@ -208,8 +208,8 @@ function PrescriptionContent() {
                  <Stethoscope size={64} strokeWidth={1} />
               </div>
               <div className="space-y-2">
-                <h3 className="text-2xl font-black tracking-tighter text-gray-400 italic">Awaiting Regimen Synthesis</h3>
-                <p className="text-xs font-bold text-gray-500 max-w-xs uppercase tracking-widest leading-loose">Upload a prescription to generate a simplified medical translation matrix.</p>
+                <h3 className="text-2xl font-black tracking-tighter text-gray-600 dark:text-gray-400 italic">Awaiting Regimen Synthesis</h3>
+                <p className="text-xs font-bold text-gray-700 dark:text-gray-500 max-w-xs uppercase tracking-widest leading-loose">Upload a prescription to generate a simplified medical translation matrix.</p>
               </div>
             </div>
           ) : (
@@ -239,13 +239,13 @@ function PrescriptionContent() {
 
                 <div className="p-6 rounded-3xl bg-amber-500/5 border border-amber-500/20 flex gap-4 items-start">
                    <AlertCircle className="text-amber-500 flex-shrink-0 mt-1" size={20} />
-                   <p className="text-xs font-bold text-gray-600 dark:text-gray-400 leading-relaxed italic">
+                   <p className="text-xs font-bold text-gray-700 dark:text-gray-400 leading-relaxed italic">
                      <span className="text-amber-600 uppercase font-black mr-2">Clinical Disclaimer:</span>
                      This synthesis is for informational continuity only. Always prioritize verified physician commands over AI pharmacological translations.
                    </p>
                 </div>
 
-                <div className="prose prose-lg dark:prose-invert prose-headings:font-black prose-headings:text-gray-900 dark:prose-headings:text-white prose-p:font-bold prose-p:text-gray-600 dark:prose-p:text-gray-400 prose-strong:text-indigo-600 dark:prose-strong:text-indigo-400 prose-li:marker:text-blue-500 max-w-none text-sm leading-8">
+                <div className="prose prose-lg dark:prose-invert prose-headings:font-black prose-headings:text-gray-900 dark:prose-headings:text-white prose-p:font-bold prose-p:text-gray-700 dark:prose-p:text-gray-400 prose-strong:text-indigo-600 dark:prose-strong:text-indigo-400 prose-li:marker:text-blue-500 max-w-none text-sm leading-8">
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>
                     {result}
                   </ReactMarkdown>
@@ -271,7 +271,7 @@ function PrescriptionContent() {
                 <div key={item.id} className={`relative group border transition-all duration-500 rounded-[3rem] p-10 overflow-hidden ${isExpanded ? "md:col-span-2 lg:col-span-3 bg-white/80 dark:bg-white/5 border-indigo-500/30 shadow-2xl" : "bg-white/[0.4] dark:bg-[#030712]/30 border-white/80 dark:border-white/5 hover:bg-white/60 dark:hover:bg-white/10 shadow-xl"}`}>
                   <div className="relative z-10 space-y-6">
                     <div className="flex justify-between items-center">
-                       <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 flex items-center gap-2">
+                       <p className="text-[10px] font-black uppercase tracking-widest text-gray-600 dark:text-gray-500 flex items-center gap-2">
                           <Clock size={12} /> {item.createdAt?.toDate?.().toLocaleDateString()}
                        </p>
                        <button onClick={() => handleDelete(item.id)} className="p-3 rounded-2xl bg-red-500/5 text-red-500 border border-red-500/10 hover:bg-red-500 hover:text-white transition-all">
@@ -284,7 +284,7 @@ function PrescriptionContent() {
                           <div className="p-2 rounded-xl bg-blue-500/10 text-blue-500"><FileText size={18} /></div>
                           Protocol Analysis
                        </h4>
-                       <p className={`text-xs font-bold text-gray-500 italic leading-relaxed ${isExpanded ? "" : "line-clamp-2"}`}>"{item.originalText}"</p>
+                       <p className={`text-xs font-bold text-gray-700 dark:text-gray-400 italic leading-relaxed ${isExpanded ? "" : "line-clamp-2"}`}>"{item.originalText}"</p>
                     </div>
 
                     {isExpanded && (
@@ -292,7 +292,7 @@ function PrescriptionContent() {
                           <p className="text-[10px] font-black uppercase tracking-widest text-indigo-500 mb-4 flex items-center gap-2">
                              <BrainCircuit size={12} /> Decoded Transformation
                           </p>
-                          <div className="prose prose-sm dark:prose-invert max-w-none text-gray-600 dark:text-gray-400 font-bold leading-7">
+                          <div className="prose prose-sm dark:prose-invert max-w-none text-gray-700 dark:text-gray-400 font-bold leading-7">
                              <ReactMarkdown remarkPlugins={[remarkGfm]}>{item.aiResponse}</ReactMarkdown>
                           </div>
                        </div>
