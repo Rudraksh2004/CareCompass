@@ -12,12 +12,16 @@ import {
   HeartPulse, 
   Dna,
   Database,
-  Globe
+  Globe,
+  Github,
+  Linkedin,
+  Sun,
+  Moon
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
 export default function AboutPage() {
-  const { theme, mounted } = useTheme();
+  const { theme, mounted, toggleTheme } = useTheme();
   const { user } = useAuth();
   const isDark = mounted ? theme === "dark" : false;
 
@@ -31,16 +35,26 @@ export default function AboutPage() {
       {/* ─── NAVIGATION ─── */}
       <nav className="fixed top-0 w-full z-50 border-b border-white/60 dark:border-white/[0.08] backdrop-blur-[40px] bg-white/40 dark:bg-[#030712]/30 px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <Link href={hubLink} className="flex items-center gap-3 hover:opacity-80 transition-all">
-            <div className="p-2 rounded-xl bg-blue-500/10 text-blue-600">
-               <ChevronLeft size={20} />
+          <div className="flex items-center gap-10">
+            <Link href={hubLink} className="flex items-center gap-3 hover:opacity-80 transition-all">
+              <div className="p-2 rounded-xl bg-blue-500/10 text-blue-600">
+                 <ChevronLeft size={20} />
+              </div>
+              <span className="text-[11px] font-black uppercase tracking-[0.4em] italic">Back to Hub</span>
+            </Link>
+            <div className="hidden md:flex items-center gap-3">
+               <img src="/logo.png" alt="Logo" className="w-8 h-8" />
+               <span className="text-lg font-black italic tracking-tighter">CareCompass</span>
             </div>
-            <span className="text-[11px] font-black uppercase tracking-[0.4em] italic">Back to Hub</span>
-          </Link>
-          <div className="flex items-center gap-3">
-             <img src="/logo.png" alt="Logo" className="w-8 h-8" />
-             <span className="text-lg font-black italic tracking-tighter">CareCompass</span>
           </div>
+
+          <button 
+            onClick={toggleTheme}
+            className="w-11 h-11 rounded-[1.2rem] bg-white/40 dark:bg-white/[0.05] border border-white dark:border-white/[0.1] backdrop-blur-xl flex items-center justify-center text-xl hover:scale-110 active:scale-95 transition-all shadow-lg group relative overflow-hidden"
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-indigo-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+            {theme === "dark" ? <Sun className="w-5 h-5 text-amber-400 animate-pulse" /> : <Moon className="w-5 h-5 text-indigo-600" />}
+          </button>
         </div>
       </nav>
 
@@ -159,6 +173,35 @@ export default function AboutPage() {
                         <div className="w-2 h-2 rounded-full bg-blue-500/40 group-hover/item:bg-blue-500 transition-colors" />
                         <span className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">{spec}</span>
                      </div>
+                   ))}
+                </div>
+
+                {/* ─── SECURE SOCIAL UPLINK ─── */}
+                <div className="pt-8 flex items-center gap-4">
+                   {[
+                     { icon: <Github size={20} />, href: "https://github.com/Rudraksh2004", label: "GitHub" },
+                     { icon: <Linkedin size={20} />, href: "https://www.linkedin.com/in/rudraksh-ganguly-411a39328/", label: "LinkedIn" },
+                     { icon: (
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                           <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                           <path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z" />
+                           <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+                        </svg>
+                     ), href: "https://www.instagram.com/__ninja18__/", label: "Instagram" }
+                   ].map((social, i) => (
+                      <a 
+                        key={i} 
+                        href={social.href} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="p-4 rounded-2xl bg-white/40 dark:bg-white/[0.05] border border-white dark:border-white/[0.1] text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-500 hover:scale-110 transition-all hover:shadow-xl group/link relative"
+                        title={social.label}
+                      >
+                         {social.icon}
+                         <div className="absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-lg bg-gray-900 text-white text-[8px] font-black uppercase tracking-widest opacity-0 group-hover/link:opacity-100 transition-opacity pointer-events-none">
+                            {social.label}
+                         </div>
+                      </a>
                    ))}
                 </div>
              </div>
