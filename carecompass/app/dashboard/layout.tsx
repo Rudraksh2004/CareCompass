@@ -77,8 +77,8 @@ export default function DashboardLayout({
       {/* SIDEBAR (Liquid Glass) - Fixed for constant visibility */}
       <aside
         className={`${
-          collapsed ? "w-20" : "w-[280px]"
-        } fixed top-0 left-0 h-screen z-50 p-6 border-r border-white/80 dark:border-white/[0.08] border-r-white/40 bg-white/[0.6] dark:bg-[#030712]/50 backdrop-blur-[50px] backdrop-saturate-[2.5] shadow-[12px_0_60px_rgba(0,0,0,0.04)] dark:shadow-[12px_0_60px_rgba(0,0,0,0.4)] flex flex-col transition-all duration-500 ease-in-out group/sidebar`}
+          collapsed ? "w-20 px-3" : "w-[280px] p-6"
+        } py-6 fixed top-0 left-0 h-screen z-50 border-r border-white/80 dark:border-white/[0.08] border-r-white/40 bg-white/[0.6] dark:bg-[#030712]/50 backdrop-blur-[50px] backdrop-saturate-[2.5] shadow-[12px_0_60px_rgba(0,0,0,0.04)] dark:shadow-[12px_0_60px_rgba(0,0,0,0.4)] flex flex-col transition-all duration-500 ease-in-out group/sidebar`}
       >
         <div className="absolute inset-0 bg-gradient-to-b from-blue-500/[0.02] via-transparent to-emerald-500/[0.02] pointer-events-none" />
         <div className="absolute top-0 right-0 w-[1px] h-full bg-gradient-to-b from-transparent via-blue-500/20 to-transparent opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-1000" />
@@ -329,7 +329,7 @@ function NavItem({
     <Link
       href={href}
       className={`group relative flex items-center ${
-        collapsed ? "justify-center px-0" : "gap-3 px-5"
+        collapsed ? "justify-center px-0 w-full" : "gap-3 px-5 w-full"
       } py-2.5 rounded-xl transition-all duration-500 overflow-hidden ${
         isActive
           ? "bg-white/[0.9] dark:bg-white/[0.07] text-blue-700 dark:text-emerald-300 shadow-md dark:shadow-xl border border-white dark:border-white/[0.12] backdrop-blur-[40px] font-black translate-x-1"
