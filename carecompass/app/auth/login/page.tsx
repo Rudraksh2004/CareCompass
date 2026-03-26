@@ -34,7 +34,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-6 relative overflow-hidden bg-gradient-to-br from-white via-blue-50/20 to-indigo-50/10 dark:from-[#020617] dark:via-[#050b18] dark:to-[#020814] text-gray-900 dark:text-gray-100 transition-all duration-700">
+    <div className="min-h-screen flex items-center justify-center px-6 py-10 relative overflow-hidden bg-gradient-to-br from-white via-blue-50/20 to-indigo-50/10 dark:from-[#020617] dark:via-[#050b18] dark:to-[#020814] text-gray-900 dark:text-gray-100 transition-all duration-700">
 
       {/* ─── Liquid Glass Background Layers ─── */}
       <div className="absolute inset-0 -z-10">

@@ -54,7 +54,7 @@ export default function SignupPage() {
     `relative rounded-[1.2rem] transition-all duration-300 ${focusedField === field ? "ring-2 ring-emerald-500/30" : ""}`;
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-6 py-8 relative overflow-hidden bg-gradient-to-br from-white via-emerald-50/20 to-indigo-50/10 dark:from-[#020617] dark:via-[#051814] dark:to-[#020814] text-gray-900 dark:text-gray-100 transition-all duration-700">
+    <div className="min-h-screen flex items-center justify-center px-6 py-12 relative overflow-hidden bg-gradient-to-br from-white via-emerald-50/20 to-indigo-50/10 dark:from-[#020617] dark:via-[#051814] dark:to-[#020814] text-gray-900 dark:text-gray-100 transition-all duration-700">
 
       {/* ─── Liquid Glass Background Layers ─── */}
       <div className="absolute inset-0 -z-10">
