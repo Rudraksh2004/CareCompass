@@ -23,7 +23,10 @@ import {
   Sun,
   Moon,
   LogOut,
-  Settings
+  Settings,
+  Twitter,
+  Linkedin,
+  Github
 } from "lucide-react";
 
 export default function DashboardLayout({
@@ -280,28 +283,56 @@ export default function DashboardLayout({
         </header>
 
         {/* Page Content */}
-        <div className="flex-1 p-6 md:p-10 mb-8">
+        <div className="flex-1 p-6 md:p-10 mb-8 overflow-y-auto">
           <div className="max-w-[1400px] mx-auto">{children}</div>
         </div>
 
         {/* ─── DASHBOARD FOOTER ─── */}
-        <footer className="mt-auto border-t border-white/80 border-t-white/40 dark:border-white/[0.08] backdrop-blur-[40px] backdrop-saturate-[2] bg-white/[0.65] dark:bg-[#030712]/40 py-8 px-8 transition-all duration-500 shadow-[0_-4px_30px_rgba(0,0,0,0.02)] dark:shadow-[0_-8px_40px_rgba(0,0,0,0.2)]">
-          <div className="max-w-[1400px] mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <img src="/logo.png" alt="CareCompass" className="w-7 h-7 object-contain drop-shadow-sm opacity-90 dark:opacity-100" />
-              <span className="text-sm font-bold bg-gradient-to-r from-gray-800 to-gray-500 dark:from-white dark:to-gray-400 bg-clip-text text-transparent">
-                CareCompass AI
-              </span>
-            </div>
-            
-            <p className="text-xs text-gray-800 dark:text-gray-300 text-center md:text-left font-bold">
-              © {new Date().getFullYear()} CareCompass AI. All rights reserved. <br className="md:hidden" />
-              Not a medical diagnostic tool.
-            </p>
+        <footer className="mt-auto border-t border-gray-200 dark:border-white/[0.08] backdrop-blur-[80px] bg-white/50 dark:bg-[#030712]/50 py-12 px-10">
+          <div className="max-w-[1400px] mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8 mb-16">
+              <div className="space-y-4 text-center md:text-left">
+                <div className="flex items-center justify-center md:justify-start gap-3">
+                  <img src="/logo.png" alt="Logo" className="w-8 h-8 object-contain" />
+                  <span className="text-xl font-black tracking-tighter dark:text-white">CareCompass</span>
+                </div>
+                <p className="text-xs font-bold text-gray-500 dark:text-gray-400 leading-relaxed">
+                  Decisions with AI-driven solutions.
+                </p>
+              </div>
 
-            <div className="flex gap-5 text-xs font-black tracking-wide text-gray-800 dark:text-gray-200">
-              <span className="hover:text-blue-700 dark:hover:text-blue-300 cursor-pointer transition-colors duration-300">Privacy</span>
-              <span className="hover:text-blue-700 dark:hover:text-blue-300 cursor-pointer transition-colors duration-300">Terms</span>
+              <div className="text-center md:text-left">
+                <h4 className="text-[11px] font-black uppercase tracking-widest mb-6 dark:text-white">Services</h4>
+                <div className="flex flex-col gap-3 text-xs font-bold text-gray-500 dark:text-gray-400">
+                  <Link href="/dashboard/report" className="hover:text-blue-600 transition-colors">Report Analyzer</Link>
+                  <Link href="/dashboard/disease-predictor" className="hover:text-blue-600 transition-colors">Disease Predictor</Link>
+                  <Link href="/dashboard/reminders" className="hover:text-blue-600 transition-colors">Medicine Details</Link>
+                </div>
+              </div>
+
+              <div className="text-center md:text-left">
+                <h4 className="text-[11px] font-black uppercase tracking-widest mb-6 dark:text-white">Company</h4>
+                <div className="flex flex-col gap-3 text-xs font-bold text-gray-500 dark:text-gray-400">
+                  <span className="hover:text-blue-600 cursor-pointer">About Us</span>
+                  <span className="hover:text-blue-600 cursor-pointer">Contact</span>
+                  <span className="hover:text-blue-600 cursor-pointer">Privacy Policy</span>
+                </div>
+              </div>
+
+              <div className="text-center md:text-left">
+                <h4 className="text-[11px] font-black uppercase tracking-widest mb-6 dark:text-white">Connect</h4>
+                <div className="flex flex-col gap-3 text-xs font-bold text-gray-500 dark:text-gray-400">
+                  <span className="hover:text-blue-600 cursor-pointer">Twitter</span>
+                  <span className="hover:text-blue-600 cursor-pointer">LinkedIn</span>
+                  <span className="hover:text-blue-600 cursor-pointer">GitHub</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-8 border-t border-gray-100 dark:border-white/[0.05] text-center">
+              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                © {new Date().getFullYear()} CareCompass AI. All rights reserved.
+              </p>
             </div>
           </div>
         </footer>

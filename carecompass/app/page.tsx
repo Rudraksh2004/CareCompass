@@ -33,6 +33,11 @@ import {
   PlusCircle,
   HelpCircle,
   ChevronDown,
+  Twitter,
+  Linkedin,
+  Github,
+  Mail,
+  Send
 } from "lucide-react";
 
 /* ─── HOOKS ─── */
@@ -325,32 +330,57 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="border-t border-slate-200 dark:border-white/[0.08] bg-white/40 dark:bg-white/[0.02] backdrop-blur-[60px] glass-grain">
-        <div className="max-w-7xl mx-auto px-6 md:px-12 py-32 grid md:grid-cols-4 gap-24">
-            <div className="md:col-span-2 space-y-12">
-                <div className="flex items-center gap-5"><img src="/logo.png" alt="Logo" className="w-14 h-14 drop-shadow-[0_0_15px_rgba(59,130,246,0.3)]" /><span className="text-3xl font-black tracking-tighter bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent italic">CareCompass</span></div>
-                <p className="text-gray-500 dark:text-gray-400 text-xl max-w-md leading-relaxed font-bold uppercase tracking-tight selection:bg-blue-500/20">Advanced medical-grade AI intelligence for autonomous health sovereignty. HIPAA Compliant. E2E Encrypted.</p>
+      <footer className="relative mt-20 border-t border-gray-200 dark:border-white/[0.08] bg-white/60 dark:bg-[#030712]/30 backdrop-blur-[80px] py-20 px-6 md:px-12">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8 mb-20">
+            {/* Left: Brand */}
+            <div className="space-y-6">
+              <div className="flex items-center gap-3">
+                <img src="/logo.png" alt="CareCompass Logo" className="w-10 h-10 object-contain drop-shadow-sm" />
+                <span className="text-2xl font-black tracking-tighter text-gray-900 dark:text-white">CareCompass</span>
+              </div>
+              <p className="text-gray-500 dark:text-gray-400 text-sm font-medium leading-relaxed max-w-xs">
+                Empowering healthcare decisions with AI-driven solutions and clinical-grade intelligence.
+              </p>
             </div>
+
+            {/* Services */}
             <div>
-                <h4 className="text-xs font-black text-gray-900 dark:text-white uppercase tracking-[0.4em] mb-10">Module Stack</h4>
-                <ul className="space-y-6 text-lg font-bold text-gray-400 italic">
-                    <li><a href="#" className="hover:text-blue-600 transition-all uppercase">Disease AI Predictor</a></li>
-                    <li><a href="#" className="hover:text-blue-600 transition-all uppercase">Medicine Reminder</a></li>
-                    <li><a href="#" className="hover:text-blue-600 transition-all uppercase">Report Simplifier</a></li>
-                </ul>
+              <h4 className="text-sm font-black text-gray-950 dark:text-white uppercase tracking-widest mb-8">Services</h4>
+              <ul className="space-y-4 text-sm font-bold text-gray-500 dark:text-gray-400">
+                <li><Link href="/dashboard/report" className="hover:text-blue-600 transition-colors">Report Explainer</Link></li>
+                <li><Link href="/dashboard/disease-predictor" className="hover:text-blue-600 transition-colors">Disease Predictor</Link></li>
+                <li><Link href="/dashboard/reminders" className="hover:text-blue-600 transition-colors">Medicine Details</Link></li>
+              </ul>
             </div>
+
+            {/* Company */}
             <div>
-                <h4 className="text-xs font-black text-gray-900 dark:text-white uppercase tracking-[0.4em] mb-10">Legal Protocol</h4>
-                <ul className="space-y-6 text-lg font-bold text-gray-400 italic">
-                    <li><a href="#" className="hover:text-blue-600 transition-all uppercase">Privacy Sandbox</a></li>
-                    <li><a href="#" className="hover:text-blue-600 transition-all uppercase">HIPAA Specs</a></li>
-                    <li><a href="#" className="hover:text-blue-600 transition-all uppercase">Usage Terms</a></li>
-                </ul>
+              <h4 className="text-sm font-black text-gray-950 dark:text-white uppercase tracking-widest mb-8">Company</h4>
+              <ul className="space-y-4 text-sm font-bold text-gray-500 dark:text-gray-400">
+                <li><Link href="#services" className="hover:text-blue-600 transition-colors">About Us</Link></li>
+                <li><Link href="#protocol" className="hover:text-blue-600 transition-colors">Contact</Link></li>
+                <li><Link href="#" className="hover:text-blue-600 transition-colors">Privacy Policy</Link></li>
+              </ul>
             </div>
-        </div>
-        <div className="max-w-7xl mx-auto px-6 py-12 border-t border-slate-200 dark:border-white/[0.08] flex justify-between items-center">
-            <p className="text-sm font-black text-gray-400 uppercase tracking-widest italic">© 2026 CareCompass Bureau Lab. All rights reserverd.</p>
-            <div className="flex gap-4">{["🏥","🔬","🛡️"].map(e => <div key={e} className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center text-xl shadow-xl">{e}</div>)}</div>
+
+            {/* Connect */}
+            <div>
+              <h4 className="text-sm font-black text-gray-950 dark:text-white uppercase tracking-widest mb-8">Connect</h4>
+              <ul className="space-y-4 text-sm font-bold text-gray-500 dark:text-gray-400">
+                <li><a href="#" className="hover:text-blue-600 transition-colors">Twitter</a></li>
+                <li><a href="#" className="hover:text-blue-600 transition-colors">LinkedIn</a></li>
+                <li><a href="#" className="hover:text-blue-600 transition-colors">GitHub</a></li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Bottom: Copyright */}
+          <div className="pt-12 border-t border-gray-100 dark:border-white/[0.05] text-center">
+            <p className="text-sm font-bold text-gray-400 dark:text-gray-500 lowercase tracking-tight">
+              © {new Date().getFullYear()} CareCompass AI. All rights reserved.
+            </p>
+          </div>
         </div>
       </footer>
     </div>
