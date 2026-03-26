@@ -336,7 +336,7 @@ export default function Home() {
         <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-emerald-500/5 blur-[120px] rounded-full pointer-events-none" />
         <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-blue-500/30 to-transparent animate-pulse" />
 
-        <div className="max-w-7xl mx-auto px-6 md:px-12 py-24">
+        <div className="max-w-7xl mx-auto px-6 md:px-12 pt-24 pb-12">
           {/* ─── NEURAL UPLINK (Sub-footer CTA) ─── */}
           <div className="mb-24 p-8 md:p-12 rounded-[3.5rem] bg-white/30 dark:bg-white/[0.02] border border-white/80 dark:border-white/[0.08] backdrop-blur-[80px] flex flex-col lg:flex-row items-center justify-between gap-12 group transition-all duration-700 hover:border-blue-500/30 shadow-2xl glass-grain">
             <div className="max-w-xl text-center lg:text-left">

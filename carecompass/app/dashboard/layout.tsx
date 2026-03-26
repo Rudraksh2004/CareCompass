@@ -299,7 +299,7 @@ export default function DashboardLayout({
         <footer className="mt-auto relative border-t border-white/80 dark:border-white/[0.08] bg-white/40 dark:bg-[#030712]/30 backdrop-blur-[100px] overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-blue-500/30 to-transparent animate-pulse" />
           
-          <div className="max-w-[1400px] mx-auto px-10 py-16">
+          <div className="max-w-[1400px] mx-auto px-10 pt-16 pb-8">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8 mb-16">
               {/* Identity Node */}
               <div className="space-y-6 text-center md:text-left">
