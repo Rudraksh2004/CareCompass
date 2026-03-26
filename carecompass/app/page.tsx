@@ -330,56 +330,112 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="relative mt-20 border-t border-gray-200 dark:border-white/[0.08] bg-white/60 dark:bg-[#030712]/30 backdrop-blur-[80px] py-20 px-6 md:px-12">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8 mb-20">
-            {/* Left: Brand */}
-            <div className="space-y-6">
-              <div className="flex items-center gap-3">
-                <img src="/logo.png" alt="CareCompass Logo" className="w-10 h-10 object-contain drop-shadow-sm" />
-                <span className="text-2xl font-black tracking-tighter text-gray-900 dark:text-white">CareCompass</span>
-              </div>
-              <p className="text-gray-500 dark:text-gray-400 text-sm font-medium leading-relaxed max-w-xs">
-                Empowering healthcare decisions with AI-driven solutions and clinical-grade intelligence.
+      <footer className="relative mt-32 border-t border-white/80 dark:border-white/[0.08] bg-white/40 dark:bg-[#030712]/30 backdrop-blur-[120px] overflow-hidden">
+        {/* ─── AMBIENT BACKGROUND GLOWS ─── */}
+        <div className="absolute top-0 left-1/4 w-[400px] h-[400px] bg-blue-500/5 blur-[120px] rounded-full pointer-events-none" />
+        <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-emerald-500/5 blur-[120px] rounded-full pointer-events-none" />
+        <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-blue-500/30 to-transparent animate-pulse" />
+
+        <div className="max-w-7xl mx-auto px-6 md:px-12 py-24">
+          {/* ─── NEURAL UPLINK (Sub-footer CTA) ─── */}
+          <div className="mb-24 p-8 md:p-12 rounded-[3.5rem] bg-white/30 dark:bg-white/[0.02] border border-white/80 dark:border-white/[0.08] backdrop-blur-[80px] flex flex-col lg:flex-row items-center justify-between gap-12 group transition-all duration-700 hover:border-blue-500/30 shadow-2xl glass-grain">
+            <div className="max-w-xl text-center lg:text-left">
+              <h3 className="text-3xl font-black tracking-tighter uppercase italic mb-3">Neural <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">Uplink</span></h3>
+              <p className="text-gray-700 dark:text-gray-400 font-bold uppercase tracking-widest text-[10px] leading-relaxed">
+                Connect your node to the latest clinical developments and protocol updates.
               </p>
             </div>
+            <div className="w-full lg:w-[450px] relative group/input">
+              <input 
+                type="email" 
+                placeholder="SECURE EMAIL ADDRESS..." 
+                className="w-full bg-white/40 dark:bg-white/[0.03] border border-white/80 dark:border-white/[0.1] rounded-2xl px-8 py-5 text-[10px] font-black tracking-widest uppercase focus:outline-none focus:ring-4 focus:ring-blue-500/20 transition-all placeholder-gray-500/60 dark:placeholder-gray-400/50 text-gray-900 dark:text-white"
+              />
+              <button className="absolute right-2 top-2 bottom-2 px-8 rounded-xl bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center transition-all shadow-lg active:scale-95">
+                <Send className="w-4 h-4 transition-transform group-hover/input:translate-x-1" />
+              </button>
+            </div>
+          </div>
 
-            {/* Services */}
+          {/* ─── 4-COLUMN PREMIUM GRID ─── */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16 lg:gap-12 mb-24">
+            {/* Identity Node */}
+            <div className="space-y-8">
+              <div className="flex items-center gap-4 group cursor-pointer">
+                <img src="/logo.png" alt="CareCompass" className="w-12 h-12 transition-transform group-hover:rotate-12 duration-500" />
+                <span className="text-2xl font-black tracking-tighter italic bg-gradient-to-r from-blue-800 to-indigo-800 dark:from-white dark:to-gray-400 bg-clip-text text-transparent">CareCompass</span>
+              </div>
+              <p className="text-gray-700 dark:text-gray-400 text-sm font-bold italic leading-relaxed max-w-xs">
+                Empowering healthcare decisions with high-fidelity, medical-grade AI intelligence and autonomous diagnostic insights.
+              </p>
+              <div className="flex items-center gap-4">
+                {[
+                  { icon: <Twitter size={18} />, href: "#" },
+                  { icon: <Linkedin size={18} />, href: "#" },
+                  { icon: <Github size={18} />, href: "#" },
+                ].map((soc, i) => (
+                  <a key={i} href={soc.href} className="w-11 h-11 rounded-[1.2rem] bg-white/40 dark:bg-white/[0.04] border border-white/80 dark:border-white/[0.08] flex items-center justify-center text-gray-600 dark:text-gray-400 hover:text-blue-500 hover:scale-110 transition-all shadow-md">
+                    {soc.icon}
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            {/* Services Protocol */}
             <div>
-              <h4 className="text-sm font-black text-gray-950 dark:text-white uppercase tracking-widest mb-8">Services</h4>
-              <ul className="space-y-4 text-sm font-bold text-gray-500 dark:text-gray-400">
-                <li><Link href="/dashboard/report" className="hover:text-blue-600 transition-colors">Report Explainer</Link></li>
-                <li><Link href="/dashboard/disease-predictor" className="hover:text-blue-600 transition-colors">Disease Predictor</Link></li>
-                <li><Link href="/dashboard/reminders" className="hover:text-blue-600 transition-colors">Medicine Details</Link></li>
+              <h4 className="text-[10px] font-black text-gray-800 dark:text-white uppercase tracking-[0.4em] mb-10 opacity-70 italic">Services Node</h4>
+              <ul className="space-y-5 text-sm font-black text-gray-600 dark:text-gray-400 tracking-tight uppercase italic font-bold">
+                <li><Link href="/dashboard/report" className="hover:text-blue-600 hover:translate-x-1 block transition-all">Report Analyzer</Link></li>
+                <li><Link href="/dashboard/disease-predictor" className="hover:text-blue-600 hover:translate-x-1 block transition-all">Disease Predictor</Link></li>
+                <li><Link href="/dashboard/reminders" className="hover:text-blue-600 hover:translate-x-1 block transition-all">Medicine Details</Link></li>
+                <li><Link href="/dashboard/chat" className="hover:text-blue-600 hover:translate-x-1 block transition-all">Diagnostic Chat</Link></li>
               </ul>
             </div>
 
-            {/* Company */}
+            {/* Architecture Node */}
             <div>
-              <h4 className="text-sm font-black text-gray-950 dark:text-white uppercase tracking-widest mb-8">Company</h4>
-              <ul className="space-y-4 text-sm font-bold text-gray-500 dark:text-gray-400">
-                <li><Link href="#services" className="hover:text-blue-600 transition-colors">About Us</Link></li>
-                <li><Link href="#protocol" className="hover:text-blue-600 transition-colors">Contact</Link></li>
-                <li><Link href="#" className="hover:text-blue-600 transition-colors">Privacy Policy</Link></li>
+              <h4 className="text-[10px] font-black text-gray-800 dark:text-white uppercase tracking-[0.4em] mb-10 opacity-70 italic">Infrastructure</h4>
+              <ul className="space-y-5 text-sm font-black text-gray-600 dark:text-gray-400 tracking-tight uppercase italic font-bold">
+                <li><a href="#" className="hover:text-blue-600 hover:translate-x-1 block transition-all">About Us</a></li>
+                <li><a href="#" className="hover:text-blue-600 hover:translate-x-1 block transition-all">Security Protocol</a></li>
+                <li><a href="#" className="hover:text-blue-600 hover:translate-x-1 block transition-all">HIPAA Ready</a></li>
+                <li><a href="#" className="hover:text-blue-600 hover:translate-x-1 block transition-all">Contact Hub</a></li>
               </ul>
             </div>
 
-            {/* Connect */}
+            {/* Compliance Node */}
             <div>
-              <h4 className="text-sm font-black text-gray-950 dark:text-white uppercase tracking-widest mb-8">Connect</h4>
-              <ul className="space-y-4 text-sm font-bold text-gray-500 dark:text-gray-400">
-                <li><a href="#" className="hover:text-blue-600 transition-colors">Twitter</a></li>
-                <li><a href="#" className="hover:text-blue-600 transition-colors">LinkedIn</a></li>
-                <li><a href="#" className="hover:text-blue-600 transition-colors">GitHub</a></li>
+              <h4 className="text-[10px] font-black text-gray-800 dark:text-white uppercase tracking-[0.4em] mb-10 opacity-70 italic">Compliance Deck</h4>
+              <ul className="space-y-5 text-sm font-black text-gray-600 dark:text-gray-400 tracking-tight uppercase italic font-bold">
+                <li><a href="#" className="hover:text-blue-600 hover:translate-x-1 block transition-all">Privacy Sandbox</a></li>
+                <li><a href="#" className="hover:text-blue-600 hover:translate-x-1 block transition-all">Usage Terms</a></li>
+                <li><a href="#" className="hover:text-blue-600 hover:translate-x-1 block transition-all">Cookie Protocol</a></li>
+                <li><a href="#" className="hover:text-blue-600 hover:translate-x-1 block transition-all">Legal Disclaimer</a></li>
               </ul>
             </div>
           </div>
 
-          {/* Bottom: Copyright */}
-          <div className="pt-12 border-t border-gray-100 dark:border-white/[0.05] text-center">
-            <p className="text-sm font-bold text-gray-400 dark:text-gray-500 lowercase tracking-tight">
-              © {new Date().getFullYear()} CareCompass AI. All rights reserved.
+          {/* ─── BOTTOM STATUS & COPYRIGHT ─── */}
+          <div className="pt-12 border-t border-white/60 dark:border-white/[0.05] flex flex-col md:flex-row justify-between items-center gap-8">
+            <p className="text-[10px] font-black text-gray-700 dark:text-gray-500 uppercase tracking-widest italic">
+              © {new Date().getFullYear()} CareCompass AI Bureau. All rights reserved.
             </p>
+            <div className="flex items-center gap-6">
+              <span className="text-[9px] font-black text-emerald-600 dark:text-emerald-500 uppercase tracking-[0.3em] flex items-center gap-2">
+                <div className="relative w-2 h-2 rounded-full bg-emerald-600 dark:bg-emerald-500">
+                  <div className="absolute inset-0 rounded-full bg-emerald-600 dark:bg-emerald-500 animate-ping opacity-40" />
+                </div>
+                Diagnostic Core Active
+              </span>
+              <div className="w-px h-4 bg-gray-200 dark:bg-white/10 hidden md:block" />
+              <div className="flex gap-3">
+                {["🔬","🛡️","💎"].map(e => (
+                  <div key={e} className="w-10 h-10 rounded-xl bg-white/50 dark:bg-white/[0.03] border border-white dark:border-white/[0.08] flex items-center justify-center text-sm shadow-inner transition-transform hover:scale-110 cursor-default">
+                    {e}
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </footer>

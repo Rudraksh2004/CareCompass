@@ -287,52 +287,84 @@ export default function DashboardLayout({
           <div className="max-w-[1400px] mx-auto">{children}</div>
         </div>
 
-        {/* ─── DASHBOARD FOOTER ─── */}
-        <footer className="mt-auto border-t border-gray-200 dark:border-white/[0.08] backdrop-blur-[80px] bg-white/50 dark:bg-[#030712]/50 py-12 px-10">
-          <div className="max-w-[1400px] mx-auto">
+        {/* ─── DASHBOARD FOOTER (Liquid Glass) ─── */}
+        <footer className="mt-auto relative border-t border-white/80 dark:border-white/[0.08] bg-white/40 dark:bg-[#030712]/30 backdrop-blur-[100px] overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-blue-500/30 to-transparent animate-pulse" />
+          
+          <div className="max-w-[1400px] mx-auto px-10 py-16">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8 mb-16">
-              <div className="space-y-4 text-center md:text-left">
-                <div className="flex items-center justify-center md:justify-start gap-3">
-                  <img src="/logo.png" alt="Logo" className="w-8 h-8 object-contain" />
-                  <span className="text-xl font-black tracking-tighter dark:text-white">CareCompass</span>
+              {/* Identity Node */}
+              <div className="space-y-6 text-center md:text-left">
+                <div className="flex items-center justify-center md:justify-start gap-4 group cursor-pointer">
+                  <img src="/logo.png" alt="CareCompass" className="w-10 h-10 transition-transform group-hover:rotate-12 duration-500" />
+                  <span className="text-xl font-black tracking-tighter italic dark:text-white text-gray-900">CareCompass</span>
                 </div>
-                <p className="text-xs font-bold text-gray-500 dark:text-gray-400 leading-relaxed">
-                  Decisions with AI-driven solutions.
+                <p className="text-[10px] font-bold text-gray-800 dark:text-gray-400 leading-relaxed uppercase tracking-widest italic">
+                  Advanced High-Fidelity <br />Health Intelligence Node.
                 </p>
-              </div>
-
-              <div className="text-center md:text-left">
-                <h4 className="text-[11px] font-black uppercase tracking-widest mb-6 dark:text-white">Services</h4>
-                <div className="flex flex-col gap-3 text-xs font-bold text-gray-500 dark:text-gray-400">
-                  <Link href="/dashboard/report" className="hover:text-blue-600 transition-colors">Report Analyzer</Link>
-                  <Link href="/dashboard/disease-predictor" className="hover:text-blue-600 transition-colors">Disease Predictor</Link>
-                  <Link href="/dashboard/reminders" className="hover:text-blue-600 transition-colors">Medicine Details</Link>
+                <div className="flex items-center justify-center md:justify-start gap-3">
+                  {[
+                    { icon: <Twitter size={14} />, href: "#" },
+                    { icon: <Linkedin size={14} />, href: "#" },
+                    { icon: <Github size={14} />, href: "#" },
+                  ].map((soc, i) => (
+                    <a key={i} href={soc.href} className="w-9 h-9 rounded-xl bg-white/40 dark:bg-white/[0.05] border border-white/80 dark:border-white/[0.08] flex items-center justify-center text-gray-700 dark:text-gray-400 hover:text-blue-500 transition-all shadow-sm">
+                      {soc.icon}
+                    </a>
+                  ))}
                 </div>
               </div>
 
+              {/* Module Protocol */}
               <div className="text-center md:text-left">
-                <h4 className="text-[11px] font-black uppercase tracking-widest mb-6 dark:text-white">Company</h4>
-                <div className="flex flex-col gap-3 text-xs font-bold text-gray-500 dark:text-gray-400">
-                  <span className="hover:text-blue-600 cursor-pointer">About Us</span>
-                  <span className="hover:text-blue-600 cursor-pointer">Contact</span>
-                  <span className="hover:text-blue-600 cursor-pointer">Privacy Policy</span>
+                <h4 className="text-[9px] font-black text-gray-950 dark:text-white uppercase tracking-[0.4em] mb-8 opacity-70">Services Node</h4>
+                <div className="flex flex-col gap-4 text-[11px] font-black text-gray-700 dark:text-gray-400 tracking-tight uppercase italic">
+                  <Link href="/dashboard/report" className="hover:text-blue-600 transition-all">Report Analyzer</Link>
+                  <Link href="/dashboard/disease-predictor" className="hover:text-blue-600 transition-all">Predictor Engine</Link>
+                  <Link href="/dashboard/reminders" className="hover:text-blue-600 transition-all">Medication Lab</Link>
                 </div>
               </div>
 
+              {/* Arch Node */}
               <div className="text-center md:text-left">
-                <h4 className="text-[11px] font-black uppercase tracking-widest mb-6 dark:text-white">Connect</h4>
-                <div className="flex flex-col gap-3 text-xs font-bold text-gray-500 dark:text-gray-400">
-                  <span className="hover:text-blue-600 cursor-pointer">Twitter</span>
-                  <span className="hover:text-blue-600 cursor-pointer">LinkedIn</span>
-                  <span className="hover:text-blue-600 cursor-pointer">GitHub</span>
+                <h4 className="text-[9px] font-black text-gray-950 dark:text-white uppercase tracking-[0.4em] mb-8 opacity-70">Architecture</h4>
+                <div className="flex flex-col gap-4 text-[11px] font-black text-gray-700 dark:text-gray-400 tracking-tight uppercase italic">
+                  <span className="hover:text-blue-600 cursor-pointer transition-all">Security Specs</span>
+                  <span className="hover:text-blue-600 cursor-pointer transition-all">Compliance Node</span>
+                  <span className="hover:text-blue-600 cursor-pointer transition-all">Protocol Docs</span>
+                </div>
+              </div>
+
+              {/* Legal Node */}
+              <div className="text-center md:text-left">
+                <h4 className="text-[9px] font-black text-gray-950 dark:text-white uppercase tracking-[0.4em] mb-8 opacity-70">Compliance Deck</h4>
+                <div className="flex flex-col gap-4 text-[11px] font-black text-gray-700 dark:text-gray-400 tracking-tight uppercase italic">
+                  <span className="hover:text-blue-600 cursor-pointer transition-all">Privacy Sandbox</span>
+                  <span className="hover:text-blue-600 cursor-pointer transition-all">Usage Protocol</span>
                 </div>
               </div>
             </div>
 
-            <div className="pt-8 border-t border-gray-100 dark:border-white/[0.05] text-center">
-              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                © {new Date().getFullYear()} CareCompass AI. All rights reserved.
+            {/* Bottom: Status & Copyright */}
+            <div className="pt-10 border-t border-white/60 dark:border-white/[0.05] flex flex-col md:flex-row justify-between items-center gap-6">
+              <p className="text-[9px] font-black text-gray-800 dark:text-gray-400 uppercase tracking-widest italic">
+                © {new Date().getFullYear()} CareCompass Protocol Bureau. Integrity Verified.
               </p>
+              <div className="flex items-center gap-6">
+                <span className="text-[8px] font-black text-emerald-600 dark:text-emerald-500 uppercase tracking-[0.3em] flex items-center gap-2">
+                  <div className="relative w-2 h-2 rounded-full bg-emerald-600 dark:bg-emerald-500">
+                    <div className="absolute inset-0 rounded-full bg-emerald-600 dark:bg-emerald-500 animate-ping opacity-40" />
+                  </div>
+                  Core Active
+                </span>
+                <div className="flex gap-2">
+                  {["🧪","🛡️"].map(e => (
+                    <div key={e} className="w-8 h-8 rounded-lg bg-white/50 dark:bg-white/[0.03] border border-white dark:border-white/[0.08] flex items-center justify-center text-xs shadow-inner">
+                      {e}
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         </footer>
