@@ -14,10 +14,14 @@ import {
   Database,
   Globe
 } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
 export default function AboutPage() {
   const { theme, mounted } = useTheme();
+  const { user } = useAuth();
   const isDark = mounted ? theme === "dark" : false;
+
+  const hubLink = user ? "/dashboard" : "/";
 
   if (!mounted) return null;
 
@@ -27,7 +31,7 @@ export default function AboutPage() {
       {/* ─── NAVIGATION ─── */}
       <nav className="fixed top-0 w-full z-50 border-b border-white/60 dark:border-white/[0.08] backdrop-blur-[40px] bg-white/40 dark:bg-[#030712]/30 px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-all">
+          <Link href={hubLink} className="flex items-center gap-3 hover:opacity-80 transition-all">
             <div className="p-2 rounded-xl bg-blue-500/10 text-blue-600">
                <ChevronLeft size={20} />
             </div>
@@ -180,7 +184,7 @@ export default function AboutPage() {
 
       <footer className="py-24 border-t border-white/60 dark:border-white/[0.08] text-center">
          <p className="text-xs font-black uppercase tracking-[0.5em] text-gray-500 mb-8">Clinical Integrity Verified</p>
-         <Link href="/" className="px-10 py-5 rounded-[2rem] bg-gray-900 text-white font-black uppercase tracking-widest text-xs hover:scale-105 transition-all shadow-2xl">
+         <Link href={hubLink} className="px-10 py-5 rounded-[2rem] bg-gray-900 text-white font-black uppercase tracking-widest text-xs hover:scale-105 transition-all shadow-2xl">
             Return to Protocol Hub
          </Link>
       </footer>
