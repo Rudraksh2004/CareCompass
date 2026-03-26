@@ -185,7 +185,7 @@ function HealthContent() {
                 Biometric Lab
               </h1>
             </div>
-            <p className="text-gray-600 dark:text-gray-400 font-bold max-w-xl text-lg leading-relaxed">
+            <p className="text-gray-700 dark:text-gray-400 font-bold max-w-xl text-lg leading-relaxed">
               Clinical telemetry and behavioral trend synchronization. Analyze physiological variability through predictive AI modeling.
             </p>
           </div>
@@ -218,16 +218,16 @@ function HealthContent() {
                         <button
                           key={m.value}
                           onClick={() => setType(m.value)}
-                          className={`p-4 rounded-2xl flex flex-col items-center gap-2 transition-all border ${type === m.value ? "bg-indigo-600 text-white border-transparent shadow-lg" : "bg-white/40 dark:bg-white/5 border-white/60 dark:border-white/10 text-gray-400 hover:bg-white dark:hover:bg-white/10"}`}
+                          className={`p-4 rounded-2xl flex flex-col items-center gap-2 transition-all border ${type === m.value ? "bg-indigo-600 text-white border-transparent shadow-lg" : "bg-white/40 dark:bg-white/5 border-white/60 dark:border-white/10 text-gray-600 dark:text-gray-400 hover:bg-white dark:hover:bg-white/10"}`}
                         >
                            <m.icon size={20} />
-                           <span className="text-[10px] font-black uppercase">{m.label}</span>
+                           <span className="text-[10px] font-black uppercase text-gray-700 dark:text-gray-400">{m.label}</span>
                         </button>
                      ))}
                   </div>
                   <button
                     onClick={() => setType("custom")}
-                    className={`w-full mt-2 py-3 rounded-2xl border text-[10px] font-black uppercase tracking-widest transition-all ${type === "custom" ? "bg-purple-600 text-white border-transparent outline-none" : "bg-white/40 dark:bg-white/5 border-white/60 dark:border-white/10 text-gray-400 hover:bg-white dark:hover:bg-white/10"}`}
+                    className={`w-full mt-2 py-3 rounded-2xl border text-[10px] font-black uppercase tracking-widest transition-all ${type === "custom" ? "bg-purple-600 text-white border-transparent outline-none" : "bg-white/40 dark:bg-white/5 border-white/60 dark:border-white/10 text-gray-600 dark:text-gray-400 hover:bg-white dark:hover:bg-white/10"}`}
                   >
                     + Custom Modality
                   </button>
@@ -246,7 +246,7 @@ function HealthContent() {
                 )}
 
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Value ({currentMetric.unit})</label>
+                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-600 dark:text-gray-500 ml-2">Value ({currentMetric.unit})</label>
                   <div className="relative">
                     <Activity className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                     <input
@@ -275,7 +275,7 @@ function HealthContent() {
                 <Info size={20} />
                 <span className="text-xs font-black uppercase tracking-widest">Protocol Tip</span>
              </div>
-             <p className="text-xs font-bold text-gray-500 leading-relaxed italic">"Consistent daily logging at similar times reduces noise in AI trend detection."</p>
+             <p className="text-xs font-bold text-gray-700 dark:text-gray-400 leading-relaxed italic">"Consistent daily logging at similar times reduces noise in AI trend detection."</p>
           </div>
         </div>
 
@@ -289,7 +289,7 @@ function HealthContent() {
              </div>
              <div className="flex items-center gap-2 px-6 py-2 rounded-full bg-white/40 dark:bg-white/5 border border-white/60 dark:border-white/[0.05] backdrop-blur-md">
                 <Stethoscope className="text-blue-500" size={14} />
-                <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">{currentMetric.label} Tracking</span>
+                <span className="text-[10px] font-black uppercase tracking-widest text-gray-600 dark:text-gray-400">{currentMetric.label} Tracking</span>
              </div>
           </div>
 
@@ -297,7 +297,7 @@ function HealthContent() {
             <div className="absolute inset-0 bg-gradient-to-t from-indigo-500/5 to-transparent pointer-events-none" />
             
             {logs.length === 0 ? (
-              <div className="flex flex-col items-center justify-center p-20 text-center space-y-6 opacity-40">
+              <div className="flex flex-col items-center justify-center p-20 text-center space-y-6 opacity-60 dark:opacity-40">
                 <div className="w-24 h-24 rounded-full bg-gray-100 dark:bg-white/5 flex items-center justify-center">
                    <TrendingUp size={48} />
                 </div>
@@ -333,10 +333,10 @@ function HealthContent() {
                           const color = data.status === "abnormal" ? "text-red-500" : data.status === "warning" ? "text-amber-500" : "text-blue-500";
                           return (
                             <div className="px-6 py-4 rounded-3xl bg-white/90 dark:bg-[#030712]/90 backdrop-blur-2xl border border-white/20 shadow-2xl transform -translate-y-4 transition-all animate-in zoom-in-95">
-                              <p className="text-[10px] font-black uppercase text-gray-400 mb-1">{data.date}</p>
+                              <p className="text-[10px] font-black uppercase text-gray-600 dark:text-gray-400 mb-1">{data.date}</p>
                               <div className="flex items-baseline gap-2">
                                 <span className={`text-4xl font-black ${color}`}>{data.value}</span>
-                                <span className="text-xs font-black text-gray-500">{currentMetric.unit}</span>
+                                <span className="text-xs font-black text-gray-700 dark:text-gray-400">{currentMetric.unit}</span>
                               </div>
                               <div className="mt-2 text-[10px] font-black uppercase flex items-center gap-2">
                                  <div className={`w-2 h-2 rounded-full ${data.status === "abnormal" ? "bg-red-500" : data.status === "warning" ? "bg-amber-500" : "bg-emerald-500"}`} />
@@ -418,14 +418,14 @@ function HealthContent() {
         <div className="space-y-6">
            <div className="flex items-center gap-3 px-2">
               <ShieldCheck className="text-emerald-500" size={20} />
-              <h3 className="text-xl font-black italic tracking-tight uppercase tracking-widest text-gray-500">Stability Analysis</h3>
+              <h3 className="text-xl font-black italic tracking-tight uppercase tracking-widest text-gray-600 dark:text-gray-400">Stability Analysis</h3>
            </div>
            <AIReportCard title="Laboratory Insight" content={insight} />
         </div>
         <div className="space-y-6">
            <div className="flex items-center gap-3 px-2">
               <History className="text-indigo-500" size={20} />
-              <h3 className="text-xl font-black italic tracking-tight uppercase tracking-widest text-gray-500">Predictive Modeling</h3>
+              <h3 className="text-xl font-black italic tracking-tight uppercase tracking-widest text-gray-600 dark:text-gray-400">Predictive Modeling</h3>
            </div>
            <AIReportCard
              title="Trend Detection Matrix"
