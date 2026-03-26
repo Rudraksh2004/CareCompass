@@ -127,7 +127,7 @@ function ReportContent() {
                 Report Meta-Explainer
               </h1>
             </div>
-            <p className="text-gray-600 dark:text-gray-400 font-bold max-w-xl text-lg leading-relaxed">
+            <p className="text-gray-700 dark:text-gray-400 font-bold max-w-xl text-lg leading-relaxed">
               Algorithmic report interpretation and metadata synthesis. CareCompass AI translates complex lab result metrics into plain-language clinical insights.
             </p>
           </div>
@@ -154,7 +154,7 @@ function ReportContent() {
 
               <div className="space-y-6">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Digital Scan (PDF/IMG)</label>
+                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-600 dark:text-gray-500 ml-2">Digital Scan (PDF/IMG)</label>
                   <div className="relative group/upload border-2 border-dashed border-emerald-500/20 dark:border-white/10 rounded-[2rem] p-10 text-center hover:bg-emerald-500/5 dark:hover:bg-white/5 transition-all cursor-pointer overflow-hidden">
                     <input
                       type="file"
@@ -165,7 +165,7 @@ function ReportContent() {
                     <div className="relative z-10 space-y-3">
                        <FileText className="mx-auto text-emerald-500 group-hover/upload:scale-110 transition-transform" size={40} />
                        <div className="font-black text-sm uppercase tracking-widest">INGEST REPORT</div>
-                       <p className="text-[10px] font-bold text-gray-400 italic">OCR Enabled Pipeline</p>
+                       <p className="text-[10px] font-bold text-gray-600 dark:text-gray-500 italic">OCR Enabled Pipeline</p>
                     </div>
                   </div>
                   {fileLoading && (
@@ -177,7 +177,7 @@ function ReportContent() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Raw Clinical Payload</label>
+                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-600 dark:text-gray-500 ml-2">Raw Clinical Payload</label>
                   <textarea
                     rows={8}
                     className="w-full bg-white/40 dark:bg-black/40 border border-white/80 dark:border-white/10 p-6 rounded-[2rem] font-bold outline-none focus:ring-4 focus:ring-emerald-500/10 transition-all text-xs leading-relaxed"
@@ -203,7 +203,7 @@ function ReportContent() {
                 <Info size={20} />
                 <span className="text-xs font-black uppercase tracking-widest">Clinical Protocol</span>
              </div>
-             <p className="text-xs font-bold text-gray-500 leading-relaxed italic">"Our AI identifies 150+ clinical lab metrics including hematology, metabolic panels, and lipid spectrums."</p>
+             <p className="text-xs font-bold text-gray-700 dark:text-gray-400 leading-relaxed italic">"Our AI identifies 150+ clinical lab metrics including hematology, metabolic panels, and lipid spectrums."</p>
           </div>
         </div>
 
@@ -215,8 +215,8 @@ function ReportContent() {
                  <Stethoscope size={64} strokeWidth={1} />
               </div>
               <div className="space-y-2">
-                <h3 className="text-2xl font-black tracking-tighter text-gray-400 italic">No Active Analysis Stream</h3>
-                <p className="text-xs font-bold text-gray-500 max-w-xs uppercase tracking-widest leading-loose">Ingest medical report telemetry to begin meta-explanation sequence.</p>
+                <h3 className="text-2xl font-black tracking-tighter text-gray-600 dark:text-gray-400 italic">No Active Analysis Stream</h3>
+                <p className="text-xs font-bold text-gray-700 dark:text-gray-500 max-w-xs uppercase tracking-widest leading-loose">Ingest medical report telemetry to begin meta-explanation sequence.</p>
               </div>
             </div>
           ) : (
@@ -246,13 +246,13 @@ function ReportContent() {
 
                 <div className="p-6 rounded-3xl bg-amber-500/5 border border-amber-500/20 flex gap-4 items-start">
                    <AlertCircle className="text-amber-500 flex-shrink-0 mt-1" size={20} />
-                   <p className="text-xs font-bold text-gray-600 dark:text-gray-400 leading-relaxed italic">
+                   <p className="text-xs font-bold text-gray-700 dark:text-gray-400 leading-relaxed italic">
                      <span className="text-amber-600 uppercase font-black mr-2">Advisory:</span>
                      This meta-explanation is an AI translation of clinical data. Always verify laboratory conclusions with a licensed medical professional.
                    </p>
                 </div>
 
-                <div className="prose prose-lg dark:prose-invert prose-headings:font-black prose-headings:text-gray-900 dark:prose-headings:text-white prose-p:font-bold prose-p:text-gray-600 dark:prose-p:text-gray-400 prose-strong:text-emerald-600 dark:prose-strong:text-emerald-400 prose-li:marker:text-blue-500 max-w-none text-sm leading-8">
+                <div className="prose prose-lg dark:prose-invert prose-headings:font-black prose-headings:text-gray-900 dark:prose-headings:text-white prose-p:font-bold prose-p:text-gray-700 dark:prose-p:text-gray-400 prose-strong:text-emerald-600 dark:prose-strong:text-emerald-400 prose-li:marker:text-blue-500 max-w-none text-sm leading-8">
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>
                     {result}
                   </ReactMarkdown>
@@ -278,7 +278,7 @@ function ReportContent() {
                 <div key={item.id} className={`relative group border transition-all duration-500 rounded-[3rem] p-10 overflow-hidden ${isExpanded ? "md:col-span-2 lg:col-span-3 bg-white/80 dark:bg-white/5 border-emerald-500/30 shadow-2xl" : "bg-white/[0.4] dark:bg-[#030712]/30 border-white/80 dark:border-white/5 hover:bg-white/60 dark:hover:bg-white/10 shadow-xl"}`}>
                   <div className="relative z-10 space-y-6">
                     <div className="flex justify-between items-center">
-                       <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 flex items-center gap-2">
+                       <p className="text-[10px] font-black uppercase tracking-widest text-gray-600 dark:text-gray-400 flex items-center gap-2">
                           <Clock size={12} /> {item.createdAt?.toDate?.().toLocaleDateString()}
                        </p>
                        <button onClick={() => deleteReport(item.id)} className="p-3 rounded-2xl bg-red-500/5 text-red-500 border border-red-500/10 hover:bg-red-500 hover:text-white transition-all">
@@ -291,7 +291,7 @@ function ReportContent() {
                           <div className="p-2 rounded-xl bg-blue-500/10 text-blue-500"><FileText size={18} /></div>
                           Diagnostic Protocol
                        </h4>
-                       <p className={`text-xs font-bold text-gray-500 italic leading-relaxed ${isExpanded ? "" : "line-clamp-2"}`}>"{item.originalText}"</p>
+                       <p className={`text-xs font-bold text-gray-700 dark:text-gray-400 italic leading-relaxed ${isExpanded ? "" : "line-clamp-2"}`}>"{item.originalText}"</p>
                     </div>
 
                     {isExpanded && (
@@ -299,7 +299,7 @@ function ReportContent() {
                           <p className="text-[10px] font-black uppercase tracking-widest text-emerald-500 mb-4 flex items-center gap-2">
                              <BrainCircuit size={12} /> Meta-Interpretation
                           </p>
-                          <div className="prose prose-sm dark:prose-invert max-w-none text-gray-600 dark:text-gray-400 font-bold leading-7">
+                          <div className="prose prose-sm dark:prose-invert max-w-none text-gray-700 dark:text-gray-400 font-bold leading-7">
                              <ReactMarkdown remarkPlugins={[remarkGfm]}>{item.aiResponse}</ReactMarkdown>
                           </div>
                        </div>
