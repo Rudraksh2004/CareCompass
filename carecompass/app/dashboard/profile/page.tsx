@@ -155,7 +155,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto space-y-12 text-gray-900 dark:text-gray-100 animate-in fade-in slide-in-from-bottom-4 duration-1000 pb-32 px-4">
+    <div className="max-w-6xl mx-auto space-y-12 text-gray-900 dark:text-gray-100 animate-in fade-in slide-in-from-bottom-4 duration-1000 pb-12 px-4">
       
       {/* 🌟 Premium Clinical Header */}
       <div className="relative overflow-hidden rounded-[3.5rem] border border-white/80 border-t-white border-l-white/90 dark:border-white/[0.05] dark:border-t-white/[0.15] dark:border-l-white/[0.1] bg-white/[0.5] dark:bg-[#030712]/30 backdrop-blur-[40px] p-10 lg:p-14 shadow-2xl transition-all duration-700">
