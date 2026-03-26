@@ -39,7 +39,7 @@ interface InputProps {
 function BioInput({ label, value, setValue, icon, placeholder, type = "text" }: InputProps) {
   return (
     <div className="space-y-3 group/field">
-      <label className="text-sm font-black text-gray-700 dark:text-gray-300 flex items-center gap-2 transition-colors group-focus-within/field:text-indigo-500">
+      <label className="text-sm font-black text-gray-950 dark:text-gray-300 flex items-center gap-2 transition-colors group-focus-within/field:text-indigo-500">
         <span className="shrink-0">{icon}</span> {label}
       </label>
       <div className="relative group/input">
@@ -48,7 +48,7 @@ function BioInput({ label, value, setValue, icon, placeholder, type = "text" }: 
           value={value}
           onChange={(e) => setValue(e.target.value)}
           placeholder={placeholder}
-          className="w-full border border-white/60 dark:border-white/[0.1] bg-white/40 dark:bg-black/20 backdrop-blur-md px-5 py-4 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/20 transition text-base font-bold text-gray-800 dark:text-gray-100 shadow-inner placeholder-gray-400/50"
+          className="w-full border border-white/60 dark:border-white/[0.1] bg-white/40 dark:bg-black/20 backdrop-blur-md px-5 py-4 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/20 transition text-base font-bold text-gray-950 dark:text-gray-100 shadow-inner placeholder-gray-400/50"
         />
         <div className="absolute inset-0 rounded-2xl ring-1 ring-white/20 pointer-events-none" />
       </div>
@@ -167,7 +167,7 @@ export default function ProfilePage() {
             <h1 className="text-4xl lg:text-7xl font-black bg-gradient-to-r from-indigo-600 via-blue-600 to-emerald-500 dark:from-indigo-400 dark:via-blue-400 dark:to-emerald-400 bg-clip-text text-transparent italic leading-[0.9] tracking-tighter">
               Bio-Metric <br /> <span className="not-italic text-gray-900 dark:text-white opacity-90">Protocol Hub</span>
             </h1>
-            <p className="text-gray-700 dark:text-gray-400 font-bold text-lg max-w-2xl leading-relaxed">
+            <p className="text-gray-950 dark:text-gray-400 font-bold text-lg max-w-2xl leading-relaxed">
                Calibrate your foundational biometric signatures for hyper-accurate AI synthesis.
             </p>
             <div className="flex items-center gap-4 px-6 py-3 rounded-2xl bg-white/40 dark:bg-black/20 border border-white/40 dark:border-white/5 backdrop-blur-md w-fit">
@@ -198,8 +198,8 @@ export default function ProfilePage() {
                    <User size={32} strokeWidth={2.5} />
                 </div>
                 <div>
-                  <h2 className="text-3xl font-black text-gray-900 dark:text-white uppercase tracking-tighter italic leading-none">Personal Manifest</h2>
-                  <p className="text-xs font-black text-gray-600 uppercase tracking-widest mt-2 opacity-60">Secure Clinical Record</p>
+                  <h2 className="text-3xl font-black text-gray-950 dark:text-white uppercase tracking-tighter italic leading-none">Personal Manifest</h2>
+                  <p className="text-xs font-black text-gray-900 dark:text-gray-400 uppercase tracking-widest mt-2 opacity-80">Secure Clinical Record</p>
                 </div>
               </div>
               <ShieldCheck size={48} className="text-emerald-500/20" />
@@ -209,7 +209,7 @@ export default function ProfilePage() {
               <BioInput label="Full Name" value={name} setValue={setName} icon={<User size={16} />} placeholder="Enter identity..." />
               
               <div className="space-y-4">
-                <label className="text-sm font-black text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                <label className="text-sm font-black text-gray-950 dark:text-gray-300 flex items-center gap-2">
                    <Droplet size={14} className="text-red-500" /> Serology Type
                 </label>
                 <div className="relative group/select">
@@ -230,7 +230,7 @@ export default function ProfilePage() {
               <BioInput label="Age" value={age} setValue={setAge} icon={<Calendar size={16} />} placeholder="YY..." type="number" />
               
               <div className="space-y-4">
-                <label className="text-sm font-black text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                <label className="text-sm font-black text-gray-950 dark:text-gray-300 flex items-center gap-2">
                    <Activity size={14} className="text-blue-500" /> Physiological Axis
                 </label>
                 <div className="relative group/select">
@@ -254,7 +254,7 @@ export default function ProfilePage() {
                <BioInput label="Weight (kg)" value={weight} setValue={setWeight} icon={<Weight size={16} />} placeholder="75..." type="number" />
                
                <div className="space-y-4">
-                  <label className="text-sm font-black text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                  <label className="text-sm font-black text-gray-950 dark:text-gray-300 flex items-center gap-2">
                      <Zap size={14} className="text-amber-500" /> Metabolism Scale
                   </label>
                   <div className="relative group/select">
@@ -274,7 +274,7 @@ export default function ProfilePage() {
                </div>
 
                <div className="space-y-4">
-                  <label className="text-sm font-black text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                  <label className="text-sm font-black text-gray-950 dark:text-gray-300 flex items-center gap-2">
                      <Target size={14} className="text-emerald-500" /> Primary Health Objective
                   </label>
                   <div className="relative group/select">
@@ -318,7 +318,7 @@ export default function ProfilePage() {
                  <Sparkles size={48} className="animate-pulse" />
               </div>
               <h3 className="text-2xl font-black uppercase tracking-tighter italic mb-4 leading-none">AI Synthesis</h3>
-              <p className="text-gray-700 dark:text-gray-400 text-sm font-bold leading-relaxed mb-8">
+              <p className="text-gray-950 dark:text-gray-400 text-sm font-bold leading-relaxed mb-8">
                  Calibrating these fields optimizes the CareCompass Neural Engine for hyper-relevant diagnostic synthesis.
               </p>
               <div className="w-full p-6 rounded-3xl bg-indigo-500/5 border border-indigo-500/10 text-xs font-bold text-indigo-700 dark:text-indigo-300 leading-relaxed italic">
@@ -347,7 +347,7 @@ export default function ProfilePage() {
            </div>
 
            {/* 🧨 Dangerous Protocol: Account Termination */}
-           <div className="relative overflow-hidden border border-red-500/20 dark:border-red-500/10 bg-red-500/[0.02] dark:bg-red-500/[0.01] p-10 rounded-[4rem] group transition-all duration-500">
+           <div className="relative overflow-hidden border border-red-500/20 dark:border-red-500/10 bg-red-500/[0.02] dark:bg-red-500/[0.01] p-10 rounded-[4rem] group transition-all duration-500 shadow-xl shadow-red-500/[0.03]">
               <div className="absolute top-0 right-0 w-32 h-32 bg-red-500/5 blur-[60px] rounded-full translate-x-1/2 -translate-y-1/2" />
               
               <div className="relative z-10 space-y-8">
@@ -357,11 +357,11 @@ export default function ProfilePage() {
                     </div>
                     <div>
                        <h3 className="text-xl font-black uppercase tracking-tighter italic text-red-600 dark:text-red-500">Session Halt</h3>
-                       <p className="text-[9px] font-black text-gray-500 uppercase tracking-widest leading-none mt-1">Clinical Disconnect</p>
+                       <p className="text-[9px] font-black text-gray-950 dark:text-gray-400 uppercase tracking-widest leading-none mt-1 opacity-80">Clinical Disconnect</p>
                     </div>
                  </div>
 
-                 <p className="text-xs font-bold text-gray-600 dark:text-gray-400 opacity-80 leading-relaxed">
+                 <p className="text-xs font-bold text-gray-900 dark:text-gray-400 opacity-90 leading-relaxed">
                     Terminate the active clinical session and seal all neural links until next biometric authentication.
                  </p>
 
