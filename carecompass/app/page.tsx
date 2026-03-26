@@ -396,7 +396,7 @@ export default function Home() {
             <div>
               <h4 className="text-[10px] font-black text-gray-800 dark:text-white uppercase tracking-[0.4em] mb-10 opacity-70 italic">Infrastructure</h4>
               <ul className="space-y-5 text-sm font-black text-gray-600 dark:text-gray-400 tracking-tight uppercase italic font-bold">
-                <li><a href="#" className="hover:text-blue-600 hover:translate-x-1 block transition-all">About Us</a></li>
+                <li><Link href="/about" className="hover:text-blue-600 hover:translate-x-1 block transition-all">About Us</Link></li>
                 <li><a href="#" className="hover:text-blue-600 hover:translate-x-1 block transition-all">Security Protocol</a></li>
                 <li><a href="#" className="hover:text-blue-600 hover:translate-x-1 block transition-all">HIPAA Ready</a></li>
                 <li><a href="#" className="hover:text-blue-600 hover:translate-x-1 block transition-all">Contact Hub</a></li>

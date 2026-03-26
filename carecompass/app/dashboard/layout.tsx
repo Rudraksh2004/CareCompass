@@ -329,6 +329,7 @@ export default function DashboardLayout({
               <div className="text-center md:text-left">
                 <h4 className="text-[9px] font-black text-gray-950 dark:text-white uppercase tracking-[0.4em] mb-8 opacity-70">Architecture</h4>
                 <div className="flex flex-col gap-4 text-[11px] font-black text-gray-700 dark:text-gray-400 tracking-tight uppercase italic">
+                  <Link href="/about" className="hover:text-blue-600 transition-all">About Us</Link>
                   <span className="hover:text-blue-600 cursor-pointer transition-all">Security Specs</span>
                   <span className="hover:text-blue-600 cursor-pointer transition-all">Compliance Node</span>
                   <span className="hover:text-blue-600 cursor-pointer transition-all">Protocol Docs</span>
