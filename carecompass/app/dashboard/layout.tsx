@@ -90,7 +90,7 @@ export default function DashboardLayout({
         </button>
 
         {/* Brand */}
-        <div className={`mb-10 relative ${collapsed ? "px-0" : "px-2"}`}>
+        <div className={`mb-6 relative ${collapsed ? "px-0" : "px-2"}`}>
           <div
             className={`flex items-center ${
               collapsed ? "justify-center" : "gap-4"
@@ -101,20 +101,20 @@ export default function DashboardLayout({
                <img
                  src="/logo.png"
                  alt="CareCompass Logo"
-                 className="w-12 h-12 object-contain drop-shadow-2xl relative z-10 transition-transform duration-500 group-hover/logo:scale-110"
+                 className="w-10 h-10 object-contain drop-shadow-2xl relative z-10 transition-transform duration-500 group-hover/logo:scale-110"
                />
             </div>
 
             {!collapsed && (
               <div className="flex flex-col animate-in fade-in slide-in-from-left-4 duration-700">
-                <h1 className="text-2xl font-black tracking-tighter bg-gradient-to-r from-gray-900 via-blue-600 to-emerald-500 dark:from-white dark:via-blue-400 dark:to-emerald-400 bg-clip-text text-transparent leading-none">
+                <h1 className="text-xl font-black tracking-tighter bg-gradient-to-r from-gray-900 via-blue-600 to-emerald-500 dark:from-white dark:via-blue-400 dark:to-emerald-400 bg-clip-text text-transparent leading-none">
                   CareCompass
                 </h1>
                 
-                <div className="flex items-center gap-2 mt-1.5">
-                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
-                   <p className="text-[9px] font-black text-gray-800 dark:text-gray-400 uppercase tracking-[0.2em] leading-none">
-                     Neural Core Active
+                <div className="flex items-center gap-1.5 mt-1">
+                   <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
+                   <p className="text-[8px] font-black text-gray-800 dark:text-gray-400 uppercase tracking-widest leading-none">
+                     Neural Core
                    </p>
                 </div>
               </div>
@@ -122,12 +122,12 @@ export default function DashboardLayout({
           </div>
           
           {!collapsed && (
-            <div className="absolute -bottom-6 left-2 right-2 h-px bg-gradient-to-r from-transparent via-blue-500/20 to-transparent" />
+            <div className="absolute -bottom-4 left-2 right-2 h-px bg-gradient-to-r from-transparent via-blue-500/10 to-transparent" />
           )}
         </div>
 
         {/* Navigation */}
-        <nav className="flex flex-col gap-1.5 flex-1 overflow-y-auto overflow-x-hidden pr-2 scrollbar-thin scrollbar-thumb-gray-200 dark:scrollbar-thumb-gray-800">
+        <nav className="flex flex-col gap-1 flex-1 overflow-y-auto overflow-x-hidden pr-2 scrollbar-thin scrollbar-thumb-gray-200 dark:scrollbar-thumb-gray-800">
           <NavItem
             href="/dashboard"
             icon={<Home className={iconClasses("/dashboard")} />}
@@ -208,7 +208,7 @@ export default function DashboardLayout({
         </nav>
 
         {/* Bottom Section */}
-        <div className="mt-auto pt-8 border-t border-white/80 dark:border-white/[0.08] relative">
+        <div className="mt-auto pt-4 border-t border-white/80 dark:border-white/[0.08] relative">
           {!collapsed && (
             <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 px-3 py-1 rounded-full bg-white/80 dark:bg-gray-900 border border-white/40 dark:border-white/10 text-[8px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 backdrop-blur-md">
               Bio-Link Protocol
@@ -238,17 +238,17 @@ export default function DashboardLayout({
 
                 <button
                   onClick={handleLogout}
-                  className="w-full flex items-center justify-center gap-3 px-5 py-4 rounded-2xl bg-red-500/5 dark:bg-red-500/[0.02] border border-red-500/10 dark:border-red-500/5 text-xs font-black uppercase tracking-widest text-red-500 hover:bg-red-500 hover:text-white hover:shadow-lg hover:shadow-red-500/20 transition-all duration-500"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-red-500/5 dark:bg-red-500/[0.02] border border-red-500/10 dark:border-red-500/5 text-[10px] font-black uppercase tracking-widest text-red-500 hover:bg-red-500 hover:text-white transition-all duration-300"
                 >
-                  Terminate Session
+                  Terminate
                 </button>
 
                 {user && (
-                   <div className="px-4 py-4 rounded-2xl bg-gradient-to-br from-blue-500/5 to-emerald-500/5 border border-white/20 dark:border-white/[0.03] flex flex-col items-center">
-                    <div className="text-[8px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-1.5">
-                      Clinical Authenticator
+                   <div className="px-3 py-3 rounded-xl bg-gradient-to-br from-blue-500/5 to-emerald-500/5 border border-white/20 dark:border-white/[0.03] flex flex-col items-center">
+                    <div className="text-[7px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1 text-center">
+                      SECURE CLINICAL UPLINK
                     </div>
-                    <div className="text-[10px] font-bold text-gray-900 dark:text-white/80 truncate w-full text-center">
+                    <div className="text-[9px] font-bold text-gray-900 dark:text-white/80 truncate w-full text-center">
                       {user.email}
                     </div>
                   </div>
@@ -345,10 +345,10 @@ function NavItem({
     <Link
       href={href}
       className={`group relative flex items-center ${
-        collapsed ? "justify-center px-0" : "gap-4 px-6"
-      } py-4 rounded-[1.25rem] transition-all duration-500 overflow-hidden ${
+        collapsed ? "justify-center px-0" : "gap-3 px-5"
+      } py-2.5 rounded-xl transition-all duration-500 overflow-hidden ${
         isActive
-          ? "bg-white/[0.9] dark:bg-white/[0.07] text-blue-700 dark:text-emerald-300 shadow-[0_10px_40px_rgba(0,0,0,0.1)] dark:shadow-[0_10px_40px_rgba(0,0,0,0.3)] border border-white border-t-white border-l-white/90 dark:border-white/[0.12] dark:border-t-white/[0.2] backdrop-blur-[40px] font-black translate-x-2"
+          ? "bg-white/[0.9] dark:bg-white/[0.07] text-blue-700 dark:text-emerald-300 shadow-md dark:shadow-xl border border-white dark:border-white/[0.12] backdrop-blur-[40px] font-black translate-x-1"
           : "text-gray-800 dark:text-gray-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-white/70 dark:hover:bg-white/[0.04] border border-transparent hover:border-white/70 dark:hover:border-white/[0.07] font-black hover:translate-x-1"
       }`}
     >
@@ -365,7 +365,7 @@ function NavItem({
       </div>
 
       {!collapsed && (
-        <span className="whitespace-nowrap translate-y-[0.5px] uppercase tracking-wider text-[11px]">{label}</span>
+        <span className="whitespace-nowrap translate-y-[0.5px] uppercase tracking-wider text-[10px]">{label}</span>
       )}
     </Link>
   );
