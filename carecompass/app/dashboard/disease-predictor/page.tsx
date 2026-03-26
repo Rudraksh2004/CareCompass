@@ -227,14 +227,14 @@ export default function DiseasePredictorPage() {
                 AI Disease Predictor
               </h1>
             </div>
-            <p className="text-gray-600 dark:text-gray-400 font-bold max-w-xl text-lg leading-relaxed">
+            <p className="text-gray-700 dark:text-gray-400 font-bold max-w-xl text-lg leading-relaxed">
               Synthesizing multi-vector diagnostic data including biometrics, temporal progression, and regional epidemiology.
             </p>
           </div>
           
           <div className="flex flex-wrap gap-4">
              <div className="px-8 py-5 rounded-[2rem] bg-white/40 dark:bg-white/5 border border-white/60 dark:border-white/[0.05] backdrop-blur-md flex flex-col items-center">
-                <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Diagnostic Integrity</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-gray-600 dark:text-gray-400 mb-2">Diagnostic Integrity</p>
                 <div className="w-32 h-2 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
                    <div className="h-full bg-gradient-to-r from-indigo-500 to-emerald-500 transition-all duration-1000" style={{ width: `${intensity}%` }} />
                 </div>
@@ -255,7 +255,7 @@ export default function DiseasePredictorPage() {
                   {s === 3 && <History size={24} />}
                   {s === 4 && <MapPin size={24} />}
                </div>
-               <span className={`text-[9px] font-black uppercase tracking-widest transition-colors ${step === s ? "text-indigo-600" : "text-gray-500"}`}>
+               <span className={`text-[9px] font-black uppercase tracking-widest transition-colors ${step === s ? "text-indigo-600" : "text-gray-600 dark:text-gray-400"}`}>
                 Phase 0{s}
               </span>
             </button>
@@ -276,14 +276,14 @@ export default function DiseasePredictorPage() {
                     <div className="w-2 h-8 bg-indigo-600 rounded-full" />
                     <h2 className="text-4xl font-black tracking-tighter">Symptom Cluster</h2>
                   </div>
-                  <p className="text-gray-500 font-bold ml-5">Identify the primary physiological manifestations using the indicators below.</p>
+                  <p className="text-gray-700 dark:text-gray-400 font-bold ml-5">Identify the primary physiological manifestations using the indicators below.</p>
                 </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
                   {SYMPTOM_CHIPS.map((s, idx) => {
                     const active = selectedSymptoms.includes(s);
                     return (
-                      <button key={s} onClick={() => toggleSymptom(s)} style={{ animationDelay: `${idx * 50}ms` }} className={`p-4 rounded-2xl border text-[10px] font-black transition-all duration-500 flex flex-col items-center gap-3 group animate-in fade-in zoom-in ${active ? "bg-indigo-600 border-indigo-500 text-white scale-105 shadow-2xl shadow-indigo-500/20" : "bg-white/40 dark:bg-white/[0.02] border-white/80 dark:border-white/[0.05] text-gray-700 dark:text-gray-400 hover:bg-white/60"}`}>
+                      <button key={s} onClick={() => toggleSymptom(s)} style={{ animationDelay: `${idx * 50}ms` }} className={`p-4 rounded-2xl border text-[10px] font-black transition-all duration-500 flex flex-col items-center gap-3 group animate-in fade-in zoom-in ${active ? "bg-indigo-600 border-indigo-500 text-white scale-105 shadow-2xl shadow-indigo-500/20" : "bg-white/40 dark:bg-white/[0.02] border-white/80 dark:border-white/[0.05] text-gray-800 dark:text-gray-400 hover:bg-white/60"}`}>
                          <Activity size={18} className={`transition-transform duration-500 ${active ? "scale-125 rotate-12" : "group-hover:scale-110"}`} />
                          {s}
                       </button>
@@ -305,7 +305,7 @@ export default function DiseasePredictorPage() {
                     <div className="w-2 h-8 bg-blue-500 rounded-full" />
                     <h2 className="text-4xl font-black tracking-tighter text-gray-900 dark:text-white">Biometric Pulse</h2>
                   </div>
-                  <p className="text-gray-500 font-bold ml-5">Calibrate vital clinical vectors for high-fidelity synthesis.</p>
+                  <p className="text-gray-700 dark:text-gray-400 font-bold ml-5">Calibrate vital clinical vectors for high-fidelity synthesis.</p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -314,7 +314,7 @@ export default function DiseasePredictorPage() {
                   <BiometricInput label="Oxygen Saturation" value={spo2} setValue={setSpo2} icon={<AlertTriangle size={16} />} unit="SpO2 %" />
                   
                   <div className="md:col-span-1 space-y-4">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 px-2">Blood Pressure (Systolic/Diastolic)</p>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-600 dark:text-gray-500 px-2">Blood Pressure (Systolic/Diastolic)</p>
                     <div className="flex gap-2">
                        <input value={systolicBP} onChange={e => setSystolicBP(e.target.value)} placeholder="120" className="w-full bg-white/40 dark:bg-white/[0.02] border border-white/80 p-5 rounded-2xl text-center font-black" />
                        <span className="flex items-center text-gray-400 font-black">/</span>
@@ -323,7 +323,7 @@ export default function DiseasePredictorPage() {
                   </div>
 
                   <div className="md:col-span-1 space-y-4">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 px-2 flex justify-between">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-600 dark:text-gray-500 px-2 flex justify-between">
                       <span>Sleep Quality</span>
                       <span className="text-indigo-500">{sleepLevel}/10</span>
                     </p>
@@ -331,7 +331,7 @@ export default function DiseasePredictorPage() {
                   </div>
 
                   <div className="md:col-span-1 space-y-4">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 px-2 flex justify-between">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-600 dark:text-gray-500 px-2 flex justify-between">
                       <span>Stress Level</span>
                       <span className="text-red-500">{stressLevel}/10</span>
                     </p>
@@ -348,7 +348,7 @@ export default function DiseasePredictorPage() {
                     <div className="w-2 h-8 bg-amber-500 rounded-full" />
                     <h2 className="text-4xl font-black tracking-tighter text-gray-900 dark:text-white">Clinical Artifacts</h2>
                   </div>
-                  <p className="text-gray-500 font-bold ml-5">Synthesize pre-existing medical history and temporal progression.</p>
+                  <p className="text-gray-700 dark:text-gray-400 font-bold ml-5">Synthesize pre-existing medical history and temporal progression.</p>
                 </div>
 
                 <div className="grid xl:grid-cols-2 gap-16">
@@ -391,7 +391,7 @@ export default function DiseasePredictorPage() {
                     <div className="w-2 h-8 bg-emerald-500 rounded-full" />
                     <h2 className="text-4xl font-black tracking-tighter">Epidemiological Sync</h2>
                   </div>
-                  <p className="text-gray-500 font-bold ml-5">Determine geographic influence on localized viral vectors.</p>
+                  <p className="text-gray-700 dark:text-gray-400 font-bold ml-5">Determine geographic influence on localized viral vectors.</p>
                 </div>
 
                 <div className="max-w-xl mx-auto w-full p-12 rounded-[2.5rem] bg-emerald-600/5 border border-emerald-600/10 space-y-8 text-center">
@@ -407,7 +407,7 @@ export default function DiseasePredictorPage() {
                       <input value={location} onChange={e => setLocation(e.target.value)} placeholder="Enter Latitude/Longitude or City..." className="w-full pl-16 pr-6 border border-white dark:border-white/10 bg-white/80 dark:bg-black py-6 rounded-3xl text-lg font-black outline-none" />
                     )}
                   </div>
-                  <div className="flex items-center gap-3 justify-center text-emerald-600/60 pb-4">
+                  <div className="flex items-center gap-3 justify-center text-emerald-700 dark:text-emerald-600/60 pb-4">
                      <AlertTriangle size={16} />
                      <span className="text-[10px] font-black uppercase tracking-widest">Regional epidemiology engine online</span>
                   </div>
@@ -522,19 +522,19 @@ export default function DiseasePredictorPage() {
               {/* 📊 Clinical Context Snapshot */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                 <div className="p-6 rounded-3xl bg-gray-50 dark:bg-white/[0.02] border border-gray-100 dark:border-white/5">
-                  <p className="text-[10px] font-black text-gray-400 uppercase mb-2">Location</p>
+                  <p className="text-[10px] font-black text-gray-600 dark:text-gray-400 uppercase mb-2">Location</p>
                   <p className="text-sm font-black text-gray-800 dark:text-gray-200">{location || "Not Provided"}</p>
                 </div>
                 <div className="p-6 rounded-3xl bg-gray-50 dark:bg-white/[0.02] border border-gray-100 dark:border-white/5">
-                  <p className="text-[10px] font-black text-gray-400 uppercase mb-2">Duration</p>
+                  <p className="text-[10px] font-black text-gray-600 dark:text-gray-400 uppercase mb-2">Duration</p>
                   <p className="text-sm font-black text-gray-800 dark:text-gray-200">{duration}</p>
                 </div>
                 <div className="p-6 rounded-3xl bg-gray-50 dark:bg-white/[0.02] border border-gray-100 dark:border-white/5">
-                  <p className="text-[10px] font-black text-gray-400 uppercase mb-2">Progression</p>
+                  <p className="text-[10px] font-black text-gray-600 dark:text-gray-400 uppercase mb-2">Progression</p>
                   <p className="text-sm font-black text-gray-800 dark:text-gray-200">{isWorsening}</p>
                 </div>
                 <div className="p-6 rounded-3xl bg-gray-50 dark:bg-white/[0.02] border border-gray-100 dark:border-white/5">
-                  <p className="text-[10px] font-black text-gray-400 uppercase mb-2">History</p>
+                  <p className="text-[10px] font-black text-gray-600 dark:text-gray-400 uppercase mb-2">History</p>
                   <p className="text-sm font-black text-gray-800 dark:text-gray-200">{allergy || chronicIllness ? "Active Complex" : "Nominal"}</p>
                 </div>
               </div>
@@ -586,7 +586,7 @@ export default function DiseasePredictorPage() {
                   <h3 className="text-lg font-black text-gray-900 dark:text-white line-clamp-1">
                     {item.symptoms?.join(", ") || "Case Study"}
                   </h3>
-                  <div className="flex items-center gap-2 text-[10px] font-black text-gray-400 uppercase tracking-tighter">
+                  <div className="flex items-center gap-2 text-[10px] font-black text-gray-600 dark:text-gray-400 uppercase tracking-tighter">
                     <MapPin size={10} />
                     {item.location || "Undisclosed Global"}
                   </div>
@@ -632,7 +632,7 @@ export default function DiseasePredictorPage() {
                  </div>
                  <div>
                     <h2 className="text-4xl font-black">Archive Report</h2>
-                    <p className="text-sm font-bold text-gray-500 uppercase tracking-widest">{expandedPrediction.id.slice(0, 8)}</p>
+                    <p className="text-sm font-bold text-gray-700 dark:text-gray-500 uppercase tracking-widest">{expandedPrediction.id.slice(0, 8)}</p>
                  </div>
               </div>
               
@@ -649,7 +649,7 @@ export default function DiseasePredictorPage() {
 function BiometricInput({ label, value, setValue, icon, unit }: any) {
   return (
     <div className="space-y-4">
-      <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 px-2 flex items-center gap-2">
+      <p className="text-[10px] font-black uppercase tracking-widest text-gray-600 dark:text-gray-500 px-2 flex items-center gap-2">
         {icon} {label}
       </p>
       <div className="relative group/input">
@@ -658,7 +658,7 @@ function BiometricInput({ label, value, setValue, icon, unit }: any) {
           onChange={(e) => setValue(e.target.value)}
           className="w-full bg-white/40 dark:bg-white/[0.02] border border-white/80 dark:border-white/[0.1] px-6 py-5 rounded-2xl text-lg font-black outline-none focus:ring-4 focus:ring-indigo-600/10 transition-all"
         />
-        <div className="absolute right-6 top-1/2 -translate-y-1/2 text-xs font-black text-gray-400 tracking-widest">
+        <div className="absolute right-6 top-1/2 -translate-y-1/2 text-xs font-black text-gray-600 dark:text-gray-400 tracking-widest">
           {unit}
         </div>
       </div>
