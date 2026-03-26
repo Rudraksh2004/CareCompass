@@ -6,6 +6,8 @@ import {
   getUserProfile,
   updateUserProfile,
 } from "@/services/userService";
+import { logout } from "@/services/authService";
+import { useRouter } from "next/navigation";
 import { 
   User, 
   Calendar, 
@@ -19,7 +21,9 @@ import {
   Zap,
   Sparkles,
   ArrowRight,
-  ChevronRight
+  ChevronRight,
+  LogOut,
+  Power
 } from "lucide-react";
 
 // 🧩 INTERNAL COMPONENT: BIO-INPUT
@@ -54,9 +58,11 @@ function BioInput({ label, value, setValue, icon, placeholder, type = "text" }: 
 
 export default function ProfilePage() {
   const { user } = useAuth();
+  const router = useRouter();
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
 
   // Profile States
   const [name, setName] = useState("");
@@ -121,6 +127,18 @@ export default function ProfilePage() {
       alert("Failed to synchronize profile.");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+       setLoggingOut(true);
+       await logout();
+       router.push("/auth/login");
+    } catch (error) {
+       console.error("Logout error:", error);
+    } finally {
+       setLoggingOut(false);
     }
   };
 
@@ -326,6 +344,40 @@ export default function ProfilePage() {
               <p className="text-[10px] font-black text-amber-800 dark:text-amber-500 uppercase tracking-widest leading-relaxed">
                  AI HEALTH HUB | CLINICAL ASSIST
               </p>
+           </div>
+
+           {/* 🧨 Dangerous Protocol: Account Termination */}
+           <div className="relative overflow-hidden border border-red-500/20 dark:border-red-500/10 bg-red-500/[0.02] dark:bg-red-500/[0.01] p-10 rounded-[4rem] group transition-all duration-500">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-red-500/5 blur-[60px] rounded-full translate-x-1/2 -translate-y-1/2" />
+              
+              <div className="relative z-10 space-y-8">
+                 <div className="flex items-center gap-4">
+                    <div className="p-3 rounded-2xl bg-red-500/10 text-red-500">
+                       <Power size={24} />
+                    </div>
+                    <div>
+                       <h3 className="text-xl font-black uppercase tracking-tighter italic text-red-600 dark:text-red-500">Session Halt</h3>
+                       <p className="text-[9px] font-black text-gray-500 uppercase tracking-widest leading-none mt-1">Clinical Disconnect</p>
+                    </div>
+                 </div>
+
+                 <p className="text-xs font-bold text-gray-600 dark:text-gray-400 opacity-80 leading-relaxed">
+                    Terminate the active clinical session and seal all neural links until next biometric authentication.
+                 </p>
+
+                 <button
+                    onClick={handleLogout}
+                    disabled={loggingOut}
+                    className="w-full flex items-center justify-center gap-3 px-8 py-5 rounded-2xl bg-red-600 text-white font-black uppercase tracking-widest text-[11px] shadow-xl shadow-red-600/20 hover:bg-red-700 hover:scale-[1.02] transition-all disabled:opacity-50"
+                 >
+                    {loggingOut ? (
+                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                       <LogOut size={16} />
+                    )}
+                    {loggingOut ? "DISCONNECTING..." : "HALT SESSION"}
+                 </button>
+              </div>
            </div>
         </div>
       </div>

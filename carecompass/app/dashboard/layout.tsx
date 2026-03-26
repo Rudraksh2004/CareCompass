@@ -20,6 +20,10 @@ import {
   User,
   PanelLeftClose,
   PanelLeftOpen,
+  Sun,
+  Moon,
+  LogOut,
+  Settings
 } from "lucide-react";
 
 export default function DashboardLayout({
@@ -74,8 +78,10 @@ export default function DashboardLayout({
       <aside
         className={`${
           collapsed ? "w-20" : "w-[280px]"
-        } fixed top-0 left-0 h-screen z-50 p-6 border-r border-white/80 dark:border-white/[0.08] border-r-white/40 bg-white/[0.65] dark:bg-[#030712]/40 backdrop-blur-[40px] backdrop-saturate-[2] shadow-[8px_0_40px_rgba(0,0,0,0.03)] dark:shadow-[8px_0_40px_rgba(0,0,0,0.4),0_0_60px_rgba(59,130,246,0.03)] flex flex-col transition-all duration-500 ease-in-out`}
+        } fixed top-0 left-0 h-screen z-50 p-6 border-r border-white/80 dark:border-white/[0.08] border-r-white/40 bg-white/[0.6] dark:bg-[#030712]/50 backdrop-blur-[50px] backdrop-saturate-[2.5] shadow-[12px_0_60px_rgba(0,0,0,0.04)] dark:shadow-[12px_0_60px_rgba(0,0,0,0.4)] flex flex-col transition-all duration-500 ease-in-out group/sidebar`}
       >
+        <div className="absolute inset-0 bg-gradient-to-b from-blue-500/[0.02] via-transparent to-emerald-500/[0.02] pointer-events-none" />
+        <div className="absolute top-0 right-0 w-[1px] h-full bg-gradient-to-b from-transparent via-blue-500/20 to-transparent opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-1000" />
         {/* 🔥 Premium Edge Collapse Button (Always Visible in Center) */}
         <button
           onClick={() => setCollapsed(!collapsed)}
@@ -224,45 +230,15 @@ export default function DashboardLayout({
               pathname={pathname}
             />
 
-            {!collapsed ? (
-              <div className="p-2 space-y-3 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <button
-                  onClick={toggleTheme}
-                  className="w-full flex items-center justify-between px-5 py-3.5 rounded-2xl bg-white/40 dark:bg-white/[0.03] border border-white/60 dark:border-white/[0.05] text-xs font-black text-gray-900 dark:text-white hover:bg-white/80 dark:hover:bg-white/[0.08] shadow-sm hover:scale-[1.02] transition-all duration-500 backdrop-blur-2xl group"
-                >
-                  <span className="uppercase tracking-widest">{theme === "dark" ? "Light Lens" : "Dark Lens"}</span>
-                  <div className="w-8 h-8 rounded-lg bg-indigo-500/10 dark:bg-emerald-500/10 flex items-center justify-center text-indigo-600 dark:text-emerald-400 group-hover:rotate-12 transition-transform">
-                    {theme === "dark" ? "☀️" : "🌙"}
-                  </div>
-                </button>
-
-                <button
-                  onClick={handleLogout}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-red-500/5 dark:bg-red-500/[0.02] border border-red-500/10 dark:border-red-500/5 text-[10px] font-black uppercase tracking-widest text-red-500 hover:bg-red-500 hover:text-white transition-all duration-300"
-                >
-                  Terminate
-                </button>
-
-                {user && (
-                   <div className="px-3 py-3 rounded-xl bg-gradient-to-br from-blue-500/5 to-emerald-500/5 border border-white/20 dark:border-white/[0.03] flex flex-col items-center">
-                    <div className="text-[7px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1 text-center">
-                      SECURE CLINICAL UPLINK
-                    </div>
-                    <div className="text-[9px] font-bold text-gray-900 dark:text-white/80 truncate w-full text-center">
-                      {user.email}
-                    </div>
-                  </div>
-                )}
+            {!collapsed && user && (
+               <div className="px-3 py-4 rounded-xl bg-gradient-to-br from-blue-500/5 to-emerald-500/5 border border-white/20 dark:border-white/[0.03] flex flex-col items-center animate-in fade-in duration-700">
+                <div className="text-[7px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1.5 text-center">
+                  SECURE CLINICAL UPLINK
+                </div>
+                <div className="text-[9px] font-bold text-gray-900 dark:text-white/80 truncate w-full text-center">
+                  {user.email}
+                </div>
               </div>
-            ) : (
-               <div className="flex flex-col items-center gap-4 animate-in fade-in duration-500">
-                  <button onClick={toggleTheme} className="w-12 h-12 rounded-xl bg-white/40 dark:bg-white/[0.03] border border-white/60 dark:border-white/[0.05] flex items-center justify-center text-lg hover:scale-110 transition-all">
-                    {theme === "dark" ? "☀️" : "🌙"}
-                  </button>
-                  <button onClick={handleLogout} className="w-12 h-12 rounded-xl bg-red-500/5 border border-red-500/10 flex items-center justify-center text-red-500 hover:bg-red-500 hover:text-white transition-all">
-                     <Clock className="w-5 h-5" />
-                  </button>
-               </div>
             )}
           </div>
         </div>
@@ -285,6 +261,14 @@ export default function DashboardLayout({
           </div>
 
           <div className="flex items-center gap-6">
+            <button 
+              onClick={toggleTheme}
+              className="w-12 h-12 rounded-2xl bg-white/40 dark:bg-white/[0.03] border border-white dark:border-white/[0.08] backdrop-blur-3xl flex items-center justify-center text-xl hover:scale-110 active:scale-95 transition-all shadow-lg group relative overflow-hidden"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-emerald-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+              {theme === "dark" ? <Sun className="w-5 h-5 text-amber-400 animate-pulse" /> : <Moon className="w-5 h-5 text-indigo-600" />}
+            </button>
+
             <div className="hidden lg:flex items-center gap-4 px-6 py-3 rounded-[2rem] bg-white/40 dark:bg-white/[0.03] border border-white dark:border-white/[0.08] backdrop-blur-3xl transition-all hover:scale-[1.05] hover:shadow-xl group">
                <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.6)]" />
                <div className="flex flex-col">
