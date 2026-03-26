@@ -241,14 +241,14 @@ function ReminderContent() {
                 Adherence Tracker
               </h1>
             </div>
-            <p className="text-gray-600 dark:text-gray-400 font-bold max-w-xl text-lg leading-relaxed">
+            <p className="text-gray-700 dark:text-gray-400 font-bold max-w-xl text-lg leading-relaxed">
               Precision medication management with behavioral adherence analytics. Ensure therapeutic continuity through multi-dose temporal tracking.
             </p>
           </div>
           
           <div className="flex flex-wrap gap-4">
              <div className="px-8 py-5 rounded-[2rem] bg-white/40 dark:bg-white/5 border border-white/60 dark:border-white/[0.05] backdrop-blur-md flex flex-col items-center">
-                <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Daily Adherence</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-gray-600 dark:text-gray-400 mb-2">Daily Adherence</p>
                 <div className="w-32 h-2 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
                    <div className="h-full bg-gradient-to-r from-blue-500 to-emerald-500 transition-all duration-1000" style={{ width: `${adherence}%` }} />
                 </div>
@@ -270,9 +270,9 @@ function ReminderContent() {
 
               <div className="space-y-6">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Medication Name</label>
+                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-600 dark:text-gray-500 ml-2">Medication Name</label>
                   <div className="relative">
-                    <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                    <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-600 dark:text-gray-400" size={18} />
                     <input
                       className="w-full bg-white/40 dark:bg-black/40 border border-white/80 dark:border-white/10 pl-12 pr-6 py-4 rounded-2xl font-bold outline-none focus:ring-4 focus:ring-blue-500/10 transition-all"
                       placeholder="e.g., Metformin..."
@@ -283,7 +283,7 @@ function ReminderContent() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Dosage Instructions</label>
+                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-600 dark:text-gray-500 ml-2">Dosage Instructions</label>
                   <input
                     className="w-full bg-white/40 dark:bg-black/40 border border-white/80 dark:border-white/10 px-6 py-4 rounded-2xl font-bold outline-none focus:ring-4 focus:ring-blue-500/10 transition-all"
                     placeholder="e.g., 500mg daily..."
@@ -293,7 +293,7 @@ function ReminderContent() {
                 </div>
 
                 <div className="space-y-3">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Temporal Markers</label>
+                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-600 dark:text-gray-500 ml-2">Temporal Markers</label>
                   <div className="flex gap-2">
                     <input
                       type="time"
@@ -339,16 +339,16 @@ function ReminderContent() {
             </div>
             <div className="flex items-center gap-2 px-6 py-2 rounded-full bg-white/40 dark:bg-white/5 border border-white/60 dark:border-white/[0.05] backdrop-blur-md">
                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-               <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">Sync Active</span>
+               <span className="text-[10px] font-black uppercase tracking-widest text-gray-600 dark:text-gray-400">Sync Active</span>
             </div>
           </div>
 
           {reminders.length === 0 ? (
             <div className="border border-white/80 dark:border-white/[0.05] bg-white/[0.4] dark:bg-white/[0.02] backdrop-blur-2xl p-20 rounded-[3rem] text-center space-y-6">
-              <div className="w-24 h-24 rounded-full bg-gray-100 dark:bg-white/5 flex items-center justify-center mx-auto text-gray-300">
+              <div className="w-24 h-24 rounded-full bg-gray-100 dark:bg-white/5 flex items-center justify-center mx-auto text-gray-400">
                  <Pill size={48} />
               </div>
-              <p className="text-gray-400 font-bold text-xl italic">No pharmacological schedules detected.</p>
+              <p className="text-gray-600 dark:text-gray-400 font-bold text-xl italic">No pharmacological schedules detected.</p>
             </div>
           ) : (
             <div className="grid gap-10">
@@ -408,7 +408,7 @@ function ReminderContent() {
                                </h3>
                                <div className="flex items-center gap-3">
                                   <span className="px-3 py-1 rounded-full bg-blue-500/10 text-blue-500 text-[10px] font-black uppercase tracking-widest border border-blue-500/20">Active Regimen</span>
-                                  <p className="text-gray-500 font-bold italic">{reminder.dosage || "Generic regimen"}</p>
+                                  <p className="text-gray-700 dark:text-gray-400 font-bold italic">{reminder.dosage || "Generic regimen"}</p>
                                </div>
                              </>
                            )}
@@ -451,7 +451,7 @@ function ReminderContent() {
                                         {!isTaken && (
                                           <button 
                                             onClick={() => startEditTime(reminder.id, t)}
-                                            className="p-2 rounded-lg bg-gray-100 dark:bg-white/5 text-gray-400 hover:text-blue-500 hover:bg-blue-500/10 transition-all opacity-0 group-hover/time:opacity-100"
+                                            className="p-2 rounded-lg bg-gray-100 dark:bg-white/5 text-gray-600 dark:text-gray-400 hover:text-blue-500 hover:bg-blue-500/10 transition-all opacity-0 group-hover/time:opacity-100"
                                             title="Edit Time"
                                           >
                                             <Edit3 size={14} />
@@ -505,7 +505,7 @@ function ReminderContent() {
                   <Activity size={24} />
                   <h3 className="text-xl font-black uppercase tracking-tighter">Behavioral Sync</h3>
                </div>
-               <p className="text-gray-500 font-bold leading-relaxed text-sm">Adherence metrics are synchronized with your clinical profile for AI disease prediction accuracy.</p>
+               <p className="text-gray-700 dark:text-gray-400 font-bold leading-relaxed text-sm">Adherence metrics are synchronized with your clinical profile for AI disease prediction accuracy.</p>
             </div>
             
             <div className="flex flex-col gap-4">
@@ -513,7 +513,7 @@ function ReminderContent() {
                   <Stethoscope size={24} />
                   <h3 className="text-xl font-black uppercase tracking-tighter">Clinical Integrity</h3>
                </div>
-               <p className="text-gray-500 font-bold leading-relaxed text-sm">Consistent medication timing reduces physiological variability and improves prognostic outcomes.</p>
+               <p className="text-gray-700 dark:text-gray-400 font-bold leading-relaxed text-sm">Consistent medication timing reduces physiological variability and improves prognostic outcomes.</p>
             </div>
 
             <div className="flex flex-col items-center justify-center p-8 rounded-[2.5rem] bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-2xl">
