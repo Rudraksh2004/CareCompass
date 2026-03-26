@@ -42,10 +42,10 @@ export default function DashboardLayout({
   const iconClasses = (path: string) => {
     const isActive = pathname === path;
 
-    return `w-5 h-5 transition-all duration-300 ${
+    return `w-5 h-5 transition-all duration-500 ${
       isActive
-        ? "scale-110 text-blue-600 dark:text-emerald-400 drop-shadow-[0_0_6px_rgba(59,130,246,0.6)]"
-        : "group-hover:scale-105"
+        ? "scale-110 text-blue-600 dark:text-emerald-400 drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]"
+        : "text-gray-500 group-hover:scale-110 group-hover:text-gray-900 dark:group-hover:text-gray-100 transition-colors"
     }`;
   };
 
@@ -90,30 +90,40 @@ export default function DashboardLayout({
         </button>
 
         {/* Brand */}
-        <div className="mb-10">
+        <div className={`mb-10 relative ${collapsed ? "px-0" : "px-2"}`}>
           <div
             className={`flex items-center ${
-              collapsed ? "justify-center" : "gap-3"
-            }`}
+              collapsed ? "justify-center" : "gap-4"
+            } transition-all duration-500`}
           >
-            <img
-              src="/logo.png"
-              alt="CareCompass Logo"
-              className="w-10 h-10 object-contain drop-shadow-lg"
-            />
+            <div className="relative group/logo flex-shrink-0">
+               <div className="absolute -inset-2 bg-gradient-to-tr from-blue-600 to-emerald-500 rounded-2xl blur-lg opacity-0 group-hover/logo:opacity-40 transition-opacity duration-500" />
+               <img
+                 src="/logo.png"
+                 alt="CareCompass Logo"
+                 className="w-12 h-12 object-contain drop-shadow-2xl relative z-10 transition-transform duration-500 group-hover/logo:scale-110"
+               />
+            </div>
 
             {!collapsed && (
-              <div>
-                <h1 className="text-2xl font-extrabold bg-gradient-to-r from-blue-600 to-emerald-500 bg-clip-text text-transparent">
+              <div className="flex flex-col animate-in fade-in slide-in-from-left-4 duration-700">
+                <h1 className="text-2xl font-black tracking-tighter bg-gradient-to-r from-gray-900 via-blue-600 to-emerald-500 dark:from-white dark:via-blue-400 dark:to-emerald-400 bg-clip-text text-transparent leading-none">
                   CareCompass
                 </h1>
-
-                <p className="text-xs font-black text-gray-800 dark:text-gray-400 mt-1">
-                  AI Health Companion
-                </p>
+                
+                <div className="flex items-center gap-2 mt-1.5">
+                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+                   <p className="text-[9px] font-black text-gray-800 dark:text-gray-400 uppercase tracking-[0.2em] leading-none">
+                     Neural Core Active
+                   </p>
+                </div>
               </div>
             )}
           </div>
+          
+          {!collapsed && (
+            <div className="absolute -bottom-6 left-2 right-2 h-px bg-gradient-to-r from-transparent via-blue-500/20 to-transparent" />
+          )}
         </div>
 
         {/* Navigation */}
@@ -198,43 +208,63 @@ export default function DashboardLayout({
         </nav>
 
         {/* Bottom Section */}
-        <div className="mt-auto pt-6 border-t border-white/10 space-y-3">
-          <NavItem
-            href="/dashboard/profile"
-            icon={<User className={iconClasses("/dashboard/profile")} />}
-            label="Profile"
-            collapsed={collapsed}
-            pathname={pathname}
-          />
-
+        <div className="mt-auto pt-8 border-t border-white/80 dark:border-white/[0.08] relative">
           {!collapsed && (
-            <>
-              <button
-                onClick={toggleTheme}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-white/60 dark:bg-white/[0.04] border border-gray-400/30 dark:border-white/[0.1] text-sm font-bold text-gray-900 dark:text-white hover:bg-white/80 dark:hover:bg-white/[0.08] shadow-[0_4px_16px_rgba(0,0,0,0.06)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.3)] hover:scale-[1.02] transition-all duration-500 backdrop-blur-2xl"
-              >
-                {theme === "dark" ? "☀️ Light Mode" : "🌙 Dark Mode"}
-              </button>
-
-              <button
-                onClick={handleLogout}
-                className="w-full mt-2 flex items-center justify-center text-red-500/80 dark:text-red-400 text-sm font-bold hover:text-red-600 dark:hover:text-red-300 transition-all duration-300 py-3.5 rounded-2xl hover:bg-red-500/10 border border-transparent hover:border-red-500/20 shadow-sm"
-              >
-                Sign Out
-              </button>
-
-              {user && (
-                <div className="mt-4 flex flex-col items-center justify-center">
-                  <div className="text-[10px] font-black text-gray-800 dark:text-gray-400 uppercase tracking-widest mb-1">
-                    Secure Session
-                  </div>
-                  <div className="text-xs font-bold text-gray-900 dark:text-white truncate max-w-[200px] drop-shadow-sm">
-                    {user.email}
-                  </div>
-                </div>
-              )}
-            </>
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 px-3 py-1 rounded-full bg-white/80 dark:bg-gray-900 border border-white/40 dark:border-white/10 text-[8px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 backdrop-blur-md">
+              Bio-Link Protocol
+            </div>
           )}
+
+          <div className="space-y-4">
+            <NavItem
+              href="/dashboard/profile"
+              icon={<User className={iconClasses("/dashboard/profile")} />}
+              label="Profile Settings"
+              collapsed={collapsed}
+              pathname={pathname}
+            />
+
+            {!collapsed ? (
+              <div className="p-2 space-y-3 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <button
+                  onClick={toggleTheme}
+                  className="w-full flex items-center justify-between px-5 py-3.5 rounded-2xl bg-white/40 dark:bg-white/[0.03] border border-white/60 dark:border-white/[0.05] text-xs font-black text-gray-900 dark:text-white hover:bg-white/80 dark:hover:bg-white/[0.08] shadow-sm hover:scale-[1.02] transition-all duration-500 backdrop-blur-2xl group"
+                >
+                  <span className="uppercase tracking-widest">{theme === "dark" ? "Light Lens" : "Dark Lens"}</span>
+                  <div className="w-8 h-8 rounded-lg bg-indigo-500/10 dark:bg-emerald-500/10 flex items-center justify-center text-indigo-600 dark:text-emerald-400 group-hover:rotate-12 transition-transform">
+                    {theme === "dark" ? "☀️" : "🌙"}
+                  </div>
+                </button>
+
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center justify-center gap-3 px-5 py-4 rounded-2xl bg-red-500/5 dark:bg-red-500/[0.02] border border-red-500/10 dark:border-red-500/5 text-xs font-black uppercase tracking-widest text-red-500 hover:bg-red-500 hover:text-white hover:shadow-lg hover:shadow-red-500/20 transition-all duration-500"
+                >
+                  Terminate Session
+                </button>
+
+                {user && (
+                   <div className="px-4 py-4 rounded-2xl bg-gradient-to-br from-blue-500/5 to-emerald-500/5 border border-white/20 dark:border-white/[0.03] flex flex-col items-center">
+                    <div className="text-[8px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-1.5">
+                      Clinical Authenticator
+                    </div>
+                    <div className="text-[10px] font-bold text-gray-900 dark:text-white/80 truncate w-full text-center">
+                      {user.email}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+               <div className="flex flex-col items-center gap-4 animate-in fade-in duration-500">
+                  <button onClick={toggleTheme} className="w-12 h-12 rounded-xl bg-white/40 dark:bg-white/[0.03] border border-white/60 dark:border-white/[0.05] flex items-center justify-center text-lg hover:scale-110 transition-all">
+                    {theme === "dark" ? "☀️" : "🌙"}
+                  </button>
+                  <button onClick={handleLogout} className="w-12 h-12 rounded-xl bg-red-500/5 border border-red-500/10 flex items-center justify-center text-red-500 hover:bg-red-500 hover:text-white transition-all">
+                     <Clock className="w-5 h-5" />
+                  </button>
+               </div>
+            )}
+          </div>
         </div>
       </aside>
 
@@ -315,24 +345,27 @@ function NavItem({
     <Link
       href={href}
       className={`group relative flex items-center ${
-        collapsed ? "justify-center px-0" : "gap-3 px-4"
-      } py-3.5 rounded-2xl transition-all duration-500 overflow-hidden ${
+        collapsed ? "justify-center px-0" : "gap-4 px-6"
+      } py-4 rounded-[1.25rem] transition-all duration-500 overflow-hidden ${
         isActive
-          ? "bg-white/[0.85] dark:bg-white/[0.08] text-blue-700 dark:text-emerald-300 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] border border-white border-t-white border-l-white/90 dark:border-white/[0.12] dark:border-t-white/[0.2] dark:border-l-white/[0.15] backdrop-blur-[20px] backdrop-saturate-[1.5] font-black translate-x-1"
-          : "text-gray-800 dark:text-gray-300 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-white/60 dark:hover:bg-white/[0.05] border border-transparent hover:border-white/80 dark:hover:border-white/[0.08] font-bold hover:translate-x-1"
+          ? "bg-white/[0.9] dark:bg-white/[0.07] text-blue-700 dark:text-emerald-300 shadow-[0_10px_40px_rgba(0,0,0,0.1)] dark:shadow-[0_10px_40px_rgba(0,0,0,0.3)] border border-white border-t-white border-l-white/90 dark:border-white/[0.12] dark:border-t-white/[0.2] backdrop-blur-[40px] font-black translate-x-2"
+          : "text-gray-800 dark:text-gray-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-white/70 dark:hover:bg-white/[0.04] border border-transparent hover:border-white/70 dark:hover:border-white/[0.07] font-black hover:translate-x-1"
       }`}
     >
       {/* Dynamic Active Indicator Glow */}
       {isActive && (
-        <div className="absolute inset-x-0 bottom-0 h-[100%] bg-gradient-to-r from-blue-400/10 to-transparent dark:from-emerald-400/10 pointer-events-none opacity-100" />
+        <>
+          <div className="absolute inset-y-2 left-0 w-1 bg-gradient-to-b from-blue-600 to-emerald-500 dark:from-blue-400 dark:to-emerald-300 rounded-full shadow-[0_0_12px_rgba(59,130,246,0.6)] z-20" />
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-transparent to-transparent dark:from-emerald-500/10 pointer-events-none opacity-100" />
+        </>
       )}
       
-      <div className={`flex items-center justify-center w-6 h-6 shrink-0 z-10 transition-transform duration-500 ${isActive ? "scale-110 drop-shadow-md" : "drop-shadow-sm group-hover:scale-110"}`}>
+      <div className={`flex items-center justify-center w-6 h-6 shrink-0 z-10 transition-all duration-500 ${isActive ? "scale-110 rotate-3 drop-shadow-md" : "drop-shadow-sm group-hover:scale-110 group-hover:-rotate-3"}`}>
         {icon}
       </div>
 
       {!collapsed && (
-        <span className="whitespace-nowrap translate-y-[0.5px]">{label}</span>
+        <span className="whitespace-nowrap translate-y-[0.5px] uppercase tracking-wider text-[11px]">{label}</span>
       )}
     </Link>
   );
