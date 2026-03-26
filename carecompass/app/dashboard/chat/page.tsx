@@ -253,7 +253,7 @@ export default function ChatPage() {
                 AI Health Chat
               </h1>
             </div>
-            <p className="text-gray-600 dark:text-gray-400 font-bold max-w-xl text-lg leading-relaxed">
+            <p className="text-gray-950 dark:text-gray-400 font-bold max-w-xl text-lg leading-relaxed">
               Your high-fidelity clinical assistant. Analyzing reports, patterns, and prescriptions with neural precision.
             </p>
           </div>
@@ -391,7 +391,7 @@ export default function ChatPage() {
                     className={`relative p-7 rounded-[2.5rem] text-base leading-relaxed break-words shadow-2xl group transition-all duration-500 border overflow-hidden ${
                       msg.role === "user"
                         ? "bg-gradient-to-br from-indigo-600 via-indigo-700 to-purple-800 text-white border-white/10 rounded-tr-none hover:shadow-indigo-500/20"
-                        : "bg-white/95 dark:bg-[#0f172a]/80 border-white/60 dark:border-white/[0.05] text-gray-800 dark:text-gray-100 backdrop-blur-3xl rounded-tl-none shadow-indigo-500/5 hover:border-indigo-500/30"
+                        : "bg-white/95 dark:bg-[#0f172a]/80 border-white/60 dark:border-white/[0.05] text-gray-950 dark:text-gray-100 backdrop-blur-3xl rounded-tl-none shadow-indigo-500/5 hover:border-indigo-500/30"
                     }`}
                   >
                     <div className="prose dark:prose-invert max-w-none prose-li:font-bold prose-p:font-bold prose-p:leading-relaxed text-[16px] relative z-10">
@@ -497,7 +497,7 @@ export default function ChatPage() {
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={handleKeyDown}
                         placeholder="Type a clinical inquiry..."
-                        className="w-full bg-transparent border-none focus:ring-0 text-gray-800 dark:text-gray-100 font-bold placeholder:text-gray-400/50 text-xl resize-none py-3 custom-scrollbar overflow-hidden"
+                        className="w-full bg-transparent border-none focus:ring-0 text-gray-950 dark:text-gray-100 font-bold placeholder:text-gray-400/50 text-xl resize-none py-3 custom-scrollbar overflow-hidden"
                         rows={1}
                         onInput={(e) => {
                            const target = e.target as HTMLTextAreaElement;
