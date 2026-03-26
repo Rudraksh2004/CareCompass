@@ -26,7 +26,8 @@ import {
   Settings,
   Twitter,
   Linkedin,
-  Github
+  Github,
+  Info
 } from "lucide-react";
 
 export default function DashboardLayout({
@@ -211,6 +212,13 @@ export default function DashboardLayout({
               <HeartPulse className={iconClasses("/dashboard/emergency")} />
             }
             label="Emergency Card"
+            collapsed={collapsed}
+            pathname={pathname}
+          />
+          <NavItem
+            href="/about"
+            icon={<Info className={iconClasses("/about")} />}
+            label="About Us"
             collapsed={collapsed}
             pathname={pathname}
           />
