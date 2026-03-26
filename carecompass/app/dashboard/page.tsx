@@ -105,14 +105,14 @@ export default function DashboardPage() {
                 Command Center
               </h1>
             </div>
-            <p className="text-gray-600 dark:text-gray-400 font-bold max-w-xl text-lg leading-relaxed">
+            <p className="text-gray-700 dark:text-gray-400 font-bold max-w-xl text-lg leading-relaxed">
               Synthesizing high-fidelity anatomical diagnostics and real-time biological data for your holistic health overview.
             </p>
           </div>
 
           <div className="flex flex-wrap gap-4">
             <div className="px-8 py-5 rounded-[2rem] bg-white/40 dark:bg-white/5 border border-white/60 dark:border-white/[0.05] backdrop-blur-md">
-              <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Secure Core ID</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-gray-600 dark:text-gray-400 mb-1">Secure Core ID</p>
               <div className="flex items-center gap-2">
                 <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
                 <span className="text-sm font-black text-gray-800 dark:text-gray-200 uppercase tracking-tighter">{secureUID}</span>
@@ -131,10 +131,10 @@ export default function DashboardPage() {
         ].map((stat, i) => (
           <div key={i} className={`relative overflow-hidden rounded-[2rem] border ${stat.border} bg-white/[0.4] dark:bg-[#030712]/40 backdrop-blur-md p-8 transition-all duration-500 hover:-translate-y-2 hover:shadow-xl`}>
              <div className="flex items-center justify-between mb-6">
-                <div className="p-3 rounded-xl bg-gray-900/5 dark:bg-white/5 text-gray-600 dark:text-gray-400">
+                <div className="p-3 rounded-xl bg-gray-900/5 dark:bg-white/5 text-gray-700 dark:text-gray-400">
                    {stat.icon}
                 </div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">{stat.label}</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-gray-600 dark:text-gray-400">{stat.label}</p>
              </div>
              <h3 className="text-4xl font-black text-gray-900 dark:text-white tracking-tighter">{stat.val}</h3>
           </div>
@@ -188,7 +188,7 @@ export default function DashboardPage() {
       {/* 🛠️ CORE OPERATIVES MATRIX */}
       <div className="space-y-8">
         <div className="flex items-center gap-4 px-2">
-           <h4 className="text-[12px] font-black text-gray-400 uppercase tracking-[0.4em] leading-none">Diagnostic Modules</h4>
+           <h4 className="text-[12px] font-black text-gray-600 dark:text-gray-400 uppercase tracking-[0.4em] leading-none">Diagnostic Modules</h4>
            <div className="h-px w-full bg-gray-200 dark:bg-white/10" />
         </div>
 
@@ -209,7 +209,7 @@ export default function DashboardPage() {
                   </div>
                   <div>
                     <h5 className="font-black text-gray-900 dark:text-white tracking-tight uppercase text-sm mb-1">{feature.title}</h5>
-                    <p className="text-[11px] font-bold text-gray-500 dark:text-gray-400">{feature.desc}</p>
+                    <p className="text-[11px] font-bold text-gray-700 dark:text-gray-400">{feature.desc}</p>
                   </div>
                </div>
             </Link>

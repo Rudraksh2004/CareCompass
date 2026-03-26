@@ -108,7 +108,7 @@ export default function DashboardLayout({
                   CareCompass
                 </h1>
 
-                <p className="text-xs font-bold text-gray-700 dark:text-gray-300 mt-1">
+                <p className="text-xs font-black text-gray-800 dark:text-gray-400 mt-1">
                   AI Health Companion
                 </p>
               </div>
@@ -225,7 +225,7 @@ export default function DashboardLayout({
 
               {user && (
                 <div className="mt-4 flex flex-col items-center justify-center">
-                  <div className="text-[10px] font-black text-gray-700 dark:text-gray-300 uppercase tracking-widest mb-1">
+                  <div className="text-[10px] font-black text-gray-800 dark:text-gray-400 uppercase tracking-widest mb-1">
                     Secure Session
                   </div>
                   <div className="text-xs font-bold text-gray-900 dark:text-white truncate max-w-[200px] drop-shadow-sm">
@@ -250,7 +250,7 @@ export default function DashboardLayout({
               <h2 className="text-3xl font-black tracking-tighter text-gray-900 dark:text-white">
                 Bio-Status <span className="text-blue-600 dark:text-blue-500">Center</span>
               </h2>
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400 dark:text-gray-500">Operational Integrity Active</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600 dark:text-gray-500">Operational Integrity Active</p>
             </div>
           </div>
 
@@ -258,7 +258,7 @@ export default function DashboardLayout({
             <div className="hidden lg:flex items-center gap-4 px-6 py-3 rounded-[2rem] bg-white/40 dark:bg-white/[0.03] border border-white dark:border-white/[0.08] backdrop-blur-3xl transition-all hover:scale-[1.05] hover:shadow-xl group">
                <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.6)]" />
                <div className="flex flex-col">
-                  <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">AI Link Status</span>
+                  <span className="text-[9px] font-black text-gray-600 dark:text-gray-500 uppercase tracking-widest leading-none mb-1">AI Link Status</span>
                   <span className="text-[11px] font-bold text-gray-900 dark:text-white uppercase leading-none">Diagnostic Core Ready</span>
                </div>
             </div>
@@ -319,7 +319,7 @@ function NavItem({
       } py-3.5 rounded-2xl transition-all duration-500 overflow-hidden ${
         isActive
           ? "bg-white/[0.85] dark:bg-white/[0.08] text-blue-700 dark:text-emerald-300 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] border border-white border-t-white border-l-white/90 dark:border-white/[0.12] dark:border-t-white/[0.2] dark:border-l-white/[0.15] backdrop-blur-[20px] backdrop-saturate-[1.5] font-black translate-x-1"
-          : "text-gray-700 dark:text-gray-300 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-white/60 dark:hover:bg-white/[0.05] border border-transparent hover:border-white/80 dark:hover:border-white/[0.08] font-bold hover:translate-x-1"
+          : "text-gray-800 dark:text-gray-300 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-white/60 dark:hover:bg-white/[0.05] border border-transparent hover:border-white/80 dark:hover:border-white/[0.08] font-bold hover:translate-x-1"
       }`}
     >
       {/* Dynamic Active Indicator Glow */}

@@ -149,12 +149,12 @@ export default function ProfilePage() {
             <h1 className="text-4xl lg:text-7xl font-black bg-gradient-to-r from-indigo-600 via-blue-600 to-emerald-500 dark:from-indigo-400 dark:via-blue-400 dark:to-emerald-400 bg-clip-text text-transparent italic leading-[0.9] tracking-tighter">
               Bio-Metric <br /> <span className="not-italic text-gray-900 dark:text-white opacity-90">Protocol Hub</span>
             </h1>
-            <p className="text-gray-600 dark:text-gray-400 font-bold text-lg max-w-2xl leading-relaxed">
+            <p className="text-gray-700 dark:text-gray-400 font-bold text-lg max-w-2xl leading-relaxed">
                Calibrate your foundational biometric signatures for hyper-accurate AI synthesis.
             </p>
             <div className="flex items-center gap-4 px-6 py-3 rounded-2xl bg-white/40 dark:bg-black/20 border border-white/40 dark:border-white/5 backdrop-blur-md w-fit">
               <div className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 dark:text-gray-400 opacity-70">Authenticated: {user?.email}</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-600 dark:text-gray-400 opacity-70">Authenticated: {user?.email}</span>
             </div>
           </div>
           <div className="shrink-0 relative group perspective-1000">
@@ -181,7 +181,7 @@ export default function ProfilePage() {
                 </div>
                 <div>
                   <h2 className="text-3xl font-black text-gray-900 dark:text-white uppercase tracking-tighter italic leading-none">Personal Manifest</h2>
-                  <p className="text-xs font-black text-gray-500 uppercase tracking-widest mt-2 opacity-50">Secure Clinical Record</p>
+                  <p className="text-xs font-black text-gray-600 uppercase tracking-widest mt-2 opacity-60">Secure Clinical Record</p>
                 </div>
               </div>
               <ShieldCheck size={48} className="text-emerald-500/20" />
@@ -300,7 +300,7 @@ export default function ProfilePage() {
                  <Sparkles size={48} className="animate-pulse" />
               </div>
               <h3 className="text-2xl font-black uppercase tracking-tighter italic mb-4 leading-none">AI Synthesis</h3>
-              <p className="text-gray-600 dark:text-gray-400 text-sm font-bold leading-relaxed mb-8">
+              <p className="text-gray-700 dark:text-gray-400 text-sm font-bold leading-relaxed mb-8">
                  Calibrating these fields optimizes the CareCompass Neural Engine for hyper-relevant diagnostic synthesis.
               </p>
               <div className="w-full p-6 rounded-3xl bg-indigo-500/5 border border-indigo-500/10 text-xs font-bold text-indigo-700 dark:text-indigo-300 leading-relaxed italic">
@@ -314,7 +314,7 @@ export default function ProfilePage() {
                     <ShieldCheck size={28} className="text-emerald-500" />
                     <h3 className="text-xl font-black uppercase tracking-tighter italic">Data Privacy</h3>
                  </div>
-                 <p className="text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest leading-loose text-justify opacity-60">
+                 <p className="text-[10px] font-black text-gray-600 dark:text-gray-400 uppercase tracking-widest leading-loose text-justify opacity-70">
                     ENCRYPTION: AES-256 <br />
                     PROTOCOL: SECURE BIO-LEDGER <br />
                     ACCESS: SUBJECT ONLY
