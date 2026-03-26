@@ -120,8 +120,12 @@ export default function AboutPage() {
           <div className="grid md:grid-cols-2 gap-16 items-center">
              <div className="relative">
                 <div className="w-full aspect-square rounded-[3rem] bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-800 dark:to-gray-900 border border-white dark:border-white/[0.1] shadow-2xl flex items-center justify-center relative overflow-hidden group/img">
-                   <div className="absolute inset-0 bg-blue-600/10 opacity-0 group-hover/img:opacity-100 transition-opacity duration-700" />
-                   <div className="text-6xl font-black italic tracking-tighter text-blue-600 dark:text-blue-500">RG</div>
+                   <div className="absolute inset-0 bg-blue-600/10 opacity-0 group-hover/img:opacity-100 transition-opacity duration-700 pointer-events-none" />
+                   <img 
+                     src="/rudraksh.jpg" 
+                     alt="Rudraksh Ganguly" 
+                     className="w-full h-full object-cover transition-transform duration-1000 group-hover/img:scale-110"
+                   />
                    <div className="absolute bottom-6 left-6 right-6 p-4 rounded-2xl bg-white/80 dark:bg-black/80 backdrop-blur-xl border border-white/40 dark:border-white/10 opacity-0 group-hover/img:opacity-100 translate-y-4 group-hover/img:translate-y-0 transition-all duration-700">
                       <p className="text-[9px] font-black uppercase tracking-widest text-blue-600 dark:text-blue-400 mb-1">Status: Active</p>
                       <p className="text-[10px] font-bold text-gray-800 dark:text-gray-300">Identity: Verified Architect</p>
@@ -135,7 +139,9 @@ export default function AboutPage() {
              <div className="space-y-8">
                 <div>
                    <h4 className="text-[11px] font-black uppercase tracking-[0.5em] text-blue-600 dark:text-blue-500 mb-4 opacity-80">Project Architect</h4>
-                   <h2 className="text-4xl md:text-5xl font-black italic tracking-tighter mb-6 dark:text-white leading-none">Rudraksh Ganguly</h2>
+                   <h2 className="text-4xl md:text-5xl font-black italic tracking-tighter mb-6 dark:text-white leading-none flex flex-wrap items-baseline gap-4 whitespace-nowrap">
+                     Rudraksh Ganguly <span className="text-2xl md:text-3xl font-normal opacity-40 not-italic tracking-normal">| Full Stack Web Developer</span>
+                   </h2>
                    <div className="h-1 w-20 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full" />
                 </div>
                 
