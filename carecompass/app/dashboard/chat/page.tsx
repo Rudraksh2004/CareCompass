@@ -263,7 +263,7 @@ export default function ChatPage() {
               <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Status</p>
               <div className="flex items-center gap-2">
                 <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
-                <span className="text-sm font-black text-gray-800 dark:text-gray-200 uppercase tracking-tighter">Diagnostic AI Online</span>
+                <span className="text-sm font-black text-gray-950 dark:text-gray-200 uppercase tracking-tighter">Diagnostic AI Online</span>
               </div>
             </div>
           </div>
@@ -298,7 +298,7 @@ export default function ChatPage() {
                   className={`group relative flex items-center justify-between p-4 rounded-2xl cursor-pointer transition-all duration-300 border ${
                     activeSession === session.id
                       ? "bg-indigo-600 text-white border-indigo-500 shadow-lg shadow-indigo-600/20"
-                      : "bg-white/40 dark:bg-white/[0.02] border-white/80 dark:border-white/[0.03] text-gray-700 dark:text-gray-300 hover:bg-white hover:border-indigo-500/50"
+                      : "bg-white/40 dark:bg-white/[0.02] border-white/80 dark:border-white/[0.03] text-gray-950 dark:text-gray-300 hover:bg-white hover:border-indigo-500/50"
                   }`}
                 >
                   <div className="flex items-center gap-3 flex-1 truncate">

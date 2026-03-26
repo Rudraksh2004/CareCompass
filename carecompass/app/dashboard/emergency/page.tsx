@@ -120,7 +120,7 @@ function EmergencyContent() {
                 Bio-Shard Protocol
               </h1>
             </div>
-            <p className="text-gray-600 dark:text-gray-400 font-bold max-w-xl text-lg leading-relaxed">
+            <p className="text-gray-950 dark:text-gray-400 font-bold max-w-xl text-lg leading-relaxed">
               Diagnostic identity synchronization. Your critical vitals are synthesized into a secure Bio-Shard ID for immediate clinical retrieval.
             </p>
           </div>
@@ -129,7 +129,7 @@ function EmergencyContent() {
              <div className="px-8 py-5 rounded-[2rem] bg-red-500/10 border border-red-500/20 backdrop-blur-md flex flex-col items-center">
                 <Dna className="text-red-500 mb-2" size={20} />
                 <span className="text-[10px] font-black uppercase tracking-widest text-red-500">Genetic Ledger</span>
-                <span className="text-xl font-black mt-1">SECURE</span>
+                <span className="text-xl font-black mt-1 text-gray-950 dark:text-white">SECURE</span>
              </div>
           </div>
         </div>
@@ -142,7 +142,7 @@ function EmergencyContent() {
             <div className="relative z-10 space-y-8">
               <div className="flex items-center gap-3">
                 <Activity className="text-red-500" size={24} />
-                <h2 className="text-2xl font-black tracking-tighter">Diagnostic Intake</h2>
+                <h2 className="text-2xl font-black tracking-tighter text-gray-950 dark:text-white">Diagnostic Intake</h2>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -183,7 +183,7 @@ function EmergencyContent() {
 
           <div className="p-8 rounded-[3rem] bg-gradient-to-br from-amber-600/10 to-transparent border border-amber-500/20 backdrop-blur-md flex items-start gap-4">
              <Info className="text-amber-500 shrink-0 mt-1" size={20} />
-             <p className="text-xs font-bold text-gray-500 leading-relaxed italic">
+             <p className="text-xs font-bold text-gray-900 dark:text-gray-400 leading-relaxed italic">
                "Your Bio-Shard is accessed by first responders via the Diagnostic QR protocol during critical status events."
              </p>
           </div>
@@ -193,7 +193,7 @@ function EmergencyContent() {
         <div className="lg:col-span-12 xl:col-span-5 order-1 xl:order-2 space-y-10">
           <div className="sticky top-10 space-y-8">
             <div className="flex items-center justify-between px-2">
-               <h3 className="text-xl font-black italic tracking-widest text-gray-500 uppercase">Shard Manifest</h3>
+               <h3 className="text-xl font-black italic tracking-widest text-gray-900 dark:text-gray-500 uppercase">Shard Manifest</h3>
                <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/40 dark:bg-black/40 border border-white/60 dark:border-white/10 text-[10px] font-black text-emerald-500">
                   <ShieldCheck size={12} /> SECURE PREVIEW
                </div>
@@ -299,7 +299,7 @@ function EmergencyContent() {
                <div className="p-6 rounded-[2.5rem] bg-white/40 dark:bg-black/40 border border-white/60 dark:border-white/10 flex items-center justify-between px-8">
                   <div className="flex flex-col">
                      <span className="text-[8px] font-black text-gray-500 uppercase tracking-widest">QR Protocol</span>
-                     <span className="text-xs font-black uppercase">{showQR ? "ACTIVE" : "IDLE"}</span>
+                     <span className="text-xs font-black uppercase text-gray-950 dark:text-white">{showQR ? "ACTIVE" : "IDLE"}</span>
                   </div>
                   <button 
                     onClick={() => setShowQR(!showQR)}
@@ -327,7 +327,7 @@ function EmergencyContent() {
 function Input({ label, value, setValue, icon, placeholder }: any) {
   return (
     <div className="space-y-2">
-      <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">
+      <label className="text-[10px] font-black uppercase tracking-widest text-gray-600 dark:text-gray-400 ml-2">
         {label}
       </label>
       <div className="relative group/input">
@@ -338,7 +338,7 @@ function Input({ label, value, setValue, icon, placeholder }: any) {
           value={value}
           onChange={(e) => setValue(e.target.value)}
           placeholder={placeholder}
-          className="w-full bg-white/40 dark:bg-black/40 border border-white/80 dark:border-white/10 pl-12 pr-6 py-4 rounded-2xl font-bold outline-none focus:ring-4 focus:ring-red-500/10 transition-all text-sm placeholder-gray-500"
+          className="w-full bg-white/40 dark:bg-black/40 border border-white/80 dark:border-white/10 pl-12 pr-6 py-4 rounded-2xl font-bold outline-none focus:ring-4 focus:ring-red-500/10 transition-all text-sm placeholder-gray-500 text-gray-950 dark:text-white"
         />
       </div>
     </div>
