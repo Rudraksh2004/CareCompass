@@ -81,8 +81,8 @@ export default function DashboardLayout({
       {/* SIDEBAR (Liquid Glass) - Fixed for constant visibility */}
       <aside
         className={`${
-          collapsed ? "w-20 px-3" : "w-[280px] p-6"
-        } py-6 fixed top-0 left-0 h-screen z-50 border-r border-white/80 dark:border-white/[0.08] border-r-white/40 bg-white/[0.6] dark:bg-[#030712]/50 backdrop-blur-[50px] backdrop-saturate-[2.5] shadow-[12px_0_60px_rgba(0,0,0,0.04)] dark:shadow-[12px_0_60px_rgba(0,0,0,0.4)] flex flex-col transition-all duration-500 ease-in-out group/sidebar`}
+          collapsed ? "w-20 px-3" : "w-[260px] p-6"
+        } py-6 fixed top-0 left-0 h-screen z-50 border-r border-white/80 dark:border-white/[0.08] border-r-white/40 bg-white/[0.6] dark:bg-[#030712]/50 backdrop-blur-[50px] backdrop-saturate-[2.5] shadow-[12px_0_60px_rgba(0,0,0,0.04)] dark:shadow-[12px_0_60_rgba(0,0,0,0.4)] flex flex-col transition-all duration-500 ease-in-out group/sidebar`}
       >
         <div className="absolute inset-0 bg-gradient-to-b from-blue-500/[0.02] via-transparent to-emerald-500/[0.02] pointer-events-none" />
         <div className="absolute top-0 right-0 w-[1px] h-full bg-gradient-to-b from-transparent via-blue-500/20 to-transparent opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-1000" />
@@ -137,7 +137,7 @@ export default function DashboardLayout({
         </div>
 
         {/* Navigation */}
-        <nav className="flex flex-col gap-1 flex-1 overflow-y-auto overflow-x-hidden pr-2 scrollbar-thin scrollbar-thumb-gray-200 dark:scrollbar-thumb-gray-800">
+        <nav className="flex flex-col gap-0.5 flex-1 overflow-y-auto overflow-x-hidden pr-2 scrollbar-none">
           <NavItem
             href="/dashboard"
             icon={<Home className={iconClasses("/dashboard")} />}
@@ -232,7 +232,7 @@ export default function DashboardLayout({
             </div>
           )}
 
-          <div className="space-y-4">
+          <div className="space-y-3">
             <NavItem
               href="/dashboard/profile"
               icon={<User className={iconClasses("/dashboard/profile")} />}
@@ -243,10 +243,10 @@ export default function DashboardLayout({
 
             {!collapsed && user && (
                <div className="px-3 py-4 rounded-xl bg-gradient-to-br from-blue-500/5 to-emerald-500/5 border border-white/20 dark:border-white/[0.03] flex flex-col items-center animate-in fade-in duration-700">
-                <div className="text-[7px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1.5 text-center">
+                <div className="text-[7.5px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1.5 text-center">
                   SECURE CLINICAL UPLINK
                 </div>
-                <div className="text-[9px] font-bold text-gray-900 dark:text-white/80 truncate w-full text-center">
+                <div className="text-[9.5px] font-bold text-gray-900 dark:text-white/80 truncate w-full text-center">
                   {user.email}
                 </div>
               </div>
@@ -256,7 +256,7 @@ export default function DashboardLayout({
       </aside>
 
       {/* Spacer to keep main content from going under the fixed sidebar */}
-      <div className={`shrink-0 transition-all duration-500 ${collapsed ? "w-20" : "w-[280px]"}`} />
+      <div className={`shrink-0 transition-all duration-500 ${collapsed ? "w-20" : "w-[260px]"}`} />
 
       {/* MAIN CONTENT */}
       <main className="flex-1 flex flex-col">
@@ -401,8 +401,8 @@ function NavItem({
     <Link
       href={href}
       className={`group relative flex items-center ${
-        collapsed ? "justify-center px-0 w-full" : "gap-3 px-5 w-full"
-      } py-2.5 rounded-xl transition-all duration-500 overflow-hidden ${
+        collapsed ? "justify-center px-0 w-full" : "gap-3 px-4 w-full"
+      } py-2 rounded-xl transition-all duration-500 overflow-hidden ${
         isActive
           ? "bg-white/[0.9] dark:bg-white/[0.07] text-blue-700 dark:text-emerald-300 shadow-md dark:shadow-xl border border-white dark:border-white/[0.12] backdrop-blur-[40px] font-black translate-x-1"
           : "text-gray-800 dark:text-gray-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-white/70 dark:hover:bg-white/[0.04] border border-transparent hover:border-white/70 dark:hover:border-white/[0.07] font-black hover:translate-x-1"
