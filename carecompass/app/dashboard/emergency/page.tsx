@@ -6,6 +6,7 @@ import {
   getEmergencyProfile,
   saveEmergencyProfile,
 } from "@/services/emergencyService";
+import { getUserProfile } from "@/services/userService";
 import QRCode from "react-qr-code";
 import * as htmlToImage from "html-to-image";
 import { 
@@ -48,6 +49,7 @@ function EmergencyContent() {
   const [conditions, setConditions] = useState("");
   const [medications, setMedications] = useState("");
   const [contact, setContact] = useState("");
+  const [photoURL, setPhotoURL] = useState("");
 
   const [saving, setSaving] = useState(false);
   const [showQR, setShowQR] = useState(true);
@@ -64,6 +66,12 @@ function EmergencyContent() {
         setConditions(data.conditions || "");
         setMedications(data.medications || "");
         setContact(data.contact || "");
+      }
+      
+      // 🧬 Bio-Ledger Retrieval
+      const profile: any = await getUserProfile(user.uid);
+      if (profile?.photoURL) {
+        setPhotoURL(profile.photoURL);
       }
     };
     load();
@@ -225,25 +233,35 @@ function EmergencyContent() {
 
                 <div className="p-8 pb-6 flex flex-col justify-between h-[calc(100%-4rem)]">
                    <div className="flex justify-between items-start gap-6">
-                      <div className="space-y-4 flex-1 min-w-0">
-                         <div className="space-y-0.5">
-                            <p className="text-[7px] font-black text-gray-600 uppercase tracking-widest">Holders Name</p>
-                            <h3 className="text-2xl font-black text-white tracking-tighter uppercase italic truncate leading-none">
-                               {name || "AWAITING..."}
-                            </h3>
-                         </div>
-                         
-                         <div className="flex items-center gap-8">
-                            <div className="space-y-0.5">
-                               <p className="text-[7px] font-black text-gray-600 uppercase tracking-widest">Serotype</p>
-                               <div className="flex items-center gap-1.5">
-                                  <span className="text-xl font-black text-red-500 leading-none">{bloodGroup || "--"}</span>
-                                  <Droplet size={12} className="text-red-500/40 fill-red-500" />
-                               </div>
+                      <div className="flex items-start gap-5 flex-1 min-w-0">
+                         {photoURL ? (
+                            <img src={photoURL} className="w-16 h-16 rounded-2xl object-cover border-2 border-white/10 shadow-xl shrink-0 transition-transform group-hover/card:scale-110 duration-700" alt="Avatar" />
+                         ) : (
+                            <div className="w-16 h-16 rounded-2xl bg-white/5 border-2 border-white/10 flex items-center justify-center text-xl font-black text-gray-500 shrink-0 uppercase transition-all group-hover/card:scale-110">
+                               {name?.charAt(0) || "U"}
                             </div>
-                            <div className="space-y-0.5 flex-1 min-w-0">
-                               <p className="text-[7px] font-black text-gray-600 uppercase tracking-widest">Relay Link</p>
-                               <span className="text-[10px] font-black text-gray-300 truncate block tracking-tighter leading-none">{contact || "IDLE STATUS"}</span>
+                         )}
+
+                         <div className="space-y-4 flex-1 min-w-0">
+                            <div className="space-y-0.5">
+                               <p className="text-[7px] font-black text-gray-600 uppercase tracking-widest">Holders Name</p>
+                               <h3 className="text-2xl font-black text-white tracking-tighter uppercase italic truncate leading-none">
+                                  {name || "AWAITING..."}
+                               </h3>
+                            </div>
+                            
+                            <div className="flex items-center gap-8">
+                               <div className="space-y-0.5">
+                                  <p className="text-[7px] font-black text-gray-600 uppercase tracking-widest">Serotype</p>
+                                  <div className="flex items-center gap-1.5">
+                                     <span className="text-xl font-black text-red-500 leading-none">{bloodGroup || "--"}</span>
+                                     <Droplet size={12} className="text-red-500/40 fill-red-500" />
+                                  </div>
+                               </div>
+                               <div className="space-y-0.5 flex-1 min-w-0">
+                                  <p className="text-[7px] font-black text-gray-600 uppercase tracking-widest">Relay Link</p>
+                                  <span className="text-[10px] font-black text-gray-300 truncate block tracking-tighter leading-none">{contact || "IDLE STATUS"}</span>
+                               </div>
                             </div>
                          </div>
                       </div>
