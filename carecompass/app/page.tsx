@@ -190,7 +190,7 @@ export default function Home() {
       </section>
 
       {/* DASHBOARD PREVIEW */}
-      <section id="services" className="px-6 pb-40">
+      <section id="services" className="px-6 pb-24">
         <div ref={el => { if(el && !revealRefs.current.includes(el)) revealRefs.current.push(el); }} className="reveal max-w-6xl mx-auto perspective-1000">
           <div className="relative group p-3 rounded-[3.5rem] bg-white/[0.4] dark:bg-[#030712]/40 border border-white/80 dark:border-white/[0.08] backdrop-blur-[60px] shadow-[0_60px_150px_-30px_rgba(0,0,0,0.2)] transition-all hover:rotate-x-2 preserve-3d glass-grain">
              <div className="rounded-[2.8rem] bg-gray-50 dark:bg-[#0a0f1e] overflow-hidden border border-gray-200/50 dark:border-white/[0.05]">
@@ -221,7 +221,7 @@ export default function Home() {
       <TrustMarquee />
 
       {/* CORE FEATURES SECTION (Detailed) */}
-      <section className="px-6 py-40 max-w-7xl mx-auto">
+      <section className="px-6 py-24 max-w-7xl mx-auto">
         <div ref={el => { if(el && !revealRefs.current.includes(el)) revealRefs.current.push(el); }} className="reveal text-center mb-32">
           <span className="inline-flex items-center gap-3 mb-8 px-6 py-2.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-black text-emerald-600 uppercase tracking-[0.4em]">INTELLIGENCE MODULES</span>
           <h2 className="text-4xl md:text-6xl font-black mb-10 tracking-tighter">Clinical-Grade <br /><span className="bg-gradient-to-r from-blue-600 to-emerald-500 bg-clip-text text-transparent italic">AI Engines</span></h2>
@@ -248,7 +248,7 @@ export default function Home() {
       </section>
 
       {/* HOW IT WORKS (Protocol) */}
-      <section id="protocol" className="py-40 px-6 bg-white/30 dark:bg-white/[0.01] border-y border-white/20 dark:border-white/[0.05] glass-grain">
+      <section id="protocol" className="py-24 px-6 bg-white/30 dark:bg-white/[0.01] border-y border-white/20 dark:border-white/[0.05] glass-grain">
         <div className="max-w-7xl mx-auto text-center mb-32">
           <span className="text-[10px] font-black text-blue-500 tracking-[0.4em] mb-4 block uppercase leading-none">The CareCompass Method</span>
           <h2 className="text-4xl md:text-6xl font-black tracking-tighter text-gray-900 dark:text-white italic">Operational Protocol</h2>
@@ -265,7 +265,7 @@ export default function Home() {
       </section>
 
       {/* COMPLIANCE & SECURITY */}
-      <section id="compliance" className="py-40 px-6">
+      <section id="compliance" className="py-24 px-6">
         <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-24 items-center">
             <div ref={el => { if(el && !revealRefs.current.includes(el)) revealRefs.current.push(el); }} className="reveal">
                 <span className="text-xs font-black text-emerald-500 tracking-[0.5em] mb-8 block uppercase">FORTRESS ARCHITECTURE</span>
@@ -294,7 +294,7 @@ export default function Home() {
       </section>
 
       {/* FAQ SECTION */}
-      <section className="py-40 px-6 bg-white/10 dark:bg-white/[0.01] glass-grain">
+      <section className="py-24 px-6 bg-white/10 dark:bg-white/[0.01] glass-grain">
         <div className="max-w-4xl mx-auto">
             <div ref={el => { if(el && !revealRefs.current.includes(el)) revealRefs.current.push(el); }} className="reveal text-center mb-24">
                 <span className="text-[10px] font-black text-blue-500 tracking-[0.4em] mb-4 block uppercase leading-none">Common Inquiries</span>
@@ -319,7 +319,7 @@ export default function Home() {
       </section>
 
       {/* CTA SECTION */}
-      <section className="px-6 py-40">
+      <section className="px-6 pt-24 pb-24">
         <div ref={el => { if(el && !revealRefs.current.includes(el)) revealRefs.current.push(el); }} className="reveal relative max-w-7xl mx-auto overflow-hidden rounded-[4.5rem] border border-white/20 dark:border-white/[0.1] shadow-[0_100px_180px_-40px_rgba(0,0,0,0.3)] glass-grain bg-blue-600">
             <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-indigo-600 to-emerald-500 animate-gradient-shift opacity-90" /><div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.2),transparent_70%)]" />
             <div className="relative z-10 p-32 text-center flex flex-col items-center">
@@ -330,7 +330,7 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="relative mt-32 border-t border-white/80 dark:border-white/[0.08] bg-white/40 dark:bg-[#030712]/30 backdrop-blur-[120px] overflow-hidden">
+      <footer className="relative border-t border-white/80 dark:border-white/[0.08] bg-white/40 dark:bg-[#030712]/30 backdrop-blur-[120px] overflow-hidden">
         {/* ─── AMBIENT BACKGROUND GLOWS ─── */}
         <div className="absolute top-0 left-1/4 w-[400px] h-[400px] bg-blue-500/5 blur-[120px] rounded-full pointer-events-none" />
         <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-emerald-500/5 blur-[120px] rounded-full pointer-events-none" />
