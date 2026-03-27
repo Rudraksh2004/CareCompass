@@ -173,28 +173,30 @@ function HealthContent() {
   return (
     <div className="max-w-7xl mx-auto space-y-12 pb-20">
       {/* 🔮 Clinical Power Header */}
-      <div className="relative group overflow-hidden rounded-[2.5rem] border border-white/80 dark:border-white/[0.05] bg-white/[0.4] dark:bg-[#030712]/30 backdrop-blur-[60px] p-12 transition-all duration-700 hover:shadow-2xl">
+      <div className="relative group overflow-hidden rounded-[2rem] md:rounded-[2.5rem] border border-white/80 dark:border-white/[0.05] bg-white/[0.4] dark:bg-[#030712]/30 backdrop-blur-[60px] p-6 md:p-12 transition-all duration-700 hover:shadow-2xl">
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-br from-indigo-600/20 to-emerald-500/10 blur-[130px] -mr-64 -mt-64 transition-all group-hover:scale-110" />
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-10">
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6 md:gap-10">
           <div className="space-y-4">
-            <div className="flex items-center gap-4">
-              <div className="p-4 rounded-[1.5rem] bg-gradient-to-br from-indigo-600 to-emerald-500 text-white shadow-xl shadow-indigo-500/20">
-                <Activity size={32} strokeWidth={2.5} />
+            <div className="flex items-center gap-3 md:gap-4">
+              <div className="p-3 md:p-4 rounded-[1.2rem] md:rounded-[1.5rem] bg-gradient-to-br from-indigo-600 to-emerald-500 text-white shadow-xl shadow-indigo-500/20">
+                <Activity className="w-6 h-6 md:w-8 md:h-8" strokeWidth={2.5} />
               </div>
-              <h1 className="text-5xl font-black tracking-tighter bg-gradient-to-r from-gray-900 via-gray-700 to-gray-400 dark:from-white dark:via-gray-300 dark:to-gray-500 bg-clip-text text-transparent">
+              <h1 className="text-3xl md:text-5xl font-black tracking-tighter bg-gradient-to-r from-gray-900 via-gray-700 to-gray-400 dark:from-white dark:via-gray-300 dark:to-gray-500 bg-clip-text text-transparent leading-none">
                 Biometric Lab
               </h1>
             </div>
-            <p className="text-gray-700 dark:text-gray-400 font-bold max-w-xl text-lg leading-relaxed">
+            <p className="text-gray-700 dark:text-gray-400 font-bold max-w-xl text-base md:text-lg leading-relaxed">
               Clinical telemetry and behavioral trend synchronization. Analyze physiological variability through predictive AI modeling.
             </p>
           </div>
           
           <div className="flex flex-wrap gap-4">
-             <div className="px-8 py-5 rounded-[2rem] bg-indigo-500/10 border border-indigo-500/20 backdrop-blur-md flex flex-col items-center group/pill transition-all hover:bg-indigo-500/20 cursor-default">
-                <Zap className="text-indigo-500 mb-2 group-hover/pill:scale-125 transition-transform" size={20} />
-                <span className="text-[10px] font-black uppercase tracking-widest text-indigo-500">Telemetry Sync</span>
-                <span className="text-xl font-black mt-1">REAL-TIME</span>
+             <div className="px-6 py-4 md:px-8 md:py-5 rounded-[1.5rem] md:rounded-[2rem] bg-indigo-500/10 border border-indigo-500/20 backdrop-blur-md flex flex-row md:flex-col items-center group/pill transition-all hover:bg-indigo-500/20 cursor-default gap-3 md:gap-0">
+                <Zap className="text-indigo-500 md:mb-2 group-hover/pill:scale-125 transition-transform" size={20} />
+                <div className="flex flex-col md:items-center">
+                   <span className="text-[10px] font-black uppercase tracking-widest text-indigo-500 leading-none">Telemetry Sync</span>
+                   <span className="text-lg md:text-xl font-black mt-1 leading-none">REAL-TIME</span>
+                </div>
              </div>
           </div>
         </div>
@@ -203,27 +205,27 @@ function HealthContent() {
       <div className="grid lg:grid-cols-4 gap-12">
         {/* 📋 Telemetry Injection (Add Log) */}
         <div className="lg:col-span-1 space-y-8">
-          <div className="relative group overflow-hidden rounded-[3rem] border border-white/60 dark:border-white/[0.05] bg-white/[0.3] dark:bg-[#030712]/30 backdrop-blur-[60px] p-8 shadow-xl transition-all">
+          <div className="relative group overflow-hidden rounded-[2rem] md:rounded-[3rem] border border-white/60 dark:border-white/[0.05] bg-white/[0.3] dark:bg-[#030712]/30 backdrop-blur-[60px] p-6 md:p-8 shadow-xl transition-all">
             <div className="relative z-10 space-y-8">
               <div className="flex items-center gap-3">
-                <BrainCircuit className="text-indigo-500" size={24} />
-                <h2 className="text-2xl font-black tracking-tighter">Metric Ingress</h2>
+                <BrainCircuit className="text-indigo-500" size={typeof window !== 'undefined' && window.innerWidth < 768 ? 20 : 24} />
+                <h2 className="text-xl md:text-2xl font-black tracking-tighter">Metric Ingress</h2>
               </div>
 
               <div className="space-y-6">
                 <div className="space-y-2">
                   <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Modality Select</label>
                   <div className="grid grid-cols-2 gap-2">
-                     {METRIC_OPTIONS.slice(0, 4).map((m) => (
+                      {METRIC_OPTIONS.slice(0, 4).map((m) => (
                         <button
                           key={m.value}
                           onClick={() => setType(m.value)}
-                          className={`p-4 rounded-2xl flex flex-col items-center gap-2 transition-all border ${type === m.value ? "bg-indigo-600 text-white border-transparent shadow-lg" : "bg-white/40 dark:bg-white/5 border-white/60 dark:border-white/10 text-gray-600 dark:text-gray-400 hover:bg-white dark:hover:bg-white/10"}`}
+                          className={`p-3 md:p-4 rounded-xl md:rounded-2xl flex flex-col items-center gap-2 transition-all border ${type === m.value ? "bg-indigo-600 text-white border-transparent shadow-lg" : "bg-white/40 dark:bg-white/5 border-white/60 dark:border-white/10 text-gray-600 dark:text-gray-400 hover:bg-white dark:hover:bg-white/10"}`}
                         >
-                           <m.icon size={20} />
-                           <span className="text-[10px] font-black uppercase text-gray-700 dark:text-gray-400">{m.label}</span>
+                           <m.icon className="w-4 h-4 md:w-5 md:h-5" />
+                           <span className="text-[9px] md:text-[10px] font-black uppercase text-gray-700 dark:text-gray-400">{m.label}</span>
                         </button>
-                     ))}
+                      ))}
                   </div>
                   <button
                     onClick={() => setType("custom")}
@@ -251,7 +253,7 @@ function HealthContent() {
                     <Activity className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                     <input
                       type="number"
-                      className="w-full bg-white/40 dark:bg-black/40 border border-white/80 dark:border-white/10 pl-12 pr-6 py-4 rounded-2xl font-bold outline-none focus:ring-4 focus:ring-indigo-500/10 transition-all text-sm"
+                      className="w-full bg-white/40 dark:bg-black/40 border border-white/80 dark:border-white/10 pl-12 pr-6 py-4 rounded-xl md:rounded-2xl font-bold outline-none focus:ring-4 focus:ring-indigo-500/10 transition-all text-xs md:text-sm"
                       placeholder="0.00"
                       value={value}
                       onChange={(e) => setValue(e.target.value)}
@@ -270,7 +272,7 @@ function HealthContent() {
             </div>
           </div>
           
-          <div className="p-8 rounded-[3rem] bg-gradient-to-br from-indigo-600/10 to-transparent border border-indigo-500/20 backdrop-blur-md">
+          <div className="p-6 md:p-8 rounded-[2rem] md:rounded-[3rem] bg-gradient-to-br from-indigo-600/10 to-transparent border border-indigo-500/20 backdrop-blur-md">
              <div className="flex items-center gap-3 text-indigo-500 mb-4">
                 <Info size={20} />
                 <span className="text-xs font-black uppercase tracking-widest">Protocol Tip</span>
@@ -282,29 +284,29 @@ function HealthContent() {
         {/* 📈 Visualization Central */}
         <div className="lg:col-span-3 space-y-12">
           {/* Chart Header */}
-          <div className="flex items-center justify-between px-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 px-2 md:px-6">
              <div className="flex items-center gap-4">
                 <BarChart4 className="text-indigo-600" size={24} />
-                <h2 className="text-3xl font-black tracking-tighter">Variability Spectrum</h2>
+                <h2 className="text-2xl md:text-3xl font-black tracking-tighter">Variability Spectrum</h2>
              </div>
-             <div className="flex items-center gap-2 px-6 py-2 rounded-full bg-white/40 dark:bg-white/5 border border-white/60 dark:border-white/[0.05] backdrop-blur-md">
+             <div className="w-fit flex items-center gap-2 px-6 py-2 rounded-full bg-white/40 dark:bg-white/5 border border-white/60 dark:border-white/[0.05] backdrop-blur-md">
                 <Stethoscope className="text-blue-500" size={14} />
                 <span className="text-[10px] font-black uppercase tracking-widest text-gray-600 dark:text-gray-400">{currentMetric.label} Tracking</span>
              </div>
           </div>
 
-          <div className="relative group rounded-[3.5rem] border border-white/80 dark:border-white/[0.05] bg-white/[0.6] dark:bg-[#030712]/40 backdrop-blur-[60px] p-10 shadow-3xl overflow-hidden transition-all duration-700">
+          <div className="relative group rounded-[2.5rem] md:rounded-[3.5rem] border border-white/80 dark:border-white/[0.05] bg-white/[0.6] dark:bg-[#030712]/40 backdrop-blur-[60px] p-4 md:p-10 shadow-3xl overflow-hidden transition-all duration-700">
             <div className="absolute inset-0 bg-gradient-to-t from-indigo-500/5 to-transparent pointer-events-none" />
             
             {logs.length === 0 ? (
-              <div className="flex flex-col items-center justify-center p-20 text-center space-y-6 opacity-60 dark:opacity-40">
-                <div className="w-24 h-24 rounded-full bg-gray-100 dark:bg-white/5 flex items-center justify-center">
-                   <TrendingUp size={48} />
+              <div className="flex flex-col items-center justify-center p-10 md:p-20 text-center space-y-6 opacity-60 dark:opacity-40">
+                <div className="w-16 h-16 md:w-24 md:h-24 rounded-full bg-gray-100 dark:bg-white/5 flex items-center justify-center">
+                   <TrendingUp className="w-8 h-8 md:w-12 md:h-12" />
                 </div>
-                <p className="font-bold text-xl italic max-w-xs">Waiting for telemetry data injection to map trend spectrum.</p>
+                <p className="font-bold text-base md:text-xl italic max-w-xs">Waiting for telemetry data injection to map trend spectrum.</p>
               </div>
             ) : (
-              <div ref={chartRef} className="w-full h-[450px] relative">
+              <div ref={chartRef} className="w-full h-[300px] md:h-[450px] relative">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={processedChartData} margin={{ top: 20, right: 20, left: 0, bottom: 0 }}>
                     <defs>
@@ -414,18 +416,18 @@ function HealthContent() {
       </div>
 
       {/* 🧬 AI Report Intersection */}
-      <div className="grid lg:grid-cols-2 gap-12 pt-8 border-t border-gray-100 dark:border-white/5">
+      <div className="grid lg:grid-cols-2 gap-8 md:gap-12 pt-8 border-t border-gray-100 dark:border-white/5">
         <div className="space-y-6">
            <div className="flex items-center gap-3 px-2">
-              <ShieldCheck className="text-emerald-500" size={20} />
-              <h3 className="text-xl font-black italic tracking-tight uppercase tracking-widest text-gray-600 dark:text-gray-400">Stability Analysis</h3>
+              <ShieldCheck className="text-emerald-500" size={typeof window !== 'undefined' && window.innerWidth < 768 ? 16 : 20} />
+              <h3 className="text-base md:text-xl font-black italic tracking-tight uppercase tracking-widest text-gray-600 dark:text-gray-400 leading-none">Stability Analysis</h3>
            </div>
            <AIReportCard title="Laboratory Insight" content={insight} />
         </div>
         <div className="space-y-6">
            <div className="flex items-center gap-3 px-2">
-              <History className="text-indigo-500" size={20} />
-              <h3 className="text-xl font-black italic tracking-tight uppercase tracking-widest text-gray-600 dark:text-gray-400">Predictive Modeling</h3>
+              <History className="text-indigo-500" size={typeof window !== 'undefined' && window.innerWidth < 768 ? 16 : 20} />
+              <h3 className="text-base md:text-xl font-black italic tracking-tight uppercase tracking-widest text-gray-600 dark:text-gray-400 leading-none">Predictive Modeling</h3>
            </div>
            <AIReportCard
              title="Trend Detection Matrix"
