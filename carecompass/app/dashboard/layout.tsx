@@ -5,7 +5,7 @@ import { useAuth } from "@/context/AuthContext";
 import { logout } from "@/services/authService";
 import { useRouter, usePathname } from "next/navigation";
 import { useTheme } from "@/context/ThemeContext";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
   Home,
@@ -41,6 +41,26 @@ export default function DashboardLayout({
   const { theme, toggleTheme } = useTheme();
 
   const [collapsed, setCollapsed] = useState(false);
+  const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
+
+  useEffect(() => {
+    // 🔍 Primary Protocol: Fast Signal from Auth Core
+    if (user?.photoURL) {
+      setProfilePhoto(user.photoURL);
+    }
+    
+    // 🔍 Secondary Protocol: Deep Retrieval from Bio-Ledger
+    const fetchProfile = async () => {
+      if (user?.uid) {
+        const { getUserProfile } = await import("@/services/userService");
+        const profile: any = await getUserProfile(user.uid);
+        if (profile?.photoURL) {
+          setProfilePhoto(profile.photoURL);
+        }
+      }
+    };
+    fetchProfile();
+  }, [user]);
 
   const handleLogout = async () => {
     await logout();
@@ -243,6 +263,16 @@ export default function DashboardLayout({
 
             {!collapsed && user && (
                <div className="px-3 py-4 rounded-xl bg-gradient-to-br from-blue-500/5 to-emerald-500/5 border border-white/20 dark:border-white/[0.03] flex flex-col items-center animate-in fade-in duration-700">
+                <div className="relative mb-3 group/avatar">
+                   <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-emerald-500 rounded-full blur opacity-25 group-hover/avatar:opacity-50 transition duration-500" />
+                   {profilePhoto ? (
+                      <img src={profilePhoto} className="w-10 h-10 rounded-full object-cover border-2 border-white dark:border-white/10 relative z-10" alt="Profile" />
+                   ) : (
+                      <div className="w-10 h-10 rounded-full bg-white dark:bg-gray-800 border-2 border-white dark:border-white/10 flex items-center justify-center text-[10px] font-black text-blue-600 dark:text-blue-400 relative z-10 uppercase transition-all">
+                        {user.email?.charAt(0)}
+                      </div>
+                   )}
+                </div>
                 <div className="text-[7.5px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1.5 text-center">
                   SECURE CLINICAL UPLINK
                 </div>

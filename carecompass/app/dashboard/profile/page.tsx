@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
+import { auth } from "@/lib/firebase";
+import { updateProfile } from "firebase/auth";
 import {
   getUserProfile,
   updateUserProfile,
-  uploadUserProfilePhoto
 } from "@/services/userService";
 import { logout } from "@/services/authService";
 import { useRouter } from "next/navigation";
@@ -152,17 +153,49 @@ export default function ProfilePage() {
     const file = e.target.files?.[0];
     if (!file || !user?.uid) return;
 
+    // 🔬 Clinical-Grade Image Compression (Canvas)
+    const resizeImage = (file: File): Promise<string> => {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement("canvas");
+            const MAX_WIDTH = 300; // Small size for fast database sync
+            const scaleSize = MAX_WIDTH / img.width;
+            canvas.width = MAX_WIDTH;
+            canvas.height = img.height * scaleSize;
+
+            const ctx = canvas.getContext("2d");
+            ctx?.drawImage(img, 0, 0, canvas.width, canvas.height);
+            resolve(canvas.toDataURL("image/webp", 0.7)); // WebP at 70% quality
+          };
+          img.src = ev.target?.result as string;
+        };
+        reader.readAsDataURL(file);
+      });
+    };
+
     try {
       setUploadingPhoto(true);
-      const url: any = await uploadUserProfilePhoto(user.uid, file);
-      if (url) {
-        setPhotoURL(url);
-        await updateUserProfile(user.uid, { photoURL: url });
-        alert("Clinical signature synchronized!");
+      const base64: string = await resizeImage(file);
+      
+      if (base64) {
+        setPhotoURL(base64);
+        
+        // ⭐ Firestore Protocol: Securely anchor in Bio-Ledger
+        await updateUserProfile(user.uid, { photoURL: base64 });
+        
+        // ⭐ Auth Signal: Sync with Neural Hub
+        if (auth.currentUser) {
+          await updateProfile(auth.currentUser, { photoURL: base64 });
+        }
+        
+        alert("Clinical signature synchronized via Data-Ledger!");
       }
     } catch (error) {
-      console.error("Photo upload error:", error);
-      alert("Failed to synchronize biometric image.");
+      console.error("Photo synchronization error:", error);
+      alert("Failed to synchronize biometric signature.");
     } finally {
       setUploadingPhoto(false);
     }
