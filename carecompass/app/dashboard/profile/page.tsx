@@ -153,22 +153,25 @@ export default function ProfilePage() {
     const file = e.target.files?.[0];
     if (!file || !user?.uid) return;
 
-    // 🔬 Clinical-Grade Image Compression (Canvas)
     const resizeImage = (file: File): Promise<string> => {
-      return new Promise((resolve) => {
+      return new Promise((resolve, reject) => {
         const reader = new FileReader();
+        reader.onerror = () => reject("Signal Read Error");
         reader.onload = (ev) => {
           const img = new Image();
+          img.onerror = () => reject("Imaging Core Failure");
           img.onload = () => {
-            const canvas = document.createElement("canvas");
-            const MAX_WIDTH = 300; // Small size for fast database sync
-            const scaleSize = MAX_WIDTH / img.width;
-            canvas.width = MAX_WIDTH;
-            canvas.height = img.height * scaleSize;
+             try {
+                const canvas = document.createElement("canvas");
+                const MAX_WIDTH = 400; // Increased quality slightly for high-fidelity sync
+                const scaleSize = MAX_WIDTH / img.width;
+                canvas.width = MAX_WIDTH;
+                canvas.height = img.height * scaleSize;
 
-            const ctx = canvas.getContext("2d");
-            ctx?.drawImage(img, 0, 0, canvas.width, canvas.height);
-            resolve(canvas.toDataURL("image/webp", 0.7)); // WebP at 70% quality
+                const ctx = canvas.getContext("2d");
+                ctx?.drawImage(img, 0, 0, canvas.width, canvas.height);
+                resolve(canvas.toDataURL("image/webp", 0.8));
+             } catch (e) { reject(e); }
           };
           img.src = ev.target?.result as string;
         };
@@ -177,25 +180,22 @@ export default function ProfilePage() {
     };
 
     try {
+      console.log("Initializing Biometric Capture...");
       setUploadingPhoto(true);
       const base64: string = await resizeImage(file);
+      console.log("Biometric signature generated successfully.");
       
       if (base64) {
         setPhotoURL(base64);
         
-        // ⭐ Firestore Protocol: Securely anchor in Bio-Ledger
+        // ⭐ Secure Bios-Link: Anchoring to Data-Ledger (Firestore)
         await updateUserProfile(user.uid, { photoURL: base64 });
         
-        // ⭐ Auth Signal: Sync with Neural Hub
-        if (auth.currentUser) {
-          await updateProfile(auth.currentUser, { photoURL: base64 });
-        }
-        
-        alert("Clinical signature synchronized via Data-Ledger!");
+        alert("Biological signature anchored to Data-Ledger.");
       }
     } catch (error) {
-      console.error("Photo synchronization error:", error);
-      alert("Failed to synchronize biometric signature.");
+      console.error("Critical Protocol Error:", error);
+      alert("Neural handshake failed. Please check imaging permissions.");
     } finally {
       setUploadingPhoto(false);
     }
@@ -247,16 +247,18 @@ export default function ProfilePage() {
                       </div>
                    )}
 
-                   {/* 📸 Upload Overlay */}
-                   <label className="absolute inset-0 cursor-pointer group/label transition-all duration-500 hover:backdrop-blur-sm">
-                      <input type="file" className="hidden" accept="image/*" onChange={handlePhotoUpload} disabled={uploadingPhoto} />
+                   <input id="calibration-input" type="file" className="hidden" accept="image/*" onChange={handlePhotoUpload} disabled={uploadingPhoto} />
+                   <div 
+                      onClick={() => document.getElementById('calibration-input')?.click()}
+                      className="absolute inset-0 cursor-pointer group/label transition-all duration-500 hover:backdrop-blur-sm z-30"
+                   >
                       <div className="absolute inset-x-0 bottom-0 opacity-0 group-hover/label:opacity-100 transition-all duration-500 transform translate-y-4 group-hover/label:translate-y-0 bg-gradient-to-t from-gray-950/80 to-transparent p-4 flex flex-col items-center">
                          <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white mb-2 border border-white/20">
                             {uploadingPhoto ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Camera size={20} />}
                          </div>
                          <span className="text-[8px] font-black text-white uppercase tracking-widest leading-none">Calibration</span>
                       </div>
-                   </label>
+                   </div>
                 </div>
 
                 {/* Status Indicator */}

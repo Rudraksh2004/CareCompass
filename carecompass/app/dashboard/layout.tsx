@@ -6,6 +6,7 @@ import { logout } from "@/services/authService";
 import { useRouter, usePathname } from "next/navigation";
 import { useTheme } from "@/context/ThemeContext";
 import { useEffect, useState } from "react";
+import { getUserProfile } from "@/services/userService";
 
 import {
   Home,
@@ -44,18 +45,15 @@ export default function DashboardLayout({
   const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
 
   useEffect(() => {
-    // 🔍 Primary Protocol: Fast Signal from Auth Core
-    if (user?.photoURL) {
-      setProfilePhoto(user.photoURL);
-    }
-    
-    // 🔍 Secondary Protocol: Deep Retrieval from Bio-Ledger
     const fetchProfile = async () => {
       if (user?.uid) {
-        const { getUserProfile } = await import("@/services/userService");
-        const profile: any = await getUserProfile(user.uid);
-        if (profile?.photoURL) {
-          setProfilePhoto(profile.photoURL);
+        try {
+          const profile: any = await getUserProfile(user.uid);
+          if (profile?.photoURL) {
+            setProfilePhoto(profile.photoURL);
+          }
+        } catch (error) {
+          console.error("Sidebar Bio-Retrieval Error:", error);
         }
       }
     };
