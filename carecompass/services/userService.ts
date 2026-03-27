@@ -1,10 +1,15 @@
-import { db } from "@/lib/firebase";
+import { db, storage } from "@/lib/firebase";
 import {
   doc,
   getDoc,
   setDoc,
   serverTimestamp,
 } from "firebase/firestore";
+import {
+  ref,
+  uploadBytes,
+  getDownloadURL
+} from "firebase/storage";
 
 // 🧠 Create User Profile
 export const createUserProfile = async (
@@ -63,4 +68,15 @@ export const updateUserProfile = async (
     },
     { merge: true } // prevents overwrite
   );
+};
+
+// 📸 Upload Profile Photo
+export const uploadUserProfilePhoto = async (uid: string, file: File) => {
+  if (!uid || !file) return null;
+
+  const storageRef = ref(storage, `users/${uid}/profile-photo`);
+  await uploadBytes(storageRef, file);
+  const downloadURL = await getDownloadURL(storageRef);
+  
+  return downloadURL;
 };

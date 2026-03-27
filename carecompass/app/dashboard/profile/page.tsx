@@ -5,6 +5,7 @@ import { useAuth } from "@/context/AuthContext";
 import {
   getUserProfile,
   updateUserProfile,
+  uploadUserProfilePhoto
 } from "@/services/userService";
 import { logout } from "@/services/authService";
 import { useRouter } from "next/navigation";
@@ -23,7 +24,9 @@ import {
   ArrowRight,
   ChevronRight,
   LogOut,
-  Power
+  Power,
+  Camera,
+  UploadCloud
 } from "lucide-react";
 
 // 🧩 INTERNAL COMPONENT: BIO-INPUT
@@ -73,6 +76,8 @@ export default function ProfilePage() {
   const [weight, setWeight] = useState("");
   const [activityLevel, setActivityLevel] = useState("");
   const [healthGoal, setHealthGoal] = useState("");
+  const [photoURL, setPhotoURL] = useState("");
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -90,6 +95,7 @@ export default function ProfilePage() {
           setWeight(data.weight ? String(data.weight) : "");
           setActivityLevel(data.activityLevel || "");
           setHealthGoal(data.healthGoal || "");
+          setPhotoURL(data.photoURL || "");
         }
       } catch (error) {
         console.error("Error loading profile:", error);
@@ -142,6 +148,26 @@ export default function ProfilePage() {
     }
   };
 
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user?.uid) return;
+
+    try {
+      setUploadingPhoto(true);
+      const url: any = await uploadUserProfilePhoto(user.uid, file);
+      if (url) {
+        setPhotoURL(url);
+        await updateUserProfile(user.uid, { photoURL: url });
+        alert("Clinical signature synchronized!");
+      }
+    } catch (error) {
+      console.error("Photo upload error:", error);
+      alert("Failed to synchronize biometric image.");
+    } finally {
+      setUploadingPhoto(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="max-w-6xl mx-auto flex flex-col items-center justify-center h-[60vh] gap-6">
@@ -177,9 +203,32 @@ export default function ProfilePage() {
           </div>
           <div className="shrink-0 relative group perspective-1000">
              <div className="absolute -inset-10 bg-indigo-500/20 blur-[60px] rounded-full opacity-50 group-hover:opacity-100 transition-opacity duration-1000" />
-             <div className="w-40 h-40 rounded-[3rem] bg-gradient-to-br from-indigo-600 to-emerald-500 p-[1px] shadow-2xl relative z-10 transform-gpu transition-all duration-700 group-hover:rotate-y-12 group-hover:scale-105">
-                <div className="w-full h-full rounded-[2.9rem] bg-white dark:bg-[#030712] flex items-center justify-center text-6xl font-black text-indigo-600 dark:text-indigo-400 shadow-inner">
-                   {name ? name.charAt(0).toUpperCase() : "U"}
+             
+             <div className="relative z-10">
+                <div className="w-40 h-40 rounded-[3.5rem] bg-gradient-to-br from-indigo-600 to-emerald-500 p-[1.5px] shadow-2xl transform-gpu transition-all duration-700 group-hover:rotate-y-12 group-hover:rotate-x-6 group-hover:scale-110 overflow-hidden relative">
+                   {photoURL ? (
+                      <img src={photoURL} alt="Profile" className="w-full h-full object-cover rounded-[3.4rem]" />
+                   ) : (
+                      <div className="w-full h-full rounded-[3.4rem] bg-white dark:bg-[#030712] flex items-center justify-center text-6xl font-black text-indigo-600 dark:text-indigo-400 shadow-inner">
+                         {name ? name.charAt(0).toUpperCase() : "U"}
+                      </div>
+                   )}
+
+                   {/* 📸 Upload Overlay */}
+                   <label className="absolute inset-0 cursor-pointer group/label transition-all duration-500 hover:backdrop-blur-sm">
+                      <input type="file" className="hidden" accept="image/*" onChange={handlePhotoUpload} disabled={uploadingPhoto} />
+                      <div className="absolute inset-x-0 bottom-0 opacity-0 group-hover/label:opacity-100 transition-all duration-500 transform translate-y-4 group-hover/label:translate-y-0 bg-gradient-to-t from-gray-950/80 to-transparent p-4 flex flex-col items-center">
+                         <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white mb-2 border border-white/20">
+                            {uploadingPhoto ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Camera size={20} />}
+                         </div>
+                         <span className="text-[8px] font-black text-white uppercase tracking-widest leading-none">Calibration</span>
+                      </div>
+                   </label>
+                </div>
+
+                {/* Status Indicator */}
+                <div className="absolute -bottom-2 -right-2 w-12 h-12 rounded-2xl bg-white dark:bg-[#030712] border border-gray-100 dark:border-white/10 flex items-center justify-center shadow-xl z-20">
+                    <div className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse" />
                 </div>
              </div>
           </div>
