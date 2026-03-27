@@ -101,7 +101,7 @@ const TrustMarquee = () => {
       <div className="flex whitespace-nowrap animate-marquee">
         {[...items, ...items].map((text, i) => (
           <div key={i} className="flex items-center gap-16 mx-8">
-            <span className="text-sm font-black text-gray-400 dark:text-gray-500 tracking-[0.4em] uppercase">{text}</span>
+            <span className="text-sm font-black text-gray-600 dark:text-gray-500 tracking-[0.4em] uppercase">{text}</span>
             <div className="w-1.5 h-1.5 rounded-full bg-blue-500/30" />
           </div>
         ))}
@@ -119,7 +119,7 @@ const AccordionItem = ({ title, content }: { title: string, content: string }) =
                 <ChevronDown className={`w-6 h-6 text-blue-500 transition-transform duration-500 ${open ? "rotate-180" : ""}`} />
             </button>
             <div className={`px-10 overflow-hidden transition-all duration-500 ease-in-out ${open ? "pb-10 max-h-96" : "max-h-0"}`}>
-                <p className="text-lg text-gray-400 dark:text-gray-400 font-bold leading-relaxed">{content}</p>
+                <p className="text-lg text-gray-700 dark:text-gray-400 font-bold leading-relaxed">{content}</p>
             </div>
         </div>
     );
@@ -162,12 +162,12 @@ export default function Home() {
           </Link>
           <nav className="hidden md:flex items-center gap-10">
             {["Services", "Network", "Compliance", "Protocol"].map(l => (
-              <a key={l} href={`#${l.toLowerCase()}`} className="text-xs font-black uppercase tracking-[0.3em] text-gray-400 hover:text-blue-500 transition-all">{l}</a>
+              <a key={l} href={`#${l.toLowerCase()}`} className="text-xs font-black uppercase tracking-[0.3em] text-gray-700 hover:text-blue-500 transition-all">{l}</a>
             ))}
           </nav>
           <div className="flex items-center gap-5">
             <button onClick={toggleTheme} className="w-12 h-12 rounded-[1.2rem] border border-white/80 dark:border-white/[0.1] bg-white/60 dark:bg-white/[0.05] flex items-center justify-center hover:scale-110 transition-all shadow-xl group cursor-pointer">{isDark ? <Moon className="w-5 h-5 text-blue-400" /> : <Sun className="w-5 h-5 text-amber-500" />}</button>
-            <Link href="/auth/login" className="hidden lg:inline-flex text-xs font-black uppercase tracking-widest text-gray-500 hover:text-white transition-colors">Login</Link>
+            <Link href="/auth/login" className="hidden lg:inline-flex text-xs font-black uppercase tracking-widest text-gray-700 hover:text-white transition-colors">Login</Link>
             <Link href="/auth/signup" className="hidden md:inline-flex bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-8 py-3.5 rounded-[1.2rem] font-black uppercase tracking-widest text-xs shadow-2xl hover:scale-[1.05] transition-all">Get Started</Link>
             <button onClick={() => setMobileMenu(!mobileMenu)} className="md:hidden w-11 h-11 rounded-[1.2rem] border border-gray-200 dark:border-white/[0.1] bg-gray-100/80 flex items-center justify-center transition-all">{mobileMenu ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}</button>
           </div>
@@ -181,7 +181,7 @@ export default function Home() {
             <Sparkles className="w-4 h-4 animate-badge-pulse" /> AI HEALTH INTELLIGENCE V3.1
           </div>
           <h1 className="animate-fade-in-up stagger-1 text-4xl md:text-6xl lg:text-[5.5rem] font-black leading-[1] md:leading-[0.9] tracking-tighter mb-10 text-gray-900 dark:text-white">Understand Your <br /><span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-emerald-500 dark:from-blue-400 dark:via-indigo-400 dark:to-emerald-400 bg-clip-text text-transparent animate-gradient-shift py-4 block">Health Protocol</span></h1>
-          <p className="animate-fade-in-up stagger-2 text-lg md:text-2xl text-gray-600 dark:text-gray-400 max-w-4xl mx-auto mb-20 leading-[1.3] font-bold italic selection:bg-blue-500/20">The first medical-grade AI engine (Non-Diagnostic) designed to decode medical reports, manage pharmacological cycles, and predict health anomalies with precision.</p>
+          <p className="animate-fade-in-up stagger-2 text-lg md:text-2xl text-gray-800 dark:text-gray-400 max-w-4xl mx-auto mb-20 leading-[1.3] font-bold italic selection:bg-blue-500/20">The first medical-grade AI engine (Non-Diagnostic) designed to decode medical reports, manage pharmacological cycles, and predict health anomalies with precision.</p>
           <div className="animate-fade-in-up stagger-3 flex flex-wrap justify-center gap-8">
             <Link href="/auth/signup" className="group relative bg-gradient-to-br from-blue-600 to-indigo-700 text-white px-10 py-5 rounded-[2rem] text-xl font-black italic shadow-[0_30px_70px_-15px_rgba(59,130,246,0.6)] hover:scale-105 transition-all flex items-center gap-4 overflow-hidden"><span className="relative z-10">Initialize Tracker</span><ArrowRight className="w-6 h-6 group-hover:translate-x-3 transition-transform duration-500" /></Link>
             <Link href="/auth/login" className="px-10 py-5 rounded-[2rem] border-2 border-slate-200 dark:border-white/[0.1] text-xl font-black italic hover:bg-white dark:hover:bg-white/[0.05] transition-all">User Login</Link>
@@ -196,7 +196,7 @@ export default function Home() {
              <div className="rounded-[2.8rem] bg-gray-50 dark:bg-[#0a0f1e] overflow-hidden border border-gray-200/50 dark:border-white/[0.05]">
                 <div className="flex items-center gap-3 px-8 py-5 border-b border-gray-200 dark:border-white/[0.08] bg-white/50 dark:bg-white/[0.02]">
                     <div className="flex gap-2"><div className="w-3.5 h-3.5 rounded-full bg-[#ff5f56]" /><div className="w-3.5 h-3.5 rounded-full bg-[#ffbd2e]" /><div className="w-3.5 h-3.5 rounded-full bg-[#27c93f]" /></div>
-                    <div className="flex-1 text-center pr-10 text-[10px] font-black uppercase text-gray-400 tracking-[0.2em]"><Lock className="w-3 h-3 inline mr-2" /> carecompass.ai/secure-node</div>
+                    <div className="flex-1 text-center pr-10 text-[10px] font-black uppercase text-gray-600 tracking-[0.2em]"><Lock className="w-3 h-3 inline mr-2" /> carecompass.ai/secure-node</div>
                 </div>
                 <div className="p-16 grid grid-cols-4 gap-10">
                     <div className="col-span-1 space-y-6 opacity-30">
@@ -225,7 +225,7 @@ export default function Home() {
         <div ref={el => { if(el && !revealRefs.current.includes(el)) revealRefs.current.push(el); }} className="reveal text-center mb-32">
           <span className="inline-flex items-center gap-3 mb-8 px-6 py-2.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-black text-emerald-600 uppercase tracking-[0.4em]">INTELLIGENCE MODULES</span>
           <h2 className="text-4xl md:text-6xl font-black mb-10 tracking-tighter">Clinical-Grade <br /><span className="bg-gradient-to-r from-blue-600 to-emerald-500 bg-clip-text text-transparent italic">AI Engines</span></h2>
-          <p className="text-gray-500 dark:text-gray-400 max-w-4xl mx-auto text-xl font-bold">Six specialized nodes operating in tandem to provide a comprehensive health sovereignty framework.</p>
+          <p className="text-gray-700 dark:text-gray-400 max-w-4xl mx-auto text-xl font-bold">Six specialized nodes operating in tandem to provide a comprehensive health sovereignty framework.</p>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
@@ -235,10 +235,10 @@ export default function Home() {
               <div className="relative bg-white/[0.5] dark:bg-[#030712]/40 backdrop-blur-[60px] rounded-[3.4rem] p-12 h-full border border-white dark:border-white/[0.08] shadow-2xl glass-grain overflow-hidden">
                 <div className={`w-20 h-20 rounded-3xl bg-gradient-to-br ${f.gradient} flex items-center justify-center mb-12 shadow-2xl group-hover:scale-110 transition-all duration-700`}>{f.icon}</div>
                 <h3 className="text-2xl font-black mb-6 text-gray-900 dark:text-white uppercase tracking-tighter italic">{f.title}</h3>
-                <p className="text-gray-500 dark:text-gray-400 leading-relaxed text-lg font-bold mb-8 italic">{f.description}</p>
+                <p className="text-gray-700 dark:text-gray-400 leading-relaxed text-lg font-bold mb-8 italic">{f.description}</p>
                 <div className="space-y-4">
                     {f.highlights.map((h, j) => (
-                        <div key={j} className="flex items-center gap-3 text-sm font-black text-gray-400 uppercase tracking-widest"><CheckCircle2 className="w-5 h-5 text-emerald-500" /> {h}</div>
+                        <div key={j} className="flex items-center gap-3 text-sm font-black text-gray-700 dark:text-gray-400 uppercase tracking-widest"><CheckCircle2 className="w-5 h-5 text-emerald-500" /> {h}</div>
                     ))}
                 </div>
               </div>
@@ -258,7 +258,7 @@ export default function Home() {
               <div key={i} ref={el => { if(el && !revealRefs.current.includes(el)) revealRefs.current.push(el); }} className={`reveal stagger-${i + 1} text-center group`}>
                 <div className="w-[140px] h-[140px] mx-auto rounded-[3.5rem] bg-gradient-to-br from-blue-600 to-indigo-900 flex items-center justify-center mb-12 shadow-2xl group-hover:scale-110 group-hover:rotate-6 transition-all">{s.icon}</div>
                 <h3 className="text-2xl font-black mb-6 text-gray-900 dark:text-white uppercase tracking-tighter">{s.title}</h3>
-                <p className="text-lg text-gray-500 dark:text-gray-400 font-bold leading-relaxed px-6">{s.description}</p>
+                <p className="text-lg text-gray-700 dark:text-gray-400 font-bold leading-relaxed px-6">{s.description}</p>
               </div>
             ))}
         </div>
@@ -270,12 +270,12 @@ export default function Home() {
             <div ref={el => { if(el && !revealRefs.current.includes(el)) revealRefs.current.push(el); }} className="reveal">
                 <span className="text-xs font-black text-emerald-500 tracking-[0.5em] mb-8 block uppercase">FORTRESS ARCHITECTURE</span>
                 <h2 className="text-4xl md:text-6xl font-black mb-12 tracking-tighter leading-none italic">Sovereign Data <br />Security</h2>
-                <p className="text-xl text-gray-500 dark:text-gray-400 font-bold leading-relaxed mb-16 italic">Every dataset is siloed, encrypted, and processed on dedicated Gemini instances to ensure clinical-grade privacy.</p>
+                <p className="text-xl text-gray-700 dark:text-gray-400 font-bold leading-relaxed mb-16 italic">Every dataset is siloed, encrypted, and processed on dedicated Gemini instances to ensure clinical-grade privacy.</p>
                 <div className="grid grid-cols-2 gap-10">
                     {complianceStats.map((s, i) => (
                         <div key={i} className="p-8 rounded-[2rem] bg-white dark:bg-white/[0.03] border border-gray-100 dark:border-white/[0.06] shadow-xl">
                             <div className="text-3xl font-black text-blue-500 mb-4 italic uppercase">{s.label}</div>
-                            <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{s.desc}</div>
+                            <div className="text-[10px] font-black text-gray-700 dark:text-gray-400 uppercase tracking-widest">{s.desc}</div>
                         </div>
                     ))}
                 </div>
@@ -284,9 +284,9 @@ export default function Home() {
                 <div className="absolute inset-0 bg-blue-500/20 blur-[150px] rounded-full group-hover:bg-blue-500/30 transition-all duration-1000" />
                 <div className="relative p-2 rounded-[4rem] bg-white/20 dark:bg-white/[0.02] border border-white/60 dark:border-white/[0.08] backdrop-blur-[80px] overflow-hidden glass-grain shadow-2xl">
                     <div className="p-16 space-y-12">
-                        <div className="flex items-center gap-8"><div className="w-16 h-16 rounded-2xl bg-emerald-500/20 flex items-center justify-center text-emerald-500"><Lock className="w-8 h-8" /></div><div><div className="text-lg font-black uppercase text-white tracking-widest italic">AES-256 Encryption</div><div className="text-xs font-bold text-gray-400 italic">Military-grade data transit</div></div></div>
-                        <div className="flex items-center gap-8"><div className="w-16 h-16 rounded-2xl bg-blue-500/20 flex items-center justify-center text-blue-500"><Database className="w-8 h-8" /></div><div><div className="text-lg font-black uppercase text-white tracking-widest italic">Encrypted Silos</div><div className="text-xs font-bold text-gray-400 italic">No cross-user data leakage</div></div></div>
-                        <div className="flex items-center gap-8"><div className="w-16 h-16 rounded-2xl bg-indigo-500/20 flex items-center justify-center text-indigo-500"><Globe className="w-8 h-8" /></div><div><div className="text-lg font-black uppercase text-white tracking-widest italic">HIPAA & GDPR</div><div className="text-xs font-bold text-gray-400 italic">International standard compliance</div></div></div>
+                        <div className="flex items-center gap-8"><div className="w-16 h-16 rounded-2xl bg-emerald-500/20 flex items-center justify-center text-emerald-500"><Lock className="w-8 h-8" /></div><div><div className="text-lg font-black uppercase text-white tracking-widest italic">AES-256 Encryption</div><div className="text-xs font-bold text-gray-600 dark:text-gray-400 italic">Military-grade data transit</div></div></div>
+                        <div className="flex items-center gap-8"><div className="w-16 h-16 rounded-2xl bg-blue-500/20 flex items-center justify-center text-blue-500"><Database className="w-8 h-8" /></div><div><div className="text-lg font-black uppercase text-white tracking-widest italic">Encrypted Silos</div><div className="text-xs font-bold text-gray-600 dark:text-gray-400 italic">No cross-user data leakage</div></div></div>
+                        <div className="flex items-center gap-8"><div className="w-16 h-16 rounded-2xl bg-indigo-500/20 flex items-center justify-center text-indigo-500"><Globe className="w-8 h-8" /></div><div><div className="text-lg font-black uppercase text-white tracking-widest italic">HIPAA & GDPR</div><div className="text-xs font-bold text-gray-600 dark:text-gray-400 italic">International standard compliance</div></div></div>
                     </div>
                 </div>
             </div>
@@ -312,7 +312,7 @@ export default function Home() {
             {mainStats.map((s, i) => (
                 <div key={i} className="text-center group p-10 rounded-[2.5rem] bg-white/40 dark:bg-white/[0.03] border border-white/60 dark:border-white/[0.1] backdrop-blur-[60px] glass-grain hover:-translate-y-4 transition-all">
                     <div className="text-4xl font-black bg-gradient-to-r from-blue-600 via-indigo-600 to-emerald-500 dark:from-blue-400 dark:via-indigo-400 dark:to-emerald-400 bg-clip-text text-transparent mb-4 italic italic">{s.v}</div>
-                    <div className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-400">{s.l}</div>
+                    <div className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-700 dark:text-gray-400">{s.l}</div>
                 </div>
             ))}
         </div>
@@ -341,7 +341,7 @@ export default function Home() {
           <div className="mb-24 p-8 md:p-12 rounded-[3.5rem] bg-white/30 dark:bg-white/[0.02] border border-white/80 dark:border-white/[0.08] backdrop-blur-[80px] flex flex-col lg:flex-row items-center justify-between gap-12 group transition-all duration-700 hover:border-blue-500/30 shadow-2xl glass-grain">
             <div className="max-w-xl text-center lg:text-left">
               <h3 className="text-3xl font-black tracking-tighter uppercase italic mb-3">Neural <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">Uplink</span></h3>
-              <p className="text-gray-700 dark:text-gray-400 font-bold uppercase tracking-widest text-[10px] leading-relaxed">
+              <p className="text-gray-800 dark:text-gray-400 font-bold uppercase tracking-widest text-[10px] leading-relaxed">
                 Connect your node to the latest clinical developments and protocol updates.
               </p>
             </div>
@@ -365,7 +365,7 @@ export default function Home() {
                 <img src="/logo.png" alt="CareCompass" className="w-12 h-12 transition-transform group-hover:rotate-12 duration-500" />
                 <span className="text-2xl font-black tracking-tighter italic bg-gradient-to-r from-blue-800 to-indigo-800 dark:from-white dark:to-gray-400 bg-clip-text text-transparent">CareCompass</span>
               </div>
-              <p className="text-gray-700 dark:text-gray-400 text-sm font-bold italic leading-relaxed max-w-xs">
+              <p className="text-gray-800 dark:text-gray-400 text-sm font-bold italic leading-relaxed max-w-xs">
                 Empowering healthcare decisions with high-fidelity, medical-grade AI intelligence and autonomous diagnostic insights.
               </p>
               <div className="flex items-center gap-4">
@@ -384,7 +384,7 @@ export default function Home() {
             {/* Services Protocol */}
             <div>
               <h4 className="text-[10px] font-black text-gray-800 dark:text-white uppercase tracking-[0.4em] mb-10 opacity-70 italic">Services Node</h4>
-              <ul className="space-y-5 text-sm font-black text-gray-600 dark:text-gray-400 tracking-tight uppercase italic font-bold">
+              <ul className="space-y-5 text-sm font-black text-gray-800 dark:text-gray-400 tracking-tight uppercase italic font-bold">
                 <li><Link href="/dashboard/report" className="hover:text-blue-600 hover:translate-x-1 block transition-all">Report Analyzer</Link></li>
                 <li><Link href="/dashboard/disease-predictor" className="hover:text-blue-600 hover:translate-x-1 block transition-all">Disease Predictor</Link></li>
                 <li><Link href="/dashboard/reminders" className="hover:text-blue-600 hover:translate-x-1 block transition-all">Medicine Details</Link></li>
@@ -395,7 +395,7 @@ export default function Home() {
             {/* Architecture Node */}
             <div>
               <h4 className="text-[10px] font-black text-gray-800 dark:text-white uppercase tracking-[0.4em] mb-10 opacity-70 italic">Infrastructure</h4>
-              <ul className="space-y-5 text-sm font-black text-gray-600 dark:text-gray-400 tracking-tight uppercase italic font-bold">
+              <ul className="space-y-5 text-sm font-black text-gray-800 dark:text-gray-400 tracking-tight uppercase italic font-bold">
                 <li><Link href="/about" className="hover:text-blue-600 hover:translate-x-1 block transition-all">About Us</Link></li>
                 <li><a href="#" className="hover:text-blue-600 hover:translate-x-1 block transition-all">Security Protocol</a></li>
                 <li><a href="#" className="hover:text-blue-600 hover:translate-x-1 block transition-all">HIPAA Ready</a></li>
@@ -406,7 +406,7 @@ export default function Home() {
             {/* Compliance Node */}
             <div>
               <h4 className="text-[10px] font-black text-gray-800 dark:text-white uppercase tracking-[0.4em] mb-10 opacity-70 italic">Compliance Deck</h4>
-              <ul className="space-y-5 text-sm font-black text-gray-600 dark:text-gray-400 tracking-tight uppercase italic font-bold">
+              <ul className="space-y-5 text-sm font-black text-gray-800 dark:text-gray-400 tracking-tight uppercase italic font-bold">
                 <li><a href="#" className="hover:text-blue-600 hover:translate-x-1 block transition-all">Privacy Sandbox</a></li>
                 <li><a href="#" className="hover:text-blue-600 hover:translate-x-1 block transition-all">Usage Terms</a></li>
                 <li><a href="#" className="hover:text-blue-600 hover:translate-x-1 block transition-all">Cookie Protocol</a></li>
@@ -417,7 +417,7 @@ export default function Home() {
 
           {/* ─── BOTTOM STATUS & COPYRIGHT ─── */}
           <div className="pt-12 border-t border-white/60 dark:border-white/[0.05] flex flex-col md:flex-row justify-between items-center gap-8">
-            <p className="text-[10px] font-black text-gray-700 dark:text-gray-500 uppercase tracking-widest italic">
+            <p className="text-[10px] font-black text-gray-800 dark:text-gray-500 uppercase tracking-widest italic">
               © {new Date().getFullYear()} CareCompass AI Bureau. All rights reserved.
             </p>
             <div className="flex items-center gap-6">
