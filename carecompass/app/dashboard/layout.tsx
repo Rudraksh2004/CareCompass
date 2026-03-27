@@ -42,6 +42,7 @@ export default function DashboardLayout({
   const { theme, toggleTheme } = useTheme();
 
   const [collapsed, setCollapsed] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
 
   useEffect(() => {
@@ -96,18 +97,28 @@ export default function DashboardLayout({
         <div className="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-overlay" style={{ backgroundImage: 'url("https://grainy-gradients.vercel.app/noise.svg")' }} />
       </div>
 
-      {/* SIDEBAR (Liquid Glass) - Fixed for constant visibility */}
+      {/* MOBILE OVERLAY */}
+      {mobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] lg:hidden animate-in fade-in duration-300" 
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* SIDEBAR (Liquid Glass) */}
       <aside
-        className={`${
-          collapsed ? "w-20 px-3" : "w-[260px] p-6"
-        } py-6 fixed top-0 left-0 h-screen z-50 border-r border-white/80 dark:border-white/[0.08] border-r-white/40 bg-white/[0.6] dark:bg-[#030712]/50 backdrop-blur-[50px] backdrop-saturate-[2.5] shadow-[12px_0_60px_rgba(0,0,0,0.04)] dark:shadow-[12px_0_60_rgba(0,0,0,0.4)] flex flex-col transition-all duration-500 ease-in-out group/sidebar`}
+        className={`
+          ${collapsed ? "w-20 px-3" : "w-[260px] p-6 text-center"}
+          ${mobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
+          py-6 fixed top-0 left-0 h-screen z-[110] border-r border-white/80 dark:border-white/[0.08] bg-white/[0.6] dark:bg-[#030712]/50 backdrop-blur-[50px] backdrop-saturate-[2.5] flex flex-col transition-all duration-500 ease-in-out group/sidebar
+        `}
       >
         <div className="absolute inset-0 bg-gradient-to-b from-blue-500/[0.02] via-transparent to-emerald-500/[0.02] pointer-events-none" />
         <div className="absolute top-0 right-0 w-[1px] h-full bg-gradient-to-b from-transparent via-blue-500/20 to-transparent opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-1000" />
         {/* 🔥 Premium Edge Collapse Button (Always Visible in Center) */}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className={`absolute -right-5 top-1/2 -translate-y-1/2 flex items-center justify-center w-10 h-10 rounded-xl bg-white dark:bg-[#111827] border-2 border-blue-500/30 dark:border-blue-500/50 shadow-[0_0_20px_rgba(59,130,246,0.2)] hover:shadow-[0_0_30px_rgba(59,130,246,0.4)] hover:scale-110 transition-all duration-500 z-[100] text-blue-600 dark:text-blue-400 focus:outline-none group`}
+          className={`absolute -right-5 top-1/2 -translate-y-1/2 hidden lg:flex items-center justify-center w-10 h-10 rounded-xl bg-white dark:bg-[#111827] border-2 border-blue-500/30 dark:border-blue-500/50 shadow-xl z-[100] text-blue-600 dark:text-blue-400 focus:outline-none group`}
           aria-label="Toggle Sidebar"
         >
           {collapsed ? (
@@ -156,90 +167,26 @@ export default function DashboardLayout({
 
         {/* Navigation */}
         <nav className="flex flex-col gap-0.5 flex-1 overflow-y-auto overflow-x-hidden pr-2 scrollbar-none">
-          <NavItem
-            href="/dashboard"
-            icon={<Home className={iconClasses("/dashboard")} />}
-            label="Dashboard"
-            collapsed={collapsed}
-            pathname={pathname}
-          />
-
-          <NavItem
-            href="/dashboard/report"
-            icon={<FileText className={iconClasses("/dashboard/report")} />}
-            label="Report Explainer"
-            collapsed={collapsed}
-            pathname={pathname}
-          />
-
-          <NavItem
-            href="/dashboard/prescription"
-            icon={<Pill className={iconClasses("/dashboard/prescription")} />}
-            label="Simplify Prescription"
-            collapsed={collapsed}
-            pathname={pathname}
-          />
-
-          <NavItem
-            href="/dashboard/health"
-            icon={<LineChart className={iconClasses("/dashboard/health")} />}
-            label="Health Tracking"
-            collapsed={collapsed}
-            pathname={pathname}
-          />
-
-          <NavItem
-            href="/dashboard/reminders"
-            icon={<Clock className={iconClasses("/dashboard/reminders")} />}
-            label="Medicine Reminders"
-            collapsed={collapsed}
-            pathname={pathname}
-          />
-
-          <NavItem
-            href="/dashboard/medicine"
-            icon={
-              <FlaskConical className={iconClasses("/dashboard/medicine")} />
-            }
-            label="Medicine Describer"
-            collapsed={collapsed}
-            pathname={pathname}
-          />
-
-          <NavItem
-            href="/dashboard/disease-predictor"
-            icon={
-              <Brain className={iconClasses("/dashboard/disease-predictor")} />
-            }
-            label="Disease Predictor"
-            collapsed={collapsed}
-            pathname={pathname}
-          />
-
-          <NavItem
-            href="/dashboard/chat"
-            icon={<Bot className={iconClasses("/dashboard/chat")} />}
-            label="AI Health Chat"
-            collapsed={collapsed}
-            pathname={pathname}
-          />
-
-          <NavItem
-            href="/dashboard/emergency"
-            icon={
-              <HeartPulse className={iconClasses("/dashboard/emergency")} />
-            }
-            label="Emergency Card"
-            collapsed={collapsed}
-            pathname={pathname}
-          />
-          <NavItem
-            href="/about"
-            icon={<Info className={iconClasses("/about")} />}
-            label="About Us"
-            collapsed={collapsed}
-            pathname={pathname}
-          />
+          {[
+            { href: "/dashboard", icon: <Home className={iconClasses("/dashboard")} />, label: "Dashboard" },
+            { href: "/dashboard/report", icon: <FileText className={iconClasses("/dashboard/report")} />, label: "Report Explainer" },
+            { href: "/dashboard/prescription", icon: <Pill className={iconClasses("/dashboard/prescription")} />, label: "Simplify Prescription" },
+            { href: "/dashboard/health", icon: <LineChart className={iconClasses("/dashboard/health")} />, label: "Health Tracking" },
+            { href: "/dashboard/reminders", icon: <Clock className={iconClasses("/dashboard/reminders")} />, label: "Medicine Reminders" },
+            { href: "/dashboard/medicine", icon: <FlaskConical className={iconClasses("/dashboard/medicine")} />, label: "Medicine Describer" },
+            { href: "/dashboard/disease-predictor", icon: <Brain className={iconClasses("/dashboard/disease-predictor")} />, label: "Disease Predictor" },
+            { href: "/dashboard/chat", icon: <Bot className={iconClasses("/dashboard/chat")} />, label: "AI Health Chat" },
+            { href: "/dashboard/emergency", icon: <HeartPulse className={iconClasses("/dashboard/emergency")} />, label: "Emergency Card" },
+            { href: "/about", icon: <Info className={iconClasses("/about")} />, label: "About Us" },
+          ].map((item) => (
+            <NavItem
+              key={item.href}
+              {...item}
+              collapsed={collapsed}
+              pathname={pathname}
+              onClick={() => setMobileMenuOpen(false)}
+            />
+          ))}
         </nav>
 
         {/* Bottom Section */}
@@ -251,6 +198,7 @@ export default function DashboardLayout({
               label="Profile Settings"
               collapsed={collapsed}
               pathname={pathname}
+              onClick={() => setMobileMenuOpen(false)}
             />
 
             {!collapsed && user && (
@@ -278,13 +226,19 @@ export default function DashboardLayout({
       </aside>
 
       {/* Spacer to keep main content from going under the fixed sidebar */}
-      <div className={`shrink-0 transition-all duration-500 ${collapsed ? "w-20" : "w-[260px]"}`} />
+      <div className={`hidden lg:block shrink-0 transition-all duration-500 ${collapsed ? "w-20" : "w-[260px]"}`} />
 
       {/* MAIN CONTENT */}
       <main className="flex-1 flex flex-col">
         {/* Header (Liquid Glass) */}
-        <header className="h-[90px] px-10 flex items-center justify-between border-b border-white/80 dark:border-white/[0.08] backdrop-blur-[60px] bg-white/[0.4] dark:bg-[#030712]/40 sticky top-0 z-30 shadow-[0_4px_30px_rgba(0,0,0,0.02)] transition-all duration-700">
-          <div className="flex items-center gap-6">
+        <header className="h-[80px] lg:h-[90px] px-4 md:px-10 flex items-center justify-between border-b border-white/80 dark:border-white/[0.08] backdrop-blur-[60px] bg-white/[0.4] dark:bg-[#030712]/40 sticky top-0 z-30 transition-all duration-700">
+          <div className="flex items-center gap-4 md:gap-6">
+            <button 
+              onClick={() => setMobileMenuOpen(true)}
+              className="lg:hidden p-2 rounded-xl bg-white/40 dark:bg-white/[0.03] border border-white dark:border-white/[0.08] text-gray-900 dark:text-white"
+            >
+              <PanelLeftOpen size={20} />
+            </button>
             <div className="flex flex-col">
               <h2 className="text-3xl font-black tracking-tighter text-gray-900 dark:text-white">
                 Bio-Status <span className="text-blue-600 dark:text-blue-500">Center</span>
@@ -410,18 +364,21 @@ function NavItem({
   label,
   collapsed,
   pathname,
+  onClick,
 }: {
   href: string;
   icon: React.ReactNode;
   label: string;
   collapsed: boolean;
   pathname: string;
+  onClick?: () => void;
 }) {
   const isActive = pathname === href;
 
   return (
     <Link
       href={href}
+      onClick={onClick}
       className={`group relative flex items-center ${
         collapsed ? "justify-center px-0 w-full" : "gap-3 px-4 w-full"
       } py-2 rounded-xl transition-all duration-500 overflow-hidden ${
