@@ -145,7 +145,7 @@ export default function Home() {
   if (!mounted) return null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-blue-50/20 to-indigo-50/10 dark:from-[#020617] dark:via-[#050b18] dark:to-[#020814] text-gray-900 dark:text-gray-100 overflow-hidden scroll-smooth transition-all duration-700">
+    <div className="min-h-screen bg-gradient-to-br from-white via-blue-50/20 to-indigo-50/10 dark:from-[#020617] dark:via-[#050b18] dark:to-[#020814] text-gray-900 dark:text-gray-100 overflow-x-hidden scroll-smooth transition-all duration-700">
       
       <div className="fixed inset-0 -z-10">
         <StarField isDark={isDark} />
@@ -154,7 +154,7 @@ export default function Home() {
         <div className="absolute inset-0 opacity-[0.25] dark:opacity-[0.08]" style={{ backgroundImage: 'radial-gradient(circle, rgba(100,116,139,0.1) 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
       </div>
 
-      <header className="mx-auto mt-6 left-6 right-6 max-w-7xl border border-white/60 dark:border-white/[0.08] backdrop-blur-[40px] bg-white/40 dark:bg-[#030712]/30 sticky top-6 z-50 glass-grain rounded-[2.5rem] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.1)] transition-all duration-500">
+      <header className="fixed top-6 left-6 right-6 mx-auto max-w-7xl border border-white/60 dark:border-white/[0.08] backdrop-blur-[40px] bg-white/40 dark:bg-[#030712]/30 z-50 glass-grain rounded-[2.5rem] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.1)] transition-all duration-500">
         <div className="px-6 md:px-10 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-4 group">
             <img src="/logo.png" alt="Logo" className="w-11 h-11 transition-all duration-500 group-hover:scale-110 drop-shadow-[0_0_15px_rgba(59,130,246,0.3)]" />
