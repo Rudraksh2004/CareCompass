@@ -244,12 +244,6 @@ export default function DashboardLayout({
 
         {/* Bottom Section */}
         <div className="mt-auto pt-4 border-t border-white/80 dark:border-white/[0.08] relative">
-          {!collapsed && (
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 px-3 py-1 rounded-full bg-white/80 dark:bg-gray-900 border border-white/40 dark:border-white/10 text-[8px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 backdrop-blur-md">
-              Bio-Link Protocol
-            </div>
-          )}
-
           <div className="space-y-3">
             <NavItem
               href="/dashboard/profile"
