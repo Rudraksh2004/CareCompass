@@ -158,20 +158,36 @@ export default function Home() {
         <div className="px-6 md:px-10 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-4 group">
             <img src="/logo.png" alt="Logo" className="w-11 h-11 transition-all duration-500 group-hover:scale-110 drop-shadow-[0_0_15px_rgba(59,130,246,0.3)]" />
-            <span className="text-2xl font-black tracking-tighter bg-gradient-to-r from-blue-600 via-indigo-600 to-emerald-500 dark:from-blue-400 dark:via-indigo-400 dark:to-emerald-400 bg-clip-text text-transparent italic">CareCompass</span>
+            <span className="text-xl md:text-2xl font-black tracking-tighter bg-gradient-to-r from-blue-600 via-indigo-600 to-emerald-500 dark:from-blue-400 dark:via-indigo-400 dark:to-emerald-400 bg-clip-text text-transparent italic">CareCompass</span>
           </Link>
           <nav className="hidden md:flex items-center gap-10">
             {["Services", "Network", "Compliance", "Protocol"].map(l => (
               <a key={l} href={`#${l.toLowerCase()}`} className="text-xs font-black uppercase tracking-[0.3em] text-gray-700 hover:text-blue-500 transition-all">{l}</a>
             ))}
           </nav>
-          <div className="flex items-center gap-5">
-            <button onClick={toggleTheme} className="w-12 h-12 rounded-[1.2rem] border border-white/80 dark:border-white/[0.1] bg-white/60 dark:bg-white/[0.05] flex items-center justify-center hover:scale-110 transition-all shadow-xl group cursor-pointer">{isDark ? <Moon className="w-5 h-5 text-blue-400" /> : <Sun className="w-5 h-5 text-amber-500" />}</button>
+          <div className="flex items-center gap-3 md:gap-5">
+            <button onClick={toggleTheme} className="w-10 h-10 md:w-12 md:h-12 rounded-[1.2rem] border border-white/80 dark:border-white/[0.1] bg-white/60 dark:bg-white/[0.05] flex items-center justify-center hover:scale-110 transition-all shadow-xl group cursor-pointer">{isDark ? <Moon className="w-5 h-5 text-blue-400" /> : <Sun className="w-5 h-5 text-amber-500" />}</button>
             <Link href="/auth/login" className="hidden lg:inline-flex text-xs font-black uppercase tracking-widest text-gray-700 hover:text-white transition-colors">Login</Link>
             <Link href="/auth/signup" className="hidden md:inline-flex bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-8 py-3.5 rounded-[1.2rem] font-black uppercase tracking-widest text-xs shadow-2xl hover:scale-[1.05] transition-all">Get Started</Link>
-            <button onClick={() => setMobileMenu(!mobileMenu)} className="md:hidden w-11 h-11 rounded-[1.2rem] border border-gray-200 dark:border-white/[0.1] bg-gray-100/80 flex items-center justify-center transition-all">{mobileMenu ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}</button>
+            <button onClick={() => setMobileMenu(!mobileMenu)} className="md:hidden w-10 h-10 rounded-[1.2rem] border border-gray-200 dark:border-white/[0.1] bg-white/40 flex items-center justify-center transition-all z-[60]">{mobileMenu ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}</button>
           </div>
         </div>
+
+        {/* 📱 Mobile Menu Hub */}
+        {mobileMenu && (
+          <div className="md:hidden absolute top-[110%] left-0 right-0 p-6 rounded-[2rem] border border-white/60 dark:border-white/[0.08] backdrop-blur-[80px] bg-white/90 dark:bg-[#030712]/90 glass-grain animate-in slide-in-from-top-4 duration-500 z-50">
+            <div className="flex flex-col gap-8 items-center text-center">
+              {["Services", "Network", "Compliance", "Protocol"].map(l => (
+                  <a key={l} href={`#${l.toLowerCase()}`} onClick={() => setMobileMenu(false)} className="text-lg font-black uppercase tracking-widest text-gray-900 dark:text-white hover:text-blue-500 transition-all">{l}</a>
+              ))}
+              <hr className="w-full border-gray-200 dark:border-white/10" />
+              <div className="flex flex-col gap-4 w-full">
+                <Link href="/auth/login" className="w-full py-4 rounded-2xl border border-gray-200 dark:border-white/10 font-black uppercase tracking-widest text-sm">Login</Link>
+                <Link href="/auth/signup" className="w-full py-4 rounded-2xl bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-black uppercase tracking-widest text-sm shadow-xl">Join Protocol</Link>
+              </div>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* HERO SECTION */}
@@ -198,18 +214,18 @@ export default function Home() {
                     <div className="flex gap-2"><div className="w-3.5 h-3.5 rounded-full bg-[#ff5f56]" /><div className="w-3.5 h-3.5 rounded-full bg-[#ffbd2e]" /><div className="w-3.5 h-3.5 rounded-full bg-[#27c93f]" /></div>
                     <div className="flex-1 text-center pr-10 text-[10px] font-black uppercase text-gray-600 tracking-[0.2em]"><Lock className="w-3 h-3 inline mr-2" /> carecompass.ai/secure-node</div>
                 </div>
-                <div className="p-16 grid grid-cols-4 gap-10">
-                    <div className="col-span-1 space-y-6 opacity-30">
+                <div className="p-8 md:p-16 grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-10">
+                    <div className="hidden md:block col-span-1 space-y-6 opacity-30">
                         <div className="w-14 h-14 rounded-2xl bg-blue-500/40" />
                         {[...Array(6)].map((_, i) => <div key={i} className="h-10 rounded-xl bg-gray-200 dark:bg-white/5" />)}
                     </div>
-                    <div className="col-span-3 space-y-8">
-                        <div className="h-44 rounded-[2.5rem] bg-gradient-to-r from-blue-600/10 via-indigo-600/10 to-transparent border dark:border-white/[0.05] p-10 flex flex-col justify-center">
-                            <div className="h-6 w-72 bg-blue-500/30 rounded-full mb-4" /><div className="h-3 w-full max-w-md bg-gray-200 dark:bg-white/5 rounded-full" />
+                    <div className="col-span-1 md:col-span-3 space-y-8">
+                        <div className="h-32 md:h-44 rounded-[2rem] md:rounded-[2.5rem] bg-gradient-to-r from-blue-600/10 via-indigo-600/10 to-transparent border dark:border-white/[0.05] p-6 md:p-10 flex flex-col justify-center">
+                            <div className="h-4 md:h-6 w-48 md:w-72 bg-blue-500/30 rounded-full mb-3 md:mb-4" /><div className="h-2 md:h-3 w-full max-w-md bg-gray-200 dark:bg-white/5 rounded-full" />
                         </div>
-                        <div className="grid grid-cols-2 gap-8">
-                            <div className="h-40 rounded-[2rem] bg-white dark:bg-white/[0.04] p-8 border border-gray-200 dark:border-white/[0.05]"><div className="w-10 h-10 rounded-xl bg-emerald-500/20 mb-6" /><div className="h-4 w-32 bg-gray-200 dark:bg-white/10 rounded-full" /></div>
-                            <div className="h-40 rounded-[2rem] bg-white dark:bg-white/[0.04] p-8 border border-gray-200 dark:border-white/[0.05]"><div className="w-10 h-10 rounded-xl bg-blue-500/20 mb-6" /><div className="h-4 w-32 bg-gray-200 dark:bg-white/10 rounded-full" /></div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 md:gap-8">
+                            <div className="h-32 md:h-40 rounded-[1.5rem] md:rounded-[2rem] bg-white dark:bg-white/[0.04] p-6 md:p-8 border border-gray-200 dark:border-white/[0.05] transition-all group-hover:bg-white/60 dark:group-hover:bg-white/[0.08]"><div className="w-8 md:w-10 h-8 md:h-10 rounded-xl bg-emerald-500/20 mb-4 md:mb-6" /><div className="h-3 md:h-4 w-24 md:w-32 bg-gray-200 dark:bg-white/10 rounded-full" /></div>
+                            <div className="h-32 md:h-40 rounded-[1.5rem] md:rounded-[2rem] bg-white dark:bg-white/[0.04] p-6 md:p-8 border border-gray-200 dark:border-white/[0.05] transition-all group-hover:bg-white/60 dark:group-hover:bg-white/[0.08]"><div className="w-8 md:w-10 h-8 md:h-10 rounded-xl bg-blue-500/20 mb-4 md:mb-6" /><div className="h-3 md:h-4 w-24 md:w-32 bg-gray-200 dark:bg-white/10 rounded-full" /></div>
                         </div>
                     </div>
                 </div>

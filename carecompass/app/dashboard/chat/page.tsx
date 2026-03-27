@@ -239,17 +239,17 @@ export default function ChatPage() {
   return (
     <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in duration-1000 pb-12">
       {/* 🔮 Ultra-Premium Chat Header */}
-      <div className="relative group overflow-hidden rounded-[2.5rem] border border-white/80 dark:border-white/[0.05] bg-white/[0.4] dark:bg-[#030712]/30 backdrop-blur-[60px] p-10 transition-all duration-700 hover:shadow-2xl">
+      <div className="relative group overflow-hidden rounded-[2rem] md:rounded-[2.5rem] border border-white/80 dark:border-white/[0.05] bg-white/[0.4] dark:bg-[#030712]/30 backdrop-blur-[60px] p-6 md:p-10 transition-all duration-700 hover:shadow-2xl">
         <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/10 blur-[100px] -mr-48 -mt-48 transition-all group-hover:bg-indigo-500/20" />
         <div className="absolute bottom-0 left-0 w-80 h-80 bg-emerald-500/10 blur-[100px] -ml-40 -mb-40" />
 
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <div className="p-3 rounded-2xl bg-indigo-600/10 dark:bg-indigo-600/20 text-indigo-600 dark:text-indigo-400">
-                <Sparkles size={32} strokeWidth={2.5} />
+              <div className="p-2 md:p-3 rounded-2xl bg-indigo-600/10 dark:bg-indigo-600/20 text-indigo-600 dark:text-indigo-400">
+                <Sparkles className="w-6 h-6 md:w-8 md:h-8" strokeWidth={2.5} />
               </div>
-              <h1 className="text-5xl font-black tracking-tight bg-gradient-to-r from-gray-900 via-gray-700 to-gray-500 dark:from-white dark:via-gray-300 dark:to-gray-500 bg-clip-text text-transparent">
+              <h1 className="text-3xl md:text-5xl font-black tracking-tight bg-gradient-to-r from-gray-900 via-gray-700 to-gray-500 dark:from-white dark:via-gray-300 dark:to-gray-500 bg-clip-text text-transparent">
                 AI Health Chat
               </h1>
             </div>
@@ -259,11 +259,11 @@ export default function ChatPage() {
           </div>
 
           <div className="flex flex-wrap gap-4">
-            <div className="px-8 py-5 rounded-[2rem] bg-white/40 dark:bg-white/5 border border-white/60 dark:border-white/[0.05] backdrop-blur-md">
+            <div className="px-6 py-4 md:px-8 md:py-5 rounded-[1.5rem] md:rounded-[2rem] bg-white/40 dark:bg-white/5 border border-white/60 dark:border-white/[0.05] backdrop-blur-md">
               <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Status</p>
               <div className="flex items-center gap-2">
                 <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
-                <span className="text-sm font-black text-gray-950 dark:text-gray-200 uppercase tracking-tighter">Diagnostic AI Online</span>
+                <span className="text-xs md:text-sm font-black text-gray-950 dark:text-gray-200 uppercase tracking-tighter">Diagnostic AI Online</span>
               </div>
             </div>
           </div>
@@ -271,10 +271,13 @@ export default function ChatPage() {
       </div>
 
       {/* 🧩 IMPERATIVE CHAT INTERFACE */}
-      <div className="flex h-[85vh] rounded-[3.5rem] overflow-hidden border border-white/80 dark:border-white/[0.05] bg-white/[0.3] dark:bg-[#030712]/30 backdrop-blur-[80px] shadow-2xl relative">
-        {/* SIDEBAR */}
+      <div className="flex h-[80vh] md:h-[85vh] rounded-[2rem] md:rounded-[3.5rem] overflow-hidden border border-white/80 dark:border-white/[0.05] bg-white/[0.3] dark:bg-[#030712]/30 backdrop-blur-[80px] shadow-2xl relative">
+        {/* SIDEBAR - Mobile Overlay */}
         {sidebarOpen && (
-          <div className="w-80 border-r border-white/60 dark:border-white/[0.05] flex flex-col bg-white/30 dark:bg-black/20 backdrop-blur-3xl animate-in slide-in-from-left duration-500">
+          <div className="fixed md:relative inset-0 md:inset-auto z-50 md:z-0 w-full md:w-80 border-r border-white/60 dark:border-white/[0.05] flex flex-col bg-white/95 dark:bg-[#0a0f1e]/95 md:bg-white/30 md:dark:bg-black/20 backdrop-blur-3xl animate-in slide-in-from-left duration-500">
+            <div className="flex md:hidden justify-end p-4">
+               <button onClick={() => setSidebarOpen(false)} className="p-2 rounded-xl bg-gray-100 dark:bg-white/5"><AlertCircle size={20}/></button>
+            </div>
             <div className="p-6 border-b border-white/60 dark:border-white/[0.05]">
               <button
                 onClick={handleNewChat}
@@ -301,7 +304,10 @@ export default function ChatPage() {
                       : "bg-white/40 dark:bg-white/[0.02] border-white/80 dark:border-white/[0.03] text-gray-950 dark:text-gray-300 hover:bg-white hover:border-indigo-500/50"
                   }`}
                 >
-                  <div className="flex items-center gap-3 flex-1 truncate">
+                  <div 
+                    onClick={() => { loadMessages(session.id); if(window.innerWidth < 768) setSidebarOpen(false); }}
+                    className="flex items-center gap-3 flex-1 truncate"
+                  >
                     <History size={16} className={activeSession === session.id ? "text-indigo-200" : "text-gray-400"} />
                     <span className="text-xs font-black truncate text-inherit">
                       {session.title || "Consultation Routine"}
@@ -323,8 +329,8 @@ export default function ChatPage() {
         {/* CHAT AREA */}
         <div className="flex-1 flex flex-col relative">
           {/* TOP BAR */}
-          <div className="flex items-center justify-between px-8 py-5 border-b border-white/60 dark:border-white/[0.05] bg-white/40 dark:bg-black/20 backdrop-blur-xl">
-            <div className="flex items-center gap-6">
+          <div className="flex items-center justify-between px-4 md:px-8 py-4 md:py-5 border-b border-white/60 dark:border-white/[0.05] bg-white/40 dark:bg-black/20 backdrop-blur-xl">
+            <div className="flex items-center gap-3 md:gap-6">
               <button
                 onClick={() => setSidebarOpen(!sidebarOpen)}
                 className="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-100 dark:bg-white/5 text-gray-600 dark:text-gray-400 hover:bg-indigo-600 hover:text-white transition-all shadow-sm"
@@ -333,20 +339,20 @@ export default function ChatPage() {
               </button>
 
               <div className="flex flex-col">
-                <h2 className="text-2xl font-black text-gray-900 dark:text-white flex items-center gap-3">
-                  CareCompass Bio-Core
+                <h2 className="text-lg md:text-2xl font-black text-gray-900 dark:text-white flex items-center gap-2 md:gap-3">
+                  Bio-Core
                   <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
                 </h2>
-                <div className="flex items-center gap-2">
+                <div className="hidden sm:flex items-center gap-2">
                    <div className="w-1 h-3 bg-indigo-500 rounded-full" />
-                   <span className="text-[10px] font-black text-indigo-500 uppercase tracking-widest leading-none">Active Clinical Logic Engine</span>
+                   <span className="text-[9px] md:text-[10px] font-black text-indigo-500 uppercase tracking-widest leading-none">Clinical Science Mode</span>
                 </div>
               </div>
             </div>
           </div>
 
           {/* MESSAGES */}
-          <div className="flex-1 overflow-y-auto p-10 space-y-10 custom-scrollbar relative">
+          <div className="flex-1 overflow-y-auto p-4 md:p-10 space-y-6 md:space-y-10 custom-scrollbar relative">
              <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none" />
              
              {messages.length === 0 && !loading && (
@@ -373,7 +379,7 @@ export default function ChatPage() {
                 }`}
                 style={{ animationDelay: `${index * 50}ms` }}
               >
-                <div className={`flex gap-5 max-w-[88%] ${msg.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
+                <div className={`flex gap-3 md:gap-5 max-w-[95%] md:max-w-[88%] ${msg.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-2xl relative group/avatar overflow-hidden ${
                      msg.role === "user" ? userIconColor : "bg-white dark:bg-[#0f172a] border border-indigo-500/20"
                    }`}>
@@ -388,13 +394,13 @@ export default function ChatPage() {
                    </div>
 
                    <div
-                    className={`relative p-7 rounded-[2.5rem] text-base leading-relaxed break-words shadow-2xl group transition-all duration-500 border overflow-hidden ${
+                    className={`relative p-4 md:p-7 rounded-[1.5rem] md:rounded-[2.5rem] text-sm md:text-base leading-relaxed break-words shadow-2xl group transition-all duration-500 border overflow-hidden ${
                       msg.role === "user"
                         ? "bg-gradient-to-br from-indigo-600 via-indigo-700 to-purple-800 text-white border-white/10 rounded-tr-none hover:shadow-indigo-500/20"
                         : "bg-white/95 dark:bg-[#0f172a]/80 border-white/60 dark:border-white/[0.05] text-gray-950 dark:text-gray-100 backdrop-blur-3xl rounded-tl-none shadow-indigo-500/5 hover:border-indigo-500/30"
                     }`}
                   >
-                    <div className="prose dark:prose-invert max-w-none prose-li:font-bold prose-p:font-bold prose-p:leading-relaxed text-[16px] relative z-10">
+                    <div className="prose prose-sm md:prose-base dark:prose-invert max-w-none prose-li:font-bold prose-p:font-bold prose-p:leading-relaxed relative z-10 text-inherit">
                       <ReactMarkdown remarkPlugins={[remarkGfm]}>
                         {msg.content}
                       </ReactMarkdown>
@@ -454,8 +460,8 @@ export default function ChatPage() {
 
           {/* SUGGESTIONS PILLS */}
           {suggestions.length > 0 && (
-            <div className="px-10 pb-6 animate-in fade-in slide-in-from-bottom-4 duration-700 z-20 relative">
-              <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400 mb-4 px-2">
+            <div className="px-4 md:px-10 pb-4 md:pb-6 animate-in fade-in slide-in-from-bottom-4 duration-700 z-20 relative overflow-x-auto scrollbar-none">
+              <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3 md:mb-4 px-2 whitespace-nowrap">
                 <Sparkles size={12} className="text-amber-500" /> Neural Context Shortcuts
               </div>
 
@@ -475,29 +481,29 @@ export default function ChatPage() {
           )}
 
           {/* FLOATING INPUT BAR */}
-          <div className="p-10 pb-12 z-40 relative">
+          <div className="p-4 md:p-10 pb-6 md:pb-12 z-40 relative">
              <div className="relative group max-w-6xl mx-auto">
                 {/* 🛡️ Premium Neural Forcefield */}
-                <div className={`absolute -inset-2 bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 rounded-[3.5rem] blur-3xl transition-all duration-1000 ${input.trim() ? "opacity-30 scale-105" : "opacity-0 scale-100"}`} />
+                <div className={`absolute -inset-2 bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 rounded-[2rem] md:rounded-[3.5rem] blur-3xl transition-all duration-1000 ${input.trim() ? "opacity-30 scale-105" : "opacity-0 scale-100"}`} />
                 
-                <div className="relative flex items-center gap-4 bg-white/95 dark:bg-[#030712]/95 backdrop-blur-[60px] px-6 py-4 rounded-[3.5rem] border border-white/80 dark:border-white/[0.05] shadow-[0_40px_80px_rgba(0,0,0,0.2)] transition-all group-focus-within:border-indigo-500/50">
+                <div className="relative flex items-center gap-2 md:gap-4 bg-white/95 dark:bg-[#030712]/95 backdrop-blur-[60px] px-4 md:px-6 py-3 md:py-4 rounded-[1.5rem] md:rounded-[3.5rem] border border-white/80 dark:border-white/[0.05] shadow-[0_40px_80px_rgba(0,0,0,0.2)] transition-all group-focus-within:border-indigo-500/50">
                    
                    {/* ➕ Attachment & Utility */}
                    <button 
                      onClick={() => fileInputRef.current?.click()}
-                     className="w-14 h-14 rounded-full bg-gray-50 dark:bg-white/5 text-gray-400 hover:text-indigo-500 hover:scale-110 transition-all flex items-center justify-center flex-shrink-0"
+                     className="w-10 h-10 md:w-14 md:h-14 rounded-full bg-gray-50 dark:bg-white/5 text-gray-400 hover:text-indigo-500 hover:scale-110 transition-all flex items-center justify-center flex-shrink-0"
                    >
-                     <Plus size={24} />
+                     <Plus size={20} />
                    </button>
                    <input type="file" ref={fileInputRef} className="hidden" />
 
-                   <div className="flex-1 min-h-[50px] flex items-center">
+                   <div className="flex-1 min-h-[40px] md:min-h-[50px] flex items-center">
                      <textarea
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={handleKeyDown}
-                        placeholder="Type a clinical inquiry..."
-                        className="w-full bg-transparent border-none focus:ring-0 text-gray-950 dark:text-gray-100 font-bold placeholder:text-gray-400/50 text-xl resize-none py-3 custom-scrollbar overflow-hidden"
+                        placeholder="Type clinical inquiry..."
+                        className="w-full bg-transparent border-none focus:ring-0 text-gray-950 dark:text-gray-100 font-bold placeholder:text-gray-400/50 text-sm md:text-xl resize-none py-2 md:py-3 custom-scrollbar overflow-hidden"
                         rows={1}
                         onInput={(e) => {
                            const target = e.target as HTMLTextAreaElement;
@@ -507,22 +513,22 @@ export default function ChatPage() {
                      />
                    </div>
 
-                   <div className="flex items-center gap-4 pr-2">
-                     <button className="hidden sm:flex w-12 h-12 rounded-full text-gray-400 hover:text-purple-500 hover:bg-purple-500/10 transition-all items-center justify-center">
-                        <History size={20} />
+                   <div className="flex items-center gap-2 md:gap-4 pr-1 md:pr-2">
+                     <button className="hidden sm:flex w-10 h-10 md:w-12 md:h-12 rounded-full text-gray-400 hover:text-purple-500 hover:bg-purple-500/10 transition-all items-center justify-center">
+                        <History size={18} />
                      </button>
                      
                      <div className="relative">
                         <button
                           onClick={() => sendMessage()}
                           disabled={loading || !input.trim()}
-                          className={`w-14 h-14 rounded-full flex items-center justify-center transition-all duration-500 ${
+                          className={`w-10 h-10 md:w-14 md:h-14 rounded-full flex items-center justify-center transition-all duration-500 ${
                             input.trim() 
                              ? "bg-indigo-600 text-white shadow-xl shadow-indigo-600/40 translate-x-0" 
-                             : "bg-gray-100 dark:bg-white/5 text-gray-400 scale-90 translate-x-2 opacity-50 cursor-not-allowed"
+                             : "bg-gray-100 dark:bg-white/5 text-gray-400 scale-90 translate-x-1 md:translate-x-2 opacity-50 cursor-not-allowed"
                           }`}
                         >
-                          <Send size={24} className={input.trim() ? "translate-x-0.5" : ""} />
+                          <Send size={18} className={input.trim() ? "translate-x-0.5" : ""} />
                         </button>
                      </div>
                    </div>
