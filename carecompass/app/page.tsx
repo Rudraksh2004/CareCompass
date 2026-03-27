@@ -175,8 +175,8 @@ export default function Home() {
       </header>
 
       {/* HERO SECTION */}
-      <section className="relative px-6 pt-20 md:pt-28 pb-16">
-        <div className="max-w-7xl mx-auto text-center z-10">
+      <section className="relative px-6 pt-24 md:pt-36 pb-32">
+        <div className="max-w-6xl mx-auto text-center z-10">
           <div className="animate-fade-in-up inline-flex items-center gap-3 mb-10 px-6 py-3 rounded-full bg-white/40 dark:bg-white/[0.04] border border-white/80 dark:border-blue-400/30 text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-[0.3em] shadow-2xl glass-grain">
             <Sparkles className="w-4 h-4 animate-badge-pulse" /> AI HEALTH INTELLIGENCE V3.1
           </div>
@@ -190,8 +190,8 @@ export default function Home() {
       </section>
 
       {/* DASHBOARD PREVIEW */}
-      <section id="services" className="px-6 py-12">
-        <div ref={el => { if(el && !revealRefs.current.includes(el)) revealRefs.current.push(el); }} className="reveal max-w-7xl mx-auto perspective-1000">
+      <section id="services" className="px-6 pb-40">
+        <div ref={el => { if(el && !revealRefs.current.includes(el)) revealRefs.current.push(el); }} className="reveal max-w-6xl mx-auto perspective-1000">
           <div className="relative group p-3 rounded-[3.5rem] bg-white/[0.4] dark:bg-[#030712]/40 border border-white/80 dark:border-white/[0.08] backdrop-blur-[60px] shadow-[0_60px_150px_-30px_rgba(0,0,0,0.2)] transition-all hover:rotate-x-2 preserve-3d glass-grain">
              <div className="rounded-[2.8rem] bg-gray-50 dark:bg-[#0a0f1e] overflow-hidden border border-gray-200/50 dark:border-white/[0.05]">
                 <div className="flex items-center gap-3 px-8 py-5 border-b border-gray-200 dark:border-white/[0.08] bg-white/50 dark:bg-white/[0.02]">
@@ -221,8 +221,8 @@ export default function Home() {
       <TrustMarquee />
 
       {/* CORE FEATURES SECTION (Detailed) */}
-      <section className="px-6 py-12 max-w-7xl mx-auto">
-        <div ref={el => { if(el && !revealRefs.current.includes(el)) revealRefs.current.push(el); }} className="reveal text-center mb-10">
+      <section className="px-6 py-40 max-w-7xl mx-auto">
+        <div ref={el => { if(el && !revealRefs.current.includes(el)) revealRefs.current.push(el); }} className="reveal text-center mb-32">
           <span className="inline-flex items-center gap-3 mb-8 px-6 py-2.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-black text-emerald-600 uppercase tracking-[0.4em]">INTELLIGENCE MODULES</span>
           <h2 className="text-4xl md:text-6xl font-black mb-10 tracking-tighter">Clinical-Grade <br /><span className="bg-gradient-to-r from-blue-600 to-emerald-500 bg-clip-text text-transparent italic">AI Engines</span></h2>
           <p className="text-gray-700 dark:text-gray-400 max-w-4xl mx-auto text-xl font-bold">Six specialized nodes operating in tandem to provide a comprehensive health sovereignty framework.</p>
@@ -248,8 +248,8 @@ export default function Home() {
       </section>
 
       {/* HOW IT WORKS (Protocol) */}
-      <section id="protocol" className="py-12 px-6 bg-white/30 dark:bg-white/[0.01] border-y border-white/20 dark:border-white/[0.05] glass-grain">
-        <div className="max-w-7xl mx-auto text-center mb-10">
+      <section id="protocol" className="py-40 px-6 bg-white/30 dark:bg-white/[0.01] border-y border-white/20 dark:border-white/[0.05] glass-grain">
+        <div className="max-w-7xl mx-auto text-center mb-32">
           <span className="text-[10px] font-black text-blue-500 tracking-[0.4em] mb-4 block uppercase leading-none">The CareCompass Method</span>
           <h2 className="text-4xl md:text-6xl font-black tracking-tighter text-gray-900 dark:text-white italic">Operational Protocol</h2>
         </div>
@@ -265,7 +265,7 @@ export default function Home() {
       </section>
 
       {/* COMPLIANCE & SECURITY */}
-      <section id="compliance" className="py-12 px-6">
+      <section id="compliance" className="py-40 px-6">
         <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-24 items-center">
             <div ref={el => { if(el && !revealRefs.current.includes(el)) revealRefs.current.push(el); }} className="reveal">
                 <span className="text-xs font-black text-emerald-500 tracking-[0.5em] mb-8 block uppercase">FORTRESS ARCHITECTURE</span>
@@ -294,9 +294,9 @@ export default function Home() {
       </section>
 
       {/* FAQ SECTION */}
-      <section className="py-12 px-6 bg-white/10 dark:bg-white/[0.01] glass-grain">
-        <div className="max-w-7xl mx-auto">
-            <div ref={el => { if(el && !revealRefs.current.includes(el)) revealRefs.current.push(el); }} className="reveal text-center mb-10">
+      <section className="py-40 px-6 bg-white/10 dark:bg-white/[0.01] glass-grain">
+        <div className="max-w-4xl mx-auto">
+            <div ref={el => { if(el && !revealRefs.current.includes(el)) revealRefs.current.push(el); }} className="reveal text-center mb-24">
                 <span className="text-[10px] font-black text-blue-500 tracking-[0.4em] mb-4 block uppercase leading-none">Common Inquiries</span>
                 <h2 className="text-4xl md:text-6xl font-black tracking-tighter text-gray-900 dark:text-white italic">Intelligence FAQ</h2>
             </div>
@@ -307,7 +307,7 @@ export default function Home() {
       </section>
 
       {/* STATS SECTION */}
-      <section className="pb-8 px-6" ref={statsRef}>
+      <section className="py-24 px-6" ref={statsRef}>
         <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-10">
             {mainStats.map((s, i) => (
                 <div key={i} className="text-center group p-10 rounded-[2.5rem] bg-white/40 dark:bg-white/[0.03] border border-white/60 dark:border-white/[0.1] backdrop-blur-[60px] glass-grain hover:-translate-y-4 transition-all">
@@ -319,10 +319,10 @@ export default function Home() {
       </section>
 
       {/* CTA SECTION */}
-      <section className="px-6 pt-8 pb-12">
+      <section className="px-6 py-40">
         <div ref={el => { if(el && !revealRefs.current.includes(el)) revealRefs.current.push(el); }} className="reveal relative max-w-7xl mx-auto overflow-hidden rounded-[4.5rem] border border-white/20 dark:border-white/[0.1] shadow-[0_100px_180px_-40px_rgba(0,0,0,0.3)] glass-grain bg-blue-600">
             <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-indigo-600 to-emerald-500 animate-gradient-shift opacity-90" /><div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.2),transparent_70%)]" />
-            <div className="relative z-10 py-16 px-12 text-center flex flex-col items-center">
+            <div className="relative z-10 p-32 text-center flex flex-col items-center">
                 <h2 className="text-4xl md:text-[5.5rem] font-black mb-14 text-white leading-[0.9] tracking-tighter uppercase italic">Secure Your <br />Health Node</h2>
                 <p className="text-white/80 text-xl md:text-2xl mb-20 max-w-4xl mx-auto leading-relaxed font-bold italic selection:bg-white/20">The future of clinical intelligence is sovereign. Join the 400+ health architects already decoding their timeline with CareCompass.</p>
                 <Link href="/auth/signup" className="group bg-white text-gray-900 px-12 py-6 rounded-[2rem] text-2xl font-black uppercase tracking-tighter shadow-2xl hover:scale-110 active:scale-95 transition-all">Initialize Now</Link>
@@ -330,13 +330,13 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="relative border-t border-white/80 dark:border-white/[0.08] bg-white/40 dark:bg-[#030712]/30 backdrop-blur-[120px] overflow-hidden">
+      <footer className="relative mt-32 border-t border-white/80 dark:border-white/[0.08] bg-white/40 dark:bg-[#030712]/30 backdrop-blur-[120px] overflow-hidden">
         {/* ─── AMBIENT BACKGROUND GLOWS ─── */}
         <div className="absolute top-0 left-1/4 w-[400px] h-[400px] bg-blue-500/5 blur-[120px] rounded-full pointer-events-none" />
         <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-emerald-500/5 blur-[120px] rounded-full pointer-events-none" />
         <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-blue-500/30 to-transparent animate-pulse" />
 
-        <div className="max-w-7xl mx-auto px-6 md:px-12 pt-16 pb-12">
+        <div className="max-w-7xl mx-auto px-6 md:px-12 pt-24 pb-12">
           {/* ─── NEURAL UPLINK (Sub-footer CTA) ─── */}
           <div className="mb-24 p-8 md:p-12 rounded-[3.5rem] bg-white/30 dark:bg-white/[0.02] border border-white/80 dark:border-white/[0.08] backdrop-blur-[80px] flex flex-col lg:flex-row items-center justify-between gap-12 group transition-all duration-700 hover:border-blue-500/30 shadow-2xl glass-grain">
             <div className="max-w-xl text-center lg:text-left">
