@@ -167,15 +167,117 @@ body {
   transform: translateY(0);
 }
 
-/* Glass Grain Effect */
-.glass-grain::before {
+/* Premium Liquid Glass Effect */
+.glass-liquid {
+  position: relative;
+  backdrop-filter: blur(40px) saturate(220%) contrast(110%);
+  -webkit-backdrop-filter: blur(40px) saturate(220%) contrast(110%);
+  transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.dark .glass-liquid {
+  backdrop-filter: blur(50px) saturate(250%) contrast(120%);
+  -webkit-backdrop-filter: blur(50px) saturate(250%) contrast(120%);
+}
+
+/* Glass Grain Effect - Intensified */
+.glass-grain {
+  position: relative;
+}
+
+.glass-grain::after {
   content: "";
   position: absolute;
   inset: 0;
-  z-index: -1;
-  opacity: 0.04;
+  z-index: 1;
+  opacity: 0.12; /* More visible grain */
   pointer-events: none;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  mix-blend-mode: soft-light;
+}
+
+/* Ensure content stays above grain for clarity */
+.glass-grain > * {
+  position: relative;
+  z-index: 5;
+}
+
+/* Refraction/Specular Highlights - High Fidelity */
+.glass-refraction {
+  position: relative;
+  box-shadow: 
+    inset 0 0 0 1px rgba(255, 255, 255, 0.4),
+    0 10px 40px -10px rgba(0, 0, 0, 0.2);
+}
+
+.dark .glass-refraction {
+  box-shadow: 
+    inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+    0 20px 40px -10px rgba(0, 0, 0, 0.5);
+}
+
+.glass-refraction::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: inherit;
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.6) 0%,
+    transparent 30%,
+    transparent 70%,
+    rgba(255, 255, 255, 0.3) 100%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* Fluid Mesh Movement - Larger and slower for Liquid feel */
+@keyframes fluid-mesh {
+  0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+  33% { transform: translate(10%, 15%) scale(1.1) rotate(5deg); }
+  66% { transform: translate(-10%, 10%) scale(1.05) rotate(-3deg); }
+  100% { transform: translate(0, 0) scale(1) rotate(0deg); }
+}
+
+.animate-fluid-mesh {
+  animation: fluid-mesh 15s ease-in-out infinite;
+}
+
+/* Liquid Button Glow */
+.btn-liquid {
+  position: relative;
+  transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  z-index: 1;
+}
+
+.btn-liquid::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(45deg, #3b82f6, #10b981, #6366f1, #3b82f6);
+  background-size: 400%;
+  z-index: -1;
+  filter: blur(10px);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  border-radius: inherit;
+}
+
+.btn-liquid:hover::before {
+  opacity: 0.6;
+  animation: liquid-btn-glow 20s linear infinite;
+}
+
+@keyframes liquid-btn-glow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 /* 3D Effects */

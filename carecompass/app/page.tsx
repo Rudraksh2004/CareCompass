@@ -97,12 +97,12 @@ const StarField = ({ isDark }: { isDark: boolean }) => {
 const TrustMarquee = () => {
   const items = ["HIPAA READY", "END-TO-END ENCRYPTED", "GEMINI 1.5 PRO", "CLINICAL GRADE", "PRIVACY FIRST", "RELIABLE INSIGHTS", "SECURE DATA SILOS"];
   return (
-    <div className="w-full py-6 md:py-8 bg-white/30 dark:bg-white/[0.01] backdrop-blur-3xl border-y border-white/40 dark:border-white/[0.06] overflow-hidden glass-grain">
+    <div className="w-full py-6 md:py-8 bg-white/40 dark:bg-white/[0.02] backdrop-blur-3xl border-y border-white/60 dark:border-white/[0.08] overflow-hidden glass-grain glass-liquid">
       <div className="flex whitespace-nowrap animate-marquee">
         {[...items, ...items].map((text, i) => (
           <div key={i} className="flex items-center gap-10 md:gap-16 mx-4 md:mx-8">
-            <span className="text-[10px] md:text-sm font-black text-gray-600 dark:text-gray-500 tracking-[0.2em] md:tracking-[0.4em] uppercase whitespace-nowrap">{text}</span>
-            <div className="w-1 md:w-1.5 h-1 md:h-1.5 rounded-full bg-blue-500/30 flex-shrink-0" />
+            <span className="text-[10px] md:text-sm font-black text-gray-700 dark:text-gray-400 tracking-[0.2em] md:tracking-[0.4em] uppercase whitespace-nowrap">{text}</span>
+            <div className="w-1 md:w-1.5 h-1 md:h-1.5 rounded-full bg-blue-500/50 flex-shrink-0" />
           </div>
         ))}
       </div>
@@ -113,7 +113,7 @@ const TrustMarquee = () => {
 const AccordionItem = ({ title, content }: { title: string, content: string }) => {
     const [open, setOpen] = useState(false);
     return (
-        <div className="mb-6 rounded-[2.5rem] border border-white/60 dark:border-white/[0.08] bg-white/40 dark:bg-white/[0.02] backdrop-blur-[60px] glass-grain overflow-hidden transition-all duration-500">
+        <div className="mb-6 rounded-[2.5rem] border border-white/60 dark:border-white/[0.08] bg-white/40 dark:bg-white/[0.02] backdrop-blur-[60px] glass-grain glass-liquid glass-refraction overflow-hidden transition-all duration-500">
             <button onClick={() => setOpen(!open)} className="w-full p-8 flex items-center justify-between text-left group">
                 <span className="text-xl font-black text-gray-900 dark:text-gray-100 uppercase tracking-tighter">{title}</span>
                 <ChevronDown className={`w-6 h-6 text-blue-500 transition-transform duration-500 ${open ? "rotate-180" : ""}`} />
@@ -147,14 +147,19 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-blue-50/20 to-indigo-50/10 dark:from-[#020617] dark:via-[#050b18] dark:to-[#020814] text-gray-900 dark:text-gray-100 overflow-x-hidden scroll-smooth transition-all duration-700">
       
-      <div className="fixed inset-0 -z-10">
+      <div className="fixed inset-0 -z-10 bg-[#f8fafc] dark:bg-[#020617] transition-colors duration-1000">
         <StarField isDark={isDark} />
-        <div className="absolute top-[-20%] left-[-15%] w-[800px] h-[800px] rounded-full bg-blue-500/15 dark:bg-blue-600/20 blur-[130px] animate-float" />
-        <div className="absolute bottom-[-20%] right-[-15%] w-[800px] h-[800px] rounded-full bg-emerald-500/10 dark:bg-emerald-600/15 blur-[120px] animate-float-reverse" />
-        <div className="absolute inset-0 opacity-[0.25] dark:opacity-[0.08]" style={{ backgroundImage: 'radial-gradient(circle, rgba(100,116,139,0.1) 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
+        {/* Dynamic Fluid Mesh - RESTORED & BOOSTED */}
+        <div className="absolute inset-0 overflow-hidden opacity-70 dark:opacity-50">
+          <div className="absolute top-[-15%] left-[-15%] w-[90%] h-[90%] rounded-full bg-blue-400/30 dark:bg-blue-600/20 blur-[130px] animate-fluid-mesh" />
+          <div className="absolute bottom-[-15%] right-[-15%] w-[80%] h-[80%] rounded-full bg-emerald-400/20 dark:bg-emerald-600/15 blur-[120px] animate-fluid-mesh [animation-delay:3s]" />
+          <div className="absolute top-[25%] right-[5%] w-[50%] h-[50%] rounded-full bg-indigo-400/25 dark:bg-indigo-600/15 blur-[110px] animate-fluid-mesh [animation-delay:5s]" />
+          <div className="absolute bottom-[20%] left-[5%] w-[40%] h-[40%] rounded-full bg-rose-400/10 dark:bg-rose-600/10 blur-[100px] animate-fluid-mesh [animation-delay:2s]" />
+        </div>
+        <div className="absolute inset-0 opacity-[0.10] dark:opacity-[0.04]" style={{ backgroundImage: 'radial-gradient(circle, rgba(148,163,184,0.3) 1.5px, transparent 1.5px)', backgroundSize: '64px 64px' }} />
       </div>
 
-      <header className="fixed top-4 md:top-6 left-4 md:left-6 right-4 md:right-6 mx-auto max-w-7xl border border-white/60 dark:border-white/[0.08] backdrop-blur-[40px] bg-white/40 dark:bg-[#030712]/30 z-50 glass-grain rounded-[1.5rem] md:rounded-[2.5rem] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.1)] transition-all duration-500">
+      <header className="fixed top-4 md:top-6 left-4 md:left-6 right-4 md:right-6 mx-auto max-w-7xl border border-white/60 dark:border-white/[0.08] backdrop-blur-[40px] bg-white/40 dark:bg-[#030712]/40 z-50 glass-grain glass-liquid glass-refraction rounded-[1.5rem] md:rounded-[2.5rem] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.2)] transition-all duration-500">
         <div className="px-6 md:px-10 py-3 md:py-4 flex items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-3 md:gap-4 group shrink-0">
             <img src="/logo.png" alt="Logo" className="w-8 h-8 md:w-11 md:h-11 transition-all duration-500 group-hover:scale-110 drop-shadow-[0_0_15px_rgba(59,130,246,0.3)]" />
@@ -170,7 +175,7 @@ export default function Home() {
               {isDark ? <Moon className="w-4 h-4 md:w-5 md:h-5 text-blue-400" /> : <Sun className="w-4 h-4 md:w-5 md:h-5 text-amber-500" />}
             </button>
             <Link href="/auth/login" className="hidden lg:inline-flex text-[10px] font-black uppercase tracking-widest text-gray-700 dark:text-gray-400 hover:text-blue-500 transition-colors">Login</Link>
-            <Link href="/auth/signup" className="hidden sm:inline-flex bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-6 md:px-8 py-3 md:py-3.5 rounded-xl md:rounded-[1.2rem] font-black uppercase tracking-widest text-[9px] md:text-[10px] shadow-2xl hover:scale-[1.05] transition-all">Get Started</Link>
+            <Link href="/auth/signup" className="hidden sm:inline-flex bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-6 md:px-8 py-3 md:py-3.5 rounded-xl md:rounded-[1.2rem] font-black uppercase tracking-widest text-[9px] md:text-[10px] shadow-2xl hover:scale-[1.05] btn-liquid transition-all">Get Started</Link>
             <button onClick={() => setMobileMenu(!mobileMenu)} className="md:hidden w-9 h-9 rounded-xl border border-gray-200 dark:border-white/[0.1] bg-white/40 dark:bg-white/[0.05] flex items-center justify-center transition-all z-[60]">
               {mobileMenu ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
             </button>
@@ -179,7 +184,7 @@ export default function Home() {
 
         {/* 📱 Mobile Menu Hub */}
         {mobileMenu && (
-          <div className="md:hidden absolute top-[110%] left-0 right-0 p-6 md:p-8 rounded-[2rem] md:rounded-[2.5rem] border border-white/60 dark:border-white/[0.08] backdrop-blur-[80px] bg-white/95 dark:bg-[#030712]/95 glass-grain animate-in slide-in-from-top-4 duration-500 z-50 shadow-2xl">
+          <div className="md:hidden absolute top-[110%] left-0 right-0 p-6 md:p-8 rounded-[2rem] md:rounded-[2.5rem] border border-white/30 dark:border-white/[0.08] backdrop-blur-[80px] bg-white/95 dark:bg-[#030712]/95 glass-grain glass-liquid glass-refraction animate-in slide-in-from-top-4 duration-500 z-50 shadow-2xl">
             <div className="flex flex-col gap-6 md:gap-8 items-center text-center">
               {["Services", "Network", "Compliance", "Protocol"].map(l => (
                   <a key={l} href={`#${l.toLowerCase()}`} onClick={() => setMobileMenu(false)} className="text-xl md:text-2xl font-black uppercase tracking-tighter text-gray-900 dark:text-white hover:text-blue-500 transition-all italic leading-tight">{l}</a>
@@ -208,7 +213,7 @@ export default function Home() {
             The first medical-grade AI engine designed to decode clinical reports, manage pharmacology, and predict health anomalies.
           </p>
           <div className="animate-fade-in-up stagger-3 flex flex-col sm:flex-row justify-center items-center gap-4 md:gap-8">
-            <Link href="/auth/signup" className="w-full sm:w-auto group relative bg-gradient-to-br from-blue-600 to-indigo-700 text-white px-8 md:px-10 py-4 md:py-5 rounded-2xl md:rounded-[2rem] text-lg md:text-xl font-black italic shadow-[0_30px_70px_-15px_rgba(59,130,246,0.6)] hover:scale-105 transition-all flex items-center justify-center gap-4 overflow-hidden">
+            <Link href="/auth/signup" className="w-full sm:w-auto group relative bg-gradient-to-br from-blue-600 to-indigo-700 text-white px-8 md:px-10 py-4 md:py-5 rounded-2xl md:rounded-[2rem] text-lg md:text-xl font-black italic shadow-[0_30px_70px_-15px_rgba(59,130,246,0.6)] hover:scale-105 btn-liquid transition-all flex items-center justify-center gap-4 overflow-hidden">
               <span className="relative z-10">Initialize Tracker</span>
               <ArrowRight className="w-5 h-5 md:w-6 md:h-6 group-hover:translate-x-3 transition-transform duration-500" />
             </Link>
@@ -222,7 +227,7 @@ export default function Home() {
       {/* DASHBOARD PREVIEW */}
       <section id="services" className="px-4 md:px-6 pb-24 md:pb-40">
         <div ref={el => { if(el && !revealRefs.current.includes(el)) revealRefs.current.push(el); }} className="reveal max-w-6xl mx-auto perspective-1000">
-          <div className="relative group p-2 md:p-3 rounded-[2rem] md:rounded-[3.5rem] bg-white/[0.4] dark:bg-[#030712]/40 border border-white/80 dark:border-white/[0.08] backdrop-blur-[60px] shadow-[0_60px_150px_-30px_rgba(0,0,0,0.2)] transition-all hover:rotate-x-2 preserve-3d glass-grain">
+          <div className="relative group p-2 md:p-3 rounded-[2rem] md:rounded-[3.5rem] bg-white/[0.4] dark:bg-[#030712]/40 border border-white/60 dark:border-white/[0.08] backdrop-blur-[60px] shadow-[0_60px_150px_-30px_rgba(0,0,0,0.25)] transition-all hover:rotate-x-2 preserve-3d glass-grain glass-liquid glass-refraction">
              <div className="rounded-[1.8rem] md:rounded-[2.8rem] bg-gray-50 dark:bg-[#0a0f1e] overflow-hidden border border-gray-200/50 dark:border-white/[0.05]">
                 <div className="flex items-center gap-3 px-6 md:px-8 py-4 md:py-5 border-b border-gray-200 dark:border-white/[0.08] bg-white/50 dark:bg-white/[0.02]">
                     <div className="flex gap-2"><div className="w-3 md:w-3.5 h-3 md:h-3.5 rounded-full bg-[#ff5f56]" /><div className="w-3 md:w-3.5 h-3 md:h-3.5 rounded-full bg-[#ffbd2e]" /><div className="w-3 md:w-3.5 h-3 md:h-3.5 rounded-full bg-[#27c93f]" /></div>
@@ -265,7 +270,7 @@ export default function Home() {
           {fullFeatures.map((f, i) => (
               <div key={i} ref={el => { if(el && !revealRefs.current.includes(el)) revealRefs.current.push(el); }} className={`reveal stagger-${i + 1} group relative rounded-[2.5rem] md:rounded-[3.5rem] p-[1.5px] transition-all hover:-translate-y-4`}>
               <div className="absolute inset-0 rounded-[2.5rem] md:rounded-[3.5rem] bg-gradient-to-br from-blue-500/40 to-emerald-500/20 opacity-0 group-hover:opacity-100 transition-opacity" />
-              <div className="relative bg-white/[0.5] dark:bg-[#030712]/40 backdrop-blur-[60px] rounded-[2.4rem] md:rounded-[3.4rem] p-8 md:p-12 h-full border border-white dark:border-white/[0.08] shadow-2xl glass-grain overflow-hidden">
+              <div className="relative bg-white/[0.5] dark:bg-[#030712]/40 backdrop-blur-[60px] rounded-[2.4rem] md:rounded-[3.4rem] p-8 md:p-12 h-full border border-white/60 dark:border-white/[0.08] shadow-2xl glass-grain glass-liquid glass-refraction overflow-hidden">
                 <div className={`w-16 h-16 md:w-20 md:h-20 rounded-2xl md:rounded-3xl bg-gradient-to-br ${f.gradient} flex items-center justify-center mb-8 md:mb-12 shadow-2xl group-hover:scale-110 transition-all duration-700 text-white`}>
                    <div className="w-8 h-8 md:w-12 md:h-12 flex items-center justify-center">
                     {f.icon}
@@ -323,7 +328,7 @@ export default function Home() {
             </div>
             <div ref={el => { if(el && !revealRefs.current.includes(el)) revealRefs.current.push(el); }} className="reveal stagger-2 relative group">
                 <div className="absolute inset-x-0 inset-y-0 bg-blue-500/10 md:bg-blue-500/20 blur-[100px] md:blur-[150px] rounded-full group-hover:bg-blue-500/30 transition-all duration-1000" />
-                <div className="relative p-2 rounded-[2.5rem] md:rounded-[4rem] bg-white/20 dark:bg-white/[0.02] border border-white/60 dark:border-white/[0.08] backdrop-blur-[80px] overflow-hidden glass-grain shadow-2xl">
+                <div className="relative p-2 rounded-[2.5rem] md:rounded-[4rem] bg-white/20 dark:bg-white/[0.02] border border-white/60 dark:border-white/[0.08] backdrop-blur-[80px] overflow-hidden glass-grain glass-liquid glass-refraction shadow-2xl">
                     <div className="p-8 md:p-16 space-y-10 md:space-y-12">
                         {[
                           { icon: <Lock className="w-6 h-6 md:w-8 md:h-8" />, label: "AES-256 Encryption", desc: "Military-grade data transit", color: "emerald" },
@@ -345,7 +350,7 @@ export default function Home() {
       </section>
 
       {/* FAQ SECTION */}
-      <section className="py-24 md:py-40 px-6 bg-white/10 dark:bg-white/[0.01] glass-grain">
+      <section className="py-24 md:py-40 px-6 bg-white/10 dark:bg-white/[0.01] glass-grain glass-liquid">
         <div className="max-w-4xl mx-auto">
             <div ref={el => { if(el && !revealRefs.current.includes(el)) revealRefs.current.push(el); }} className="reveal text-center mb-16 md:mb-24">
                 <span className="text-[9px] md:text-[10px] font-black text-blue-500 tracking-[0.4em] mb-4 block uppercase leading-none">Common Inquiries</span>
@@ -361,7 +366,7 @@ export default function Home() {
       <section className="py-16 md:py-24 px-6" ref={statsRef}>
         <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 md:gap-10">
             {mainStats.map((s, i) => (
-                <div key={i} className="text-center group p-8 md:p-10 rounded-2xl md:rounded-[2.5rem] bg-white/40 dark:bg-white/[0.03] border border-white/60 dark:border-white/[0.1] backdrop-blur-[60px] glass-grain hover:-translate-y-4 transition-all">
+                <div key={i} className="text-center group p-8 md:p-10 rounded-2xl md:rounded-[2.5rem] bg-white/40 dark:bg-white/[0.03] border border-white/20 dark:border-white/[0.1] backdrop-blur-[60px] glass-grain glass-liquid glass-refraction hover:-translate-y-4 transition-all">
                     <div className="text-3xl md:text-4xl font-black bg-gradient-to-r from-blue-600 via-indigo-600 to-emerald-500 dark:from-blue-400 dark:via-indigo-400 dark:to-emerald-400 bg-clip-text text-transparent mb-3 md:mb-4 italic">{s.v}</div>
                     <div className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.3em] md:tracking-[0.4em] text-gray-700 dark:text-gray-400">{s.l}</div>
                 </div>
@@ -371,7 +376,7 @@ export default function Home() {
 
       {/* CTA SECTION */}
       <section className="px-4 md:px-6 py-24 md:py-40">
-        <div ref={el => { if(el && !revealRefs.current.includes(el)) revealRefs.current.push(el); }} className="reveal relative max-w-7xl mx-auto overflow-hidden rounded-[2.5rem] md:rounded-[4.5rem] border border-white/20 dark:border-white/[0.1] shadow-[0_100px_180px_-40px_rgba(0,0,0,0.3)] glass-grain bg-blue-600">
+        <div ref={el => { if(el && !revealRefs.current.includes(el)) revealRefs.current.push(el); }} className="reveal relative max-w-7xl mx-auto overflow-hidden rounded-[2.5rem] md:rounded-[4.5rem] border border-white/20 dark:border-white/[0.1] shadow-[0_100px_180px_-40px_rgba(0,0,0,0.3)] glass-grain glass-liquid glass-refraction bg-blue-600">
             <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-indigo-600 to-emerald-500 animate-gradient-shift opacity-90" /><div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.2),transparent_70%)]" />
             <div className="relative z-10 p-12 md:p-32 text-center flex flex-col items-center">
                 <h2 className="text-3xl md:text-[5.5rem] font-black mb-8 md:mb-14 text-white leading-[1.1] md:leading-[0.9] tracking-tighter uppercase italic">Secure Your <br />Health Node</h2>
@@ -389,7 +394,7 @@ export default function Home() {
 
         <div className="max-w-7xl mx-auto px-6 md:px-12 pt-16 md:pt-24 pb-12">
           {/* ─── NEURAL UPLINK (Sub-footer CTA) ─── */}
-          <div className="mb-16 md:mb-24 p-8 md:p-12 rounded-[2.5rem] md:rounded-[3.5rem] bg-white/30 dark:bg-white/[0.02] border border-white/80 dark:border-white/[0.08] backdrop-blur-[80px] flex flex-col lg:flex-row items-center justify-between gap-8 md:gap-12 group transition-all duration-700 hover:border-blue-500/30 shadow-2xl glass-grain">
+          <div className="mb-16 md:mb-24 p-8 md:p-12 rounded-[2.5rem] md:rounded-[3.5rem] bg-white/30 dark:bg-white/[0.02] border border-white/30 dark:border-white/[0.08] backdrop-blur-[80px] flex flex-col lg:flex-row items-center justify-between gap-8 md:gap-12 group transition-all duration-700 hover:border-blue-500/30 shadow-2xl glass-grain glass-liquid glass-refraction">
             <div className="max-w-xl text-center lg:text-left">
               <h3 className="text-2xl md:text-3xl font-black tracking-tighter uppercase italic mb-3">Neural <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">Uplink</span></h3>
               <p className="text-gray-800 dark:text-gray-400 font-bold uppercase tracking-[0.2em] md:tracking-[0.4em] text-[9px] md:text-[10px] leading-relaxed">
