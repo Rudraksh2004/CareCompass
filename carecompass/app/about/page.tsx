@@ -135,66 +135,56 @@ export default function AboutPage() {
           <div className="absolute -inset-[1px] rounded-[2.5rem] bg-gradient-to-br from-white/40 via-white/5 to-transparent dark:from-white/20 dark:via-transparent dark:to-transparent -z-10 opacity-50 transition-opacity group-hover:opacity-100" />
           
           <div className="relative overflow-hidden rounded-[2.5rem] bg-white/40 dark:bg-white/[0.02] backdrop-blur-[100px] border border-white/20 dark:border-white/[0.05] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.15)] glass-grain glass-liquid p-2">
-             <div className="flex flex-col md:flex-row gap-8 lg:gap-10">
-                {/* ─── Photo Section (Portrait ID style) ─── */}
-                <div className="relative w-full md:w-[280px] lg:w-[320px] aspect-[4/5] md:aspect-[3/4] rounded-[2rem] overflow-hidden flex-shrink-0 group/photo shadow-2xl">
+             <div className="flex flex-col items-center p-6 md:p-10 space-y-8 md:space-y-12">
+                {/* ─── Photo Section (Circular ID style) ─── */}
+                <div className="relative w-[240px] h-[240px] md:w-[280px] md:h-[280px] rounded-full overflow-hidden flex-shrink-0 group/photo shadow-2xl transition-all duration-700 hover:shadow-blue-500/20">
+                   {/* Photo Glass Internal Refraction Border */}
+                   <div className="absolute inset-0 rounded-full border-[4px] border-white/20 dark:border-white/10 z-20 pointer-events-none mix-blend-overlay" />
+                   
                    <img 
-                     src="/rudraksh.jpg" 
+                     src="/rudraksh.JPG" 
                      alt="Rudraksh Ganguly" 
                      className="w-full h-full object-cover transition-transform duration-1000 group-hover/photo:scale-110"
                    />
-                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60 group-hover/photo:opacity-40 transition-opacity" />
+                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-60 group-hover/photo:opacity-40 transition-opacity z-10" />
                    
-                   {/* Meta-Badge */}
-                   <div className="absolute bottom-4 left-4 right-4 p-3 rounded-2xl bg-white/10 dark:bg-black/40 backdrop-blur-md border border-white/20 flex items-center justify-between opacity-0 group-hover/photo:opacity-100 translate-y-4 group-hover/photo:translate-y-0 transition-all duration-700">
-                      <div className="flex flex-col gap-0.5">
-                         <span className="text-[7px] font-black uppercase tracking-widest text-blue-400">System Priority</span>
-                         <span className="text-[9px] font-bold text-white uppercase italic">Root Architect</span>
+                   {/* Meta-Badge (Circular Blend) */}
+                   <div className="absolute bottom-6 left-1/2 -translate-x-1/2 px-5 py-3 rounded-full bg-white/10 dark:bg-black/50 backdrop-blur-xl border border-white/20 flex items-center gap-3 opacity-0 group-hover/photo:opacity-100 translate-y-4 group-hover/photo:translate-y-0 transition-all duration-700 z-30 whitespace-nowrap shadow-xl">
+                      <div className="w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center text-white shadow-lg">
+                         <Brain className="w-5 h-5" />
                       </div>
-                      <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white">
-                         <Brain className="w-4 h-4" />
+                      <div className="flex flex-col text-left">
+                         <span className="text-[8px] font-black uppercase tracking-widest text-blue-400 leading-none">Identity Node</span>
+                         <span className="text-[10px] font-bold text-white uppercase italic mt-0.5">Root Architect</span>
                       </div>
                    </div>
                 </div>
 
-                {/* ─── Information Section ─── */}
-                <div className="flex-1 flex flex-col justify-center py-6 md:py-10 pr-6 lg:pr-10 pl-6 md:pl-0 space-y-6 md:space-y-8">
-                   <div className="space-y-2">
-                      <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-[8px] md:text-[9px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-[0.3em] italic">
-                         <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+                {/* ─── Information Section (Centered) ─── */}
+                <div className="flex flex-col items-center text-center space-y-6 md:space-y-8 max-w-2xl">
+                   <div className="space-y-3">
+                      <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-[9px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-[0.3em] italic mx-auto">
+                         <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
                          Project Architect Node
                       </div>
-                      <h2 className="text-3xl md:text-5xl font-black italic tracking-tighter text-gray-900 dark:text-white leading-[1] md:leading-tight">
+                      <h2 className="text-4xl md:text-6xl font-black italic tracking-tighter text-gray-900 dark:text-white leading-tight">
                          Rudraksh Ganguly
-                         <span className="block text-lg md:text-2xl font-normal opacity-40 not-italic tracking-normal mt-1">Full Stack Web Developer</span>
+                         <span className="block text-xl md:text-3xl font-normal opacity-40 not-italic tracking-normal mt-2">Full Stack Web Developer</span>
                       </h2>
+                      <div className="h-1.5 w-24 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full mx-auto mt-4" />
                    </div>
 
-                   <p className="text-sm md:text-base text-gray-700 dark:text-gray-400 font-bold italic leading-relaxed border-l-2 border-blue-500/30 pl-6">
+                   <p className="text-base md:text-xl text-gray-700 dark:text-gray-400 font-bold italic leading-relaxed px-4">
                       "CareCompass was engineered for absolute data clarity. We are building a neural infrastructure of trust to democratize healthcare."
                    </p>
 
-                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                   {/* ─── Social Uplink (Centered) ─── */}
+                   <div className="flex items-center justify-center gap-4 pt-4">
                       {[
-                        { label: "Core Protocol", value: "Liquid Glass" },
-                        { label: "AI Engine", value: "Neural Bio-Link" },
-                        { label: "Environment", value: "Clinical Node" },
-                        { label: "Status", value: "Active Architect" }
-                      ].map((stat, i) => (
-                        <div key={i} className="flex flex-col gap-1 group/stat">
-                           <span className="text-[7px] md:text-[8px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 transition-colors group-hover/stat:text-blue-500">{stat.label}</span>
-                           <span className="text-[10px] md:text-[11px] font-bold text-gray-900 dark:text-gray-200 uppercase italic tracking-tighter">{stat.value}</span>
-                        </div>
-                      ))}
-                   </div>
-
-                   {/* ─── Social Uplink ─── */}
-                   <div className="flex items-center gap-3 pt-4">
-                      {[
-                        { icon: <Github size={18} />, href: "https://github.com/Rudraksh2004", label: "GitHub" },
-                        { icon: <Linkedin size={18} />, href: "https://www.linkedin.com/in/rudraksh-ganguly-411a39328/", label: "LinkedIn" },
+                        { icon: <Github size={20} />, href: "https://github.com/Rudraksh2004", label: "GitHub" },
+                        { icon: <Linkedin size={20} />, href: "https://www.linkedin.com/in/rudraksh-ganguly-411a39328/", label: "LinkedIn" },
                         { icon: (
-                           <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                           <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                               <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
                               <path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z" />
                               <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
@@ -206,7 +196,7 @@ export default function AboutPage() {
                            href={social.href} 
                            target="_blank" 
                            rel="noopener noreferrer" 
-                           className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-white/40 dark:bg-white/[0.05] border border-white dark:border-white/[0.1] text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-500 hover:scale-110 transition-all flex items-center justify-center hover:shadow-xl group/link relative flex-shrink-0"
+                           className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-white/40 dark:bg-white/[0.05] border border-white dark:border-white/[0.1] text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-500 hover:scale-110 transition-all flex items-center justify-center hover:shadow-xl group/link"
                          >
                             {social.icon}
                          </a>
