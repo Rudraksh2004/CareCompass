@@ -167,30 +167,36 @@ body {
   transform: translateY(0);
 }
 
-/* Premium Liquid Glass Effect */
+/* Premium Liquid Glass Effect - High Fidelity */
 .glass-liquid {
   position: relative;
-  backdrop-filter: blur(40px) saturate(220%) contrast(110%);
-  -webkit-backdrop-filter: blur(40px) saturate(220%) contrast(110%);
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(40px) saturate(200%) contrast(100%);
+  -webkit-backdrop-filter: blur(40px) saturate(200%) contrast(100%);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 
+    0 25px 50px -12px rgba(0, 0, 0, 0.15),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.3);
   transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 .dark .glass-liquid {
-  backdrop-filter: blur(50px) saturate(250%) contrast(120%);
-  -webkit-backdrop-filter: blur(50px) saturate(250%) contrast(120%);
+  background: rgba(15, 23, 42, 0.35);
+  backdrop-filter: blur(50px) saturate(250%) contrast(110%);
+  -webkit-backdrop-filter: blur(50px) saturate(250%) contrast(110%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 
+    0 30px 60px -15px rgba(0, 0, 0, 0.5),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05);
 }
 
-/* Glass Grain Effect - Intensified */
-.glass-grain {
-  position: relative;
-}
-
+/* Glass Grain Effect - Optimized */
 .glass-grain::after {
   content: "";
   position: absolute;
   inset: 0;
   z-index: 1;
-  opacity: 0.12; /* More visible grain */
+  opacity: 0.15;
   pointer-events: none;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
   mix-blend-mode: soft-light;

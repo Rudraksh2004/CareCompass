@@ -1,11 +1,46 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { login } from "@/services/authService";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowRight, Lock, Mail, Sparkles, Shield, Eye, EyeOff, Sun, Moon, Activity } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
+
+/* ─── Star Background Component ─── */
+const StarField = ({ isDark }: { isDark: boolean }) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    let animationFrameId: number;
+    let stars: { x: number; y: number; size: number; speed: number; opacity: number; pulse: number }[] = [];
+    const resize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; initStars(); };
+    const initStars = () => {
+      stars = [];
+      const count = isDark ? 150 : 70;
+      for (let i = 0; i < count; i++) {
+        stars.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, size: Math.random() * 2, speed: Math.random() * 0.3 + 0.1, opacity: Math.random() * 0.7 + 0.3, pulse: Math.random() * Math.PI * 2 });
+      }
+    };
+    const draw = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      stars.forEach((star) => {
+        star.pulse += 0.01;
+        const flicker = 0.5 + Math.sin(star.pulse) * 0.5;
+        ctx.fillStyle = isDark ? `rgba(147, 197, 253, ${star.opacity * flicker * 0.6})` : `rgba(59, 130, 246, ${star.opacity * flicker * 0.2})`;
+        ctx.beginPath(); ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2); ctx.fill();
+        star.y -= star.speed; if (star.y < 0) star.y = canvas.height;
+      });
+      animationFrameId = window.requestAnimationFrame(draw);
+    };
+    window.addEventListener("resize", resize); resize(); draw();
+    return () => { window.removeEventListener("resize", resize); window.cancelAnimationFrame(animationFrameId); };
+  }, [isDark]);
+  return <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none" />;
+};
 
 export default function LoginPage() {
   const router = useRouter();
@@ -37,22 +72,27 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center px-6 py-10 relative overflow-hidden bg-gradient-to-br from-white via-blue-50/20 to-indigo-50/10 dark:from-[#020617] dark:via-[#050b18] dark:to-[#020814] text-gray-900 dark:text-gray-100 transition-all duration-700">
 
       {/* ─── Liquid Glass Background Layers ─── */}
-      <div className="absolute inset-0 -z-10">
-        <div className="absolute top-[-20%] right-[-15%] w-[800px] h-[800px] rounded-full bg-blue-500/15 dark:bg-blue-600/20 blur-[130px] animate-float" />
-        <div className="absolute bottom-[-20%] left-[-15%] w-[800px] h-[800px] rounded-full bg-emerald-500/10 dark:bg-emerald-600/15 blur-[120px] animate-float-reverse" />
-        <div className="absolute inset-0 opacity-[0.25] dark:opacity-[0.08]" style={{ backgroundImage: 'radial-gradient(circle, rgba(100,116,139,0.1) 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
+      <div className="absolute inset-0 -z-10 bg-[#f8fafc] dark:bg-[#020617] transition-colors duration-1000">
+        <StarField isDark={isDark} />
+        {/* Dynamic Fluid Mesh */}
+        <div className="absolute inset-0 overflow-hidden opacity-70 dark:opacity-50">
+          <div className="absolute top-[-20%] left-[-10%] w-[100%] h-[100%] rounded-full bg-blue-400/25 dark:bg-blue-600/15 blur-[130px] animate-fluid-mesh" />
+          <div className="absolute bottom-[-20%] right-[-10%] w-[90%] h-[120%] rounded-full bg-emerald-400/20 dark:bg-emerald-600/10 blur-[120px] animate-fluid-mesh [animation-delay:4s]" />
+          <div className="absolute top-[20%] right-[10%] w-[50%] h-[50%] rounded-full bg-indigo-400/15 dark:bg-indigo-600/10 blur-[100px] animate-fluid-mesh [animation-delay:2s]" />
+        </div>
+        <div className="absolute inset-0 opacity-[0.10] dark:opacity-[0.04]" style={{ backgroundImage: 'radial-gradient(circle, rgba(148,163,184,0.3) 1.5px, transparent 1.5px)', backgroundSize: '64px 64px' }} />
       </div>
 
-      {/* Theme Toggle */}
+      {/* Theme Toggle - Restored to standard top-right positioning */}
       {mounted && (
-        <button
-          type="button"
-          onClick={handleToggle}
-          className="absolute top-6 right-6 z-50 w-11 h-11 rounded-2xl border border-white/60 dark:border-white/[0.08] bg-white/40 dark:bg-white/[0.04] backdrop-blur-[40px] flex items-center justify-center hover:scale-110 transition-all duration-500 cursor-pointer shadow-xl glass-grain"
-          aria-label="Toggle theme"
-        >
-          {isDark ? <Moon className="w-[18px] h-[18px] text-blue-400" /> : <Sun className="w-[18px] h-[18px] text-amber-500" />}
-        </button>
+        <div className="fixed top-6 right-6 z-50">
+          <button
+            onClick={handleToggle}
+            className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-[1.2rem] border border-white/60 dark:border-white/[0.08] bg-white/40 dark:bg-white/[0.04] backdrop-blur-[40px] flex items-center justify-center hover:scale-110 transition-all duration-500 cursor-pointer shadow-xl glass-grain glass-liquid glass-refraction"
+          >
+            {isDark ? <Moon className="w-4 h-4 md:w-5 md:h-5 text-blue-400" /> : <Sun className="w-4 h-4 md:w-5 md:h-5 text-amber-500" />}
+          </button>
+        </div>
       )}
 
       <div className="relative w-full max-w-[440px]">
@@ -82,10 +122,7 @@ export default function LoginPage() {
 
           <form
             onSubmit={handleLogin}
-            className="relative bg-white/40 dark:bg-white/[0.02] backdrop-blur-[60px] rounded-[2.5rem] border border-white/60 dark:border-white/[0.08] p-10 transition-all duration-500 glass-grain"
-            style={{
-              boxShadow: "0 40px 100px -20px rgba(0,0,0,0.15)"
-            }}
+            className="relative rounded-[2.5rem] p-10 transition-all duration-500 glass-grain glass-liquid glass-refraction"
           >
             <h2 className="text-xl font-black text-gray-900 dark:text-white text-center mb-1.5 tracking-tighter uppercase italic">
               Welcome Back
