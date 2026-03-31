@@ -288,11 +288,21 @@ export default function DashboardLayout({
                 </p>
                 <div className="flex items-center justify-center md:justify-start gap-3">
                   {[
-                    { icon: <Twitter size={14} />, href: "#" },
-                    { icon: <Linkedin size={14} />, href: "#" },
-                    { icon: <Github size={14} />, href: "#" },
+                    { icon: (
+                      <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932 6.064-6.932zm-1.292 19.494h2.039L6.486 3.24H4.298l13.311 17.407z" />
+                      </svg>
+                    ), href: "https://www.instagram.com/__ninja18__/" },
+                    { icon: <Linkedin size={14} />, href: "https://www.linkedin.com/in/rudraksh-ganguly-411a39328/" },
+                    { icon: <Github size={14} />, href: "https://github.com/Rudraksh2004" },
                   ].map((soc, i) => (
-                    <a key={i} href={soc.href} className="w-9 h-9 rounded-xl bg-white/40 dark:bg-white/[0.05] border border-white/80 dark:border-white/[0.08] flex items-center justify-center text-gray-700 dark:text-gray-400 hover:text-blue-500 transition-all shadow-sm">
+                    <a 
+                      key={i} 
+                      href={soc.href} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="w-9 h-9 rounded-xl bg-white/40 dark:bg-white/[0.05] border border-white/80 dark:border-white/[0.08] flex items-center justify-center text-gray-700 dark:text-gray-400 hover:text-blue-500 transition-all shadow-sm"
+                    >
                       {soc.icon}
                     </a>
                   ))}

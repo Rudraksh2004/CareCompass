@@ -453,12 +453,22 @@ export default function Home() {
               </p>
               <div className="flex items-center gap-4">
                 {[
-                  { icon: <Twitter size={18} />, href: "#" },
-                  { icon: <Linkedin size={18} />, href: "#" },
-                  { icon: <Github size={18} />, href: "#" },
+                  { icon: (
+                    <svg className="w-4 h-4 md:w-5 md:h-5" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932 6.064-6.932zm-1.292 19.494h2.039L6.486 3.24H4.298l13.311 17.407z" />
+                    </svg>
+                  ), href: "https://www.instagram.com/__ninja18__/" },
+                  { icon: <Linkedin size={18} />, href: "https://www.linkedin.com/in/rudraksh-ganguly-411a39328/" },
+                  { icon: <Github size={18} />, href: "https://github.com/Rudraksh2004" },
                 ].map((soc, i) => (
-                  <a key={i} href={soc.href} className="w-9 h-9 md:w-11 md:h-11 rounded-lg md:rounded-[1.2rem] bg-white/40 dark:bg-white/[0.04] border border-white/80 dark:border-white/[0.08] flex items-center justify-center text-gray-600 dark:text-gray-400 hover:text-blue-500 hover:scale-110 transition-all shadow-md">
-                    {soc.icon}
+                  <a 
+                    key={i} 
+                    href={soc.href} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="w-9 h-9 md:w-11 md:h-11 rounded-lg md:rounded-[1.2rem] bg-white/40 dark:bg-white/[0.04] border border-white/80 dark:border-white/[0.08] flex items-center justify-center text-gray-600 dark:text-gray-400 hover:text-blue-500 hover:scale-110 transition-all shadow-md group/soc"
+                  >
+                     <div className="group-hover/soc:scale-110 transition-transform">{soc.icon}</div>
                   </a>
                 ))}
               </div>
