@@ -39,6 +39,7 @@ import {
   Mail,
   Send
 } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
 /* ─── HOOKS ─── */
 const useCountUp = (end: number, duration: number = 2000, start: number = 0, trigger: boolean = true) => {
@@ -127,6 +128,7 @@ const AccordionItem = ({ title, content }: { title: string, content: string }) =
 
 export default function Home() {
   const { theme, toggleTheme, mounted } = useTheme();
+  const { user } = useAuth();
   const isDark = mounted ? theme === "dark" : false;
   const [mobileMenu, setMobileMenu] = useState(false);
   const [statsVisible, setStatsVisible] = useState(false);
@@ -174,8 +176,16 @@ export default function Home() {
             <button onClick={toggleTheme} className="w-9 h-9 md:w-12 md:h-12 rounded-xl md:rounded-[1.2rem] border border-white/80 dark:border-white/[0.1] bg-white/60 dark:bg-white/[0.05] flex items-center justify-center hover:scale-110 transition-all shadow-xl group cursor-pointer">
               {isDark ? <Moon className="w-4 h-4 md:w-5 md:h-5 text-blue-400" /> : <Sun className="w-4 h-4 md:w-5 md:h-5 text-amber-500" />}
             </button>
-            <Link href="/auth/login" className="hidden lg:inline-flex text-[10px] font-black uppercase tracking-widest text-gray-700 dark:text-gray-400 hover:text-blue-500 transition-colors">Login</Link>
-            <Link href="/auth/signup" className="hidden sm:inline-flex bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-6 md:px-8 py-3 md:py-3.5 rounded-xl md:rounded-[1.2rem] font-black uppercase tracking-widest text-[9px] md:text-[10px] shadow-2xl hover:scale-[1.05] btn-liquid transition-all">Get Started</Link>
+            {user ? (
+              <Link href="/dashboard" className="bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-6 md:px-8 py-3 md:py-3.5 rounded-xl md:rounded-[1.2rem] font-black uppercase tracking-widest text-[9px] md:text-[10px] shadow-2xl hover:scale-[1.05] btn-liquid transition-all inline-flex items-center gap-2">
+                Go to Hub <ArrowRight className="w-3 h-3 md:w-4 md:h-4" />
+              </Link>
+            ) : (
+              <>
+                <Link href="/auth/login" className="hidden lg:inline-flex text-[10px] font-black uppercase tracking-widest text-gray-700 dark:text-gray-400 hover:text-blue-500 transition-colors">Login</Link>
+                <Link href="/auth/signup" className="hidden sm:inline-flex bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-6 md:px-8 py-3 md:py-3.5 rounded-xl md:rounded-[1.2rem] font-black uppercase tracking-widest text-[9px] md:text-[10px] shadow-2xl hover:scale-[1.05] btn-liquid transition-all">Get Started</Link>
+              </>
+            )}
             <button onClick={() => setMobileMenu(!mobileMenu)} className="md:hidden w-9 h-9 rounded-xl border border-gray-200 dark:border-white/[0.1] bg-white/40 dark:bg-white/[0.05] flex items-center justify-center transition-all z-[60]">
               {mobileMenu ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
             </button>
@@ -191,8 +201,16 @@ export default function Home() {
               ))}
               <hr className="w-full border-gray-100 dark:border-white/10" />
               <div className="flex flex-col gap-4 w-full">
-                <Link href="/auth/login" className="w-full py-4 rounded-xl md:rounded-2xl border border-gray-200 dark:border-white/10 font-black uppercase tracking-widest text-xs md:text-sm">Login</Link>
-                <Link href="/auth/signup" className="w-full py-4 rounded-xl md:rounded-2xl bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-black uppercase tracking-widest text-xs md:text-sm shadow-xl">Join Protocol</Link>
+                {user ? (
+                  <Link href="/dashboard" onClick={() => setMobileMenu(false)} className="w-full py-4 rounded-xl md:rounded-2xl bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-black uppercase tracking-widest text-xs md:text-sm shadow-xl flex items-center justify-center gap-2">
+                    Open Hub <ArrowRight className="w-4 h-4" />
+                  </Link>
+                ) : (
+                  <>
+                    <Link href="/auth/login" onClick={() => setMobileMenu(false)} className="w-full py-4 rounded-xl md:rounded-2xl border border-gray-200 dark:border-white/10 font-black uppercase tracking-widest text-xs md:text-sm">Login</Link>
+                    <Link href="/auth/signup" onClick={() => setMobileMenu(false)} className="w-full py-4 rounded-xl md:rounded-2xl bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-black uppercase tracking-widest text-xs md:text-sm shadow-xl">Join Protocol</Link>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -213,13 +231,22 @@ export default function Home() {
             The first medical-grade AI engine designed to decode clinical reports, manage pharmacology, and predict health anomalies.
           </p>
           <div className="animate-fade-in-up stagger-3 flex flex-col sm:flex-row justify-center items-center gap-4 md:gap-8">
-            <Link href="/auth/signup" className="w-full sm:w-auto group relative bg-gradient-to-br from-blue-600 to-indigo-700 text-white px-6 md:px-10 py-3.5 md:py-5 rounded-xl md:rounded-[2rem] text-base md:text-xl font-black italic shadow-[0_30px_70px_-15px_rgba(59,130,246,0.6)] hover:scale-105 btn-liquid transition-all flex items-center justify-center gap-4 overflow-hidden">
-              <span className="relative z-10">Initialize Tracker</span>
-              <ArrowRight className="w-5 h-5 md:w-6 md:h-6 group-hover:translate-x-3 transition-transform duration-500" />
-            </Link>
-            <Link href="/auth/login" className="w-full sm:w-auto px-6 md:px-10 py-3.5 md:py-5 rounded-xl md:rounded-[2rem] border-2 border-slate-200 dark:border-white/[0.1] text-base md:text-xl font-black italic hover:bg-white dark:hover:bg-white/[0.05] transition-all text-center">
-              User Login
-            </Link>
+            {user ? (
+              <Link href="/dashboard" className="w-full sm:w-auto group relative bg-gradient-to-br from-blue-600 to-indigo-700 text-white px-6 md:px-10 py-3.5 md:py-5 rounded-xl md:rounded-[2rem] text-base md:text-xl font-black italic shadow-[0_30px_70px_-15px_rgba(59,130,246,0.6)] hover:scale-105 btn-liquid transition-all flex items-center justify-center gap-4 overflow-hidden">
+                <span className="relative z-10">Command Center</span>
+                <ArrowRight className="w-5 h-5 md:w-6 md:h-6 group-hover:translate-x-3 transition-transform duration-500" />
+              </Link>
+            ) : (
+              <>
+                <Link href="/auth/signup" className="w-full sm:w-auto group relative bg-gradient-to-br from-blue-600 to-indigo-700 text-white px-6 md:px-10 py-3.5 md:py-5 rounded-xl md:rounded-[2rem] text-base md:text-xl font-black italic shadow-[0_30px_70px_-15px_rgba(59,130,246,0.6)] hover:scale-105 btn-liquid transition-all flex items-center justify-center gap-4 overflow-hidden">
+                  <span className="relative z-10">Initialize Tracker</span>
+                  <ArrowRight className="w-5 h-5 md:w-6 md:h-6 group-hover:translate-x-3 transition-transform duration-500" />
+                </Link>
+                <Link href="/auth/login" className="w-full sm:w-auto px-6 md:px-10 py-3.5 md:py-5 rounded-xl md:rounded-[2rem] border-2 border-slate-200 dark:border-white/[0.1] text-base md:text-xl font-black italic hover:bg-white dark:hover:bg-white/[0.05] transition-all text-center">
+                  User Login
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </section>

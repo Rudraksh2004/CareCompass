@@ -19,10 +19,12 @@ import {
   Moon
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
 
 export default function AboutPage() {
   const { theme, mounted, toggleTheme } = useTheme();
   const { user } = useAuth();
+  const router = useRouter();
   const isDark = mounted ? theme === "dark" : false;
 
   const hubLink = user ? "/dashboard" : "/";
@@ -36,12 +38,12 @@ export default function AboutPage() {
       <nav className="fixed top-0 w-full z-50 border-b border-white/60 dark:border-white/[0.08] backdrop-blur-[40px] bg-white/40 dark:bg-[#030712]/30 px-4 md:px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4 md:gap-10">
-            <Link href={hubLink} className="flex items-center gap-2 md:gap-3 hover:opacity-80 transition-all">
+            <button onClick={() => router.back()} className="flex items-center gap-2 md:gap-3 hover:opacity-80 transition-all cursor-pointer">
               <div className="p-2 rounded-lg md:rounded-xl bg-blue-500/10 text-blue-600">
                  <ChevronLeft className="w-4 h-4 md:w-5 md:h-5" />
               </div>
               <span className="text-[9px] md:text-[11px] font-black uppercase tracking-[0.2em] md:tracking-[0.4em] italic leading-none">Back</span>
-            </Link>
+            </button>
             <div className="flex items-center gap-3">
                <img src="/logo.png" alt="Logo" className="w-6 h-6 md:w-8 md:h-8" />
                <span className="text-base md:text-lg font-black italic tracking-tighter">CareCompass</span>
