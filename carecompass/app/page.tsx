@@ -101,7 +101,7 @@ const TrustMarquee = () => {
       <div className="flex whitespace-nowrap animate-marquee">
         {[...items, ...items].map((text, i) => (
           <div key={i} className="flex items-center gap-10 md:gap-16 mx-4 md:mx-8">
-            <span className="text-[10px] md:text-sm font-black text-gray-700 dark:text-gray-400 tracking-[0.2em] md:tracking-[0.4em] uppercase whitespace-nowrap">{text}</span>
+            <span className="text-[11px] md:text-sm font-black text-gray-700 dark:text-gray-400 tracking-[0.2em] md:tracking-[0.4em] uppercase whitespace-nowrap">{text}</span>
             <div className="w-1 md:w-1.5 h-1 md:h-1.5 rounded-full bg-blue-500/50 flex-shrink-0" />
           </div>
         ))}
@@ -114,11 +114,11 @@ const AccordionItem = ({ title, content }: { title: string, content: string }) =
     const [open, setOpen] = useState(false);
     return (
         <div className="mb-6 rounded-[2.5rem] border border-white/60 dark:border-white/[0.08] bg-white/40 dark:bg-white/[0.02] backdrop-blur-[60px] glass-grain glass-liquid glass-refraction overflow-hidden transition-all duration-500">
-            <button onClick={() => setOpen(!open)} className="w-full p-8 flex items-center justify-between text-left group">
+            <button onClick={() => setOpen(!open)} className="w-full p-6 md:p-8 flex items-center justify-between text-left group">
                 <span className="text-xl font-black text-gray-900 dark:text-gray-100 uppercase tracking-tighter">{title}</span>
                 <ChevronDown className={`w-6 h-6 text-blue-500 transition-transform duration-500 ${open ? "rotate-180" : ""}`} />
             </button>
-            <div className={`px-10 overflow-hidden transition-all duration-500 ease-in-out ${open ? "pb-10 max-h-96" : "max-h-0"}`}>
+            <div className={`px-6 md:px-10 overflow-hidden transition-all duration-500 ease-in-out ${open ? "pb-8 md:pb-10 max-h-96" : "max-h-0"}`}>
                 <p className="text-lg text-gray-700 dark:text-gray-400 font-bold leading-relaxed">{content}</p>
             </div>
         </div>
@@ -160,10 +160,10 @@ export default function Home() {
       </div>
 
       <header className="fixed top-4 md:top-6 left-4 md:left-6 right-4 md:right-6 mx-auto max-w-7xl border border-white/60 dark:border-white/[0.08] backdrop-blur-[40px] bg-white/40 dark:bg-[#030712]/40 z-50 glass-grain glass-liquid glass-refraction rounded-[1.5rem] md:rounded-[2.5rem] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.2)] transition-all duration-500">
-        <div className="px-6 md:px-10 py-3 md:py-4 flex items-center justify-between gap-4">
+        <div className="px-5 md:px-10 py-2.5 md:py-4 flex items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-3 md:gap-4 group shrink-0">
-            <img src="/logo.png" alt="Logo" className="w-8 h-8 md:w-11 md:h-11 transition-all duration-500 group-hover:scale-110 drop-shadow-[0_0_15px_rgba(59,130,246,0.3)]" />
-            <span className="text-lg md:text-2xl font-black tracking-tighter bg-gradient-to-r from-blue-600 via-indigo-600 to-emerald-500 dark:from-blue-400 dark:via-indigo-400 dark:to-emerald-400 bg-clip-text text-transparent italic leading-none">CareCompass</span>
+            <img src="/logo.png" alt="Logo" className="w-7 h-7 md:w-11 md:h-11 transition-all duration-500 group-hover:scale-110 drop-shadow-[0_0_15px_rgba(59,130,246,0.3)]" />
+            <span className="text-base md:text-2xl font-black tracking-tighter bg-gradient-to-r from-blue-600 via-indigo-600 to-emerald-500 dark:from-blue-400 dark:via-indigo-400 dark:to-emerald-400 bg-clip-text text-transparent italic leading-none">CareCompass</span>
           </Link>
           <nav className="hidden md:flex items-center gap-8 lg:gap-10">
             {["Services", "Network", "Compliance", "Protocol"].map(l => (
@@ -200,24 +200,24 @@ export default function Home() {
       </header>
 
       {/* HERO SECTION */}
-      <section className="relative px-6 pt-32 md:pt-36 pb-20 md:pb-32">
+      <section className="relative px-6 pt-24 md:pt-36 pb-12 md:pb-32">
         <div className="max-w-6xl mx-auto text-center z-10">
           <div className="animate-fade-in-up inline-flex items-center gap-3 mb-8 md:mb-10 px-5 md:px-6 py-2.5 md:py-3 rounded-full bg-white/40 dark:bg-white/[0.04] border border-white/80 dark:border-blue-400/30 text-[8px] md:text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-[0.15em] md:tracking-[0.3em] shadow-2xl glass-grain">
             <Sparkles className="w-3.5 h-3.5 md:w-4 md:h-4 animate-badge-pulse" /> AI HEALTH INTELLIGENCE V3.1
           </div>
-          <h1 className="animate-fade-in-up stagger-1 text-3xl md:text-6xl lg:text-[5.5rem] font-black leading-[1.1] md:leading-[0.9] tracking-tighter mb-8 md:mb-10 text-gray-900 dark:text-white px-2">
+          <h1 className="animate-fade-in-up stagger-1 text-4xl md:text-6xl lg:text-[5.5rem] font-black leading-[1.1] md:leading-[0.9] tracking-tighter mb-6 md:mb-10 text-gray-900 dark:text-white px-2">
             Understand Your <br />
             <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-emerald-500 dark:from-blue-400 dark:via-indigo-400 dark:to-emerald-400 bg-clip-text text-transparent animate-gradient-shift py-2 md:py-4 block">Health Protocol</span>
           </h1>
-          <p className="animate-fade-in-up stagger-2 text-base md:text-2xl text-gray-800 dark:text-gray-400 max-w-4xl mx-auto mb-16 md:mb-20 leading-relaxed md:leading-[1.3] font-bold italic selection:bg-blue-500/20 px-4">
+          <p className="animate-fade-in-up stagger-2 text-sm md:text-2xl text-gray-800 dark:text-gray-400 max-w-4xl mx-auto mb-12 md:mb-20 leading-relaxed md:leading-[1.3] font-bold italic selection:bg-blue-500/20 px-4">
             The first medical-grade AI engine designed to decode clinical reports, manage pharmacology, and predict health anomalies.
           </p>
           <div className="animate-fade-in-up stagger-3 flex flex-col sm:flex-row justify-center items-center gap-4 md:gap-8">
-            <Link href="/auth/signup" className="w-full sm:w-auto group relative bg-gradient-to-br from-blue-600 to-indigo-700 text-white px-8 md:px-10 py-4 md:py-5 rounded-2xl md:rounded-[2rem] text-lg md:text-xl font-black italic shadow-[0_30px_70px_-15px_rgba(59,130,246,0.6)] hover:scale-105 btn-liquid transition-all flex items-center justify-center gap-4 overflow-hidden">
+            <Link href="/auth/signup" className="w-full sm:w-auto group relative bg-gradient-to-br from-blue-600 to-indigo-700 text-white px-6 md:px-10 py-3.5 md:py-5 rounded-xl md:rounded-[2rem] text-base md:text-xl font-black italic shadow-[0_30px_70px_-15px_rgba(59,130,246,0.6)] hover:scale-105 btn-liquid transition-all flex items-center justify-center gap-4 overflow-hidden">
               <span className="relative z-10">Initialize Tracker</span>
               <ArrowRight className="w-5 h-5 md:w-6 md:h-6 group-hover:translate-x-3 transition-transform duration-500" />
             </Link>
-            <Link href="/auth/login" className="w-full sm:w-auto px-8 md:px-10 py-4 md:py-5 rounded-2xl md:rounded-[2rem] border-2 border-slate-200 dark:border-white/[0.1] text-lg md:text-xl font-black italic hover:bg-white dark:hover:bg-white/[0.05] transition-all text-center">
+            <Link href="/auth/login" className="w-full sm:w-auto px-6 md:px-10 py-3.5 md:py-5 rounded-xl md:rounded-[2rem] border-2 border-slate-200 dark:border-white/[0.1] text-base md:text-xl font-black italic hover:bg-white dark:hover:bg-white/[0.05] transition-all text-center">
               User Login
             </Link>
           </div>
@@ -227,8 +227,8 @@ export default function Home() {
       {/* DASHBOARD PREVIEW */}
       <section id="services" className="px-4 md:px-6 pb-24 md:pb-40">
         <div ref={el => { if(el && !revealRefs.current.includes(el)) revealRefs.current.push(el); }} className="reveal max-w-6xl mx-auto perspective-1000">
-          <div className="relative group p-2 md:p-3 rounded-[2rem] md:rounded-[3.5rem] bg-white/[0.4] dark:bg-[#030712]/40 border border-white/60 dark:border-white/[0.08] backdrop-blur-[60px] shadow-[0_60px_150px_-30px_rgba(0,0,0,0.25)] transition-all hover:rotate-x-2 preserve-3d glass-grain glass-liquid glass-refraction">
-             <div className="rounded-[1.8rem] md:rounded-[2.8rem] bg-gray-50 dark:bg-[#0a0f1e] overflow-hidden border border-gray-200/50 dark:border-white/[0.05]">
+          <div className="relative group p-1.5 md:p-3 rounded-[1.5rem] md:rounded-[3.5rem] bg-white/[0.4] dark:bg-[#030712]/40 border border-white/60 dark:border-white/[0.08] backdrop-blur-[60px] shadow-[0_60px_150px_-30px_rgba(0,0,0,0.25)] transition-all hover:rotate-x-2 preserve-3d glass-grain glass-liquid glass-refraction">
+             <div className="rounded-[1.3rem] md:rounded-[2.8rem] bg-gray-50 dark:bg-[#0a0f1e] overflow-hidden border border-gray-200/50 dark:border-white/[0.05]">
                 <div className="flex items-center gap-3 px-6 md:px-8 py-4 md:py-5 border-b border-gray-200 dark:border-white/[0.08] bg-white/50 dark:bg-white/[0.02]">
                     <div className="flex gap-2"><div className="w-3 md:w-3.5 h-3 md:h-3.5 rounded-full bg-[#ff5f56]" /><div className="w-3 md:w-3.5 h-3 md:h-3.5 rounded-full bg-[#ffbd2e]" /><div className="w-3 md:w-3.5 h-3 md:h-3.5 rounded-full bg-[#27c93f]" /></div>
                     <div className="flex-1 text-center pr-10 text-[8px] md:text-[10px] font-black uppercase text-gray-600 tracking-[0.1em] md:tracking-[0.2em] truncate">
@@ -269,8 +269,8 @@ export default function Home() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10">
           {fullFeatures.map((f, i) => (
               <div key={i} ref={el => { if(el && !revealRefs.current.includes(el)) revealRefs.current.push(el); }} className={`reveal stagger-${i + 1} group relative rounded-[2.5rem] md:rounded-[3.5rem] p-[1.5px] transition-all hover:-translate-y-4`}>
-              <div className="absolute inset-0 rounded-[2.5rem] md:rounded-[3.5rem] bg-gradient-to-br from-blue-500/40 to-emerald-500/20 opacity-0 group-hover:opacity-100 transition-opacity" />
-              <div className="relative bg-white/[0.5] dark:bg-[#030712]/40 backdrop-blur-[60px] rounded-[2.4rem] md:rounded-[3.4rem] p-8 md:p-12 h-full border border-white/60 dark:border-white/[0.08] shadow-2xl glass-grain glass-liquid glass-refraction overflow-hidden">
+              <div className="absolute inset-0 rounded-[1.5rem] md:rounded-[3.5rem] bg-gradient-to-br from-blue-500/40 to-emerald-500/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="relative bg-white/[0.5] dark:bg-[#030712]/40 backdrop-blur-[60px] rounded-[1.4rem] md:rounded-[3.4rem] p-6 md:p-12 h-full border border-white/60 dark:border-white/[0.08] shadow-2xl glass-grain glass-liquid glass-refraction overflow-hidden">
                 <div className={`w-16 h-16 md:w-20 md:h-20 rounded-2xl md:rounded-3xl bg-gradient-to-br ${f.gradient} flex items-center justify-center mb-8 md:mb-12 shadow-2xl group-hover:scale-110 transition-all duration-700 text-white`}>
                    <div className="w-8 h-8 md:w-12 md:h-12 flex items-center justify-center">
                     {f.icon}
@@ -298,7 +298,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-20">
             {protocolSteps.map((s, i) => (
               <div key={i} ref={el => { if(el && !revealRefs.current.includes(el)) revealRefs.current.push(el); }} className={`reveal stagger-${i + 1} text-center group`}>
-                <div className="w-[100px] md:w-[140px] h-[100px] md:h-[140px] mx-auto rounded-[2.5rem] md:rounded-[3.5rem] bg-gradient-to-br from-blue-600 to-indigo-900 flex items-center justify-center mb-8 md:mb-12 shadow-2xl group-hover:scale-110 group-hover:rotate-6 transition-all text-white">
+                <div className="w-[80px] md:w-[140px] h-[80px] md:h-[140px] mx-auto rounded-[1.5rem] md:rounded-[3.5rem] bg-gradient-to-br from-blue-600 to-indigo-900 flex items-center justify-center mb-6 md:mb-12 shadow-2xl group-hover:scale-110 group-hover:rotate-6 transition-all text-white">
                    <div className="w-10 h-10 md:w-16 md:h-16 flex items-center justify-center">
                     {s.icon}
                    </div>
@@ -320,7 +320,7 @@ export default function Home() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 md:gap-10">
                     {complianceStats.map((s, i) => (
                         <div key={i} className="p-6 md:p-8 rounded-[1.5rem] md:rounded-[2rem] bg-white dark:bg-white/[0.03] border border-gray-100 dark:border-white/[0.06] shadow-xl">
-                            <div className="text-2xl md:text-3xl font-black text-blue-500 mb-2 md:mb-4 italic uppercase">{s.label}</div>
+                            <div className="text-xl md:text-3xl font-black text-blue-500 mb-1 md:mb-4 italic uppercase">{s.label}</div>
                             <div className="text-[9px] md:text-[10px] font-black text-gray-700 dark:text-gray-400 uppercase tracking-widest">{s.desc}</div>
                         </div>
                     ))}
@@ -328,7 +328,7 @@ export default function Home() {
             </div>
             <div ref={el => { if(el && !revealRefs.current.includes(el)) revealRefs.current.push(el); }} className="reveal stagger-2 relative group">
                 <div className="absolute inset-x-0 inset-y-0 bg-blue-500/10 md:bg-blue-500/20 blur-[100px] md:blur-[150px] rounded-full group-hover:bg-blue-500/30 transition-all duration-1000" />
-                <div className="relative p-2 rounded-[2.5rem] md:rounded-[4rem] bg-white/20 dark:bg-white/[0.02] border border-white/60 dark:border-white/[0.08] backdrop-blur-[80px] overflow-hidden glass-grain glass-liquid glass-refraction shadow-2xl">
+                <div className="relative p-1.5 rounded-[1.5rem] md:rounded-[4rem] bg-white/20 dark:bg-white/[0.02] border border-white/60 dark:border-white/[0.08] backdrop-blur-[80px] overflow-hidden glass-grain glass-liquid glass-refraction shadow-2xl">
                     <div className="p-8 md:p-16 space-y-10 md:space-y-12">
                         {[
                           { icon: <Lock className="w-6 h-6 md:w-8 md:h-8" />, label: "AES-256 Encryption", desc: "Military-grade data transit", color: "emerald" },
@@ -378,10 +378,10 @@ export default function Home() {
       <section className="px-4 md:px-6 py-24 md:py-40">
         <div ref={el => { if(el && !revealRefs.current.includes(el)) revealRefs.current.push(el); }} className="reveal relative max-w-7xl mx-auto overflow-hidden rounded-[2.5rem] md:rounded-[4.5rem] border border-white/20 dark:border-white/[0.1] shadow-[0_100px_180px_-40px_rgba(0,0,0,0.3)] glass-grain glass-liquid glass-refraction bg-blue-600">
             <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-indigo-600 to-emerald-500 animate-gradient-shift opacity-90" /><div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.2),transparent_70%)]" />
-            <div className="relative z-10 p-12 md:p-32 text-center flex flex-col items-center">
+            <div className="relative z-10 p-10 md:p-32 text-center flex flex-col items-center">
                 <h2 className="text-3xl md:text-[5.5rem] font-black mb-8 md:mb-14 text-white leading-[1.1] md:leading-[0.9] tracking-tighter uppercase italic">Secure Your <br />Health Node</h2>
                 <p className="text-white/80 text-base md:text-2xl mb-12 md:mb-20 max-w-4xl mx-auto leading-relaxed font-bold italic selection:bg-white/20">The future of clinical intelligence is sovereign. Join the 400+ health architects already decoding their timeline with CareCompass.</p>
-                <Link href="/auth/signup" className="group bg-white text-gray-900 px-8 md:px-12 py-4 md:py-6 rounded-xl md:rounded-[2rem] text-lg md:text-2xl font-black uppercase tracking-tighter shadow-2xl hover:scale-110 active:scale-95 transition-all">Initialize Now</Link>
+                <Link href="/auth/signup" className="group bg-white text-gray-900 px-6 md:px-12 py-3.5 md:py-6 rounded-xl md:rounded-[2rem] text-base md:text-2xl font-black uppercase tracking-tighter shadow-2xl hover:scale-110 active:scale-95 transition-all">Initialize Now</Link>
             </div>
         </div>
       </section>
@@ -394,7 +394,7 @@ export default function Home() {
 
         <div className="max-w-7xl mx-auto px-6 md:px-12 pt-16 md:pt-24 pb-12">
           {/* ─── NEURAL UPLINK (Sub-footer CTA) ─── */}
-          <div className="mb-16 md:mb-24 p-8 md:p-12 rounded-[2.5rem] md:rounded-[3.5rem] bg-white/30 dark:bg-white/[0.02] border border-white/30 dark:border-white/[0.08] backdrop-blur-[80px] flex flex-col lg:flex-row items-center justify-between gap-8 md:gap-12 group transition-all duration-700 hover:border-blue-500/30 shadow-2xl glass-grain glass-liquid glass-refraction">
+          <div className="mb-10 md:mb-24 p-6 md:p-12 rounded-[1.5rem] md:rounded-[3.5rem] bg-white/30 dark:bg-white/[0.02] border border-white/30 dark:border-white/[0.08] backdrop-blur-[80px] flex flex-col lg:flex-row items-center justify-between gap-8 md:gap-12 group transition-all duration-700 hover:border-blue-500/30 shadow-2xl glass-grain glass-liquid glass-refraction">
             <div className="max-w-xl text-center lg:text-left">
               <h3 className="text-2xl md:text-3xl font-black tracking-tighter uppercase italic mb-3">Neural <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">Uplink</span></h3>
               <p className="text-gray-800 dark:text-gray-400 font-bold uppercase tracking-[0.2em] md:tracking-[0.4em] text-[9px] md:text-[10px] leading-relaxed">
@@ -405,9 +405,9 @@ export default function Home() {
               <input 
                 type="email" 
                 placeholder="SECURE EMAIL ADDRESS..." 
-                className="w-full bg-white/40 dark:bg-white/[0.03] border border-white/80 dark:border-white/[0.1] rounded-xl md:rounded-2xl px-6 md:px-8 py-4 md:py-5 text-[9px] md:text-[10px] font-black tracking-widest uppercase focus:outline-none focus:ring-4 focus:ring-blue-500/20 transition-all placeholder-gray-500/60 dark:placeholder-gray-400/50 text-gray-900 dark:text-white"
+                className="w-full bg-white/40 dark:bg-white/[0.03] border border-white/80 dark:border-white/[0.1] rounded-xl md:rounded-2xl px-5 md:px-8 py-3.5 md:py-5 text-[9px] md:text-[10px] font-black tracking-widest uppercase focus:outline-none focus:ring-4 focus:ring-blue-500/20 transition-all placeholder-gray-500/60 dark:placeholder-gray-400/50 text-gray-900 dark:text-white"
               />
-              <button className="absolute right-2 top-2 bottom-2 px-6 md:px-8 rounded-lg md:rounded-xl bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center transition-all shadow-lg active:scale-95">
+              <button className="absolute right-1.5 top-1.5 bottom-1.5 px-5 md:px-8 rounded-lg md:rounded-xl bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center transition-all shadow-lg active:scale-95">
                 <Send className="w-4 h-4 transition-transform group-hover/input:translate-x-1" />
               </button>
             </div>
@@ -430,7 +430,7 @@ export default function Home() {
                   { icon: <Linkedin size={18} />, href: "#" },
                   { icon: <Github size={18} />, href: "#" },
                 ].map((soc, i) => (
-                  <a key={i} href={soc.href} className="w-10 h-10 md:w-11 md:h-11 rounded-lg md:rounded-[1.2rem] bg-white/40 dark:bg-white/[0.04] border border-white/80 dark:border-white/[0.08] flex items-center justify-center text-gray-600 dark:text-gray-400 hover:text-blue-500 hover:scale-110 transition-all shadow-md">
+                  <a key={i} href={soc.href} className="w-9 h-9 md:w-11 md:h-11 rounded-lg md:rounded-[1.2rem] bg-white/40 dark:bg-white/[0.04] border border-white/80 dark:border-white/[0.08] flex items-center justify-center text-gray-600 dark:text-gray-400 hover:text-blue-500 hover:scale-110 transition-all shadow-md">
                     {soc.icon}
                   </a>
                 ))}
