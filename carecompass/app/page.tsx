@@ -205,7 +205,7 @@ export default function Home() {
             <span className={`${scrolled ? "text-sm md:text-xl" : "text-base md:text-2xl"} font-black tracking-tighter bg-gradient-to-r from-blue-600 via-indigo-600 to-emerald-500 dark:from-blue-400 dark:via-indigo-400 dark:to-emerald-400 bg-clip-text text-transparent italic leading-none transition-all duration-500`}>CareCompass</span>
           </Link>
           <nav className="hidden md:flex items-center gap-8 lg:gap-10">
-            {["Services", "FAQ", "Compliance", "Protocol"].map(l => (
+            {["Services", "Protocol", "Compliance", "FAQ"].map(l => (
               <a key={l} href={`#${l.toLowerCase()}`} className={`${scrolled ? "text-[9px]" : "text-[10px]"} font-black uppercase tracking-[0.3em] text-gray-700 dark:text-gray-400 hover:text-blue-500 transition-all duration-500`}>{l}</a>
             ))}
           </nav>
@@ -234,7 +234,7 @@ export default function Home() {
           <div className="md:hidden absolute top-[115%] left-2 right-2 p-1 rounded-[2.5rem] overflow-hidden border border-white/40 dark:border-white/[0.08] backdrop-blur-[100px] bg-white/90 dark:bg-[#030712]/90 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.5)] animate-in zoom-in-95 fade-in duration-500 z-50">
             <div className="glass-grain p-8 space-y-8">
               <div className="flex flex-col gap-6 items-center text-center">
-                {["Services", "FAQ", "Compliance", "Protocol"].map(l => (
+                {["Services", "Protocol", "Compliance", "FAQ"].map(l => (
                     <a key={l} href={`#${l.toLowerCase()}`} onClick={() => setMobileMenu(false)} className="text-2xl font-black uppercase tracking-tighter text-gray-900 dark:text-white hover:text-blue-500 transition-all italic leading-tight active:scale-95">{l}</a>
                 ))}
                 <div className="w-full h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-white/10 to-transparent" />
