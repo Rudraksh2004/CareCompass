@@ -291,7 +291,7 @@ export default function Home() {
       </section>
 
       {/* DASHBOARD PREVIEW */}
-      <section id="services" className="px-4 md:px-6 pb-24 md:pb-40">
+      <section className="px-4 md:px-6 pb-24 md:pb-40">
         <div ref={el => { if(el && !revealRefs.current.includes(el)) revealRefs.current.push(el); }} className="reveal max-w-6xl mx-auto perspective-1000">
           <div className="relative group p-1.5 md:p-3 rounded-[1.5rem] md:rounded-[3.5rem] bg-white/[0.4] dark:bg-[#030712]/40 border border-white/60 dark:border-white/[0.08] backdrop-blur-[60px] shadow-[0_60px_150px_-30px_rgba(0,0,0,0.25)] transition-all hover:rotate-x-2 preserve-3d glass-grain glass-liquid glass-refraction">
              <div className="rounded-[1.3rem] md:rounded-[2.8rem] bg-gray-50 dark:bg-[#0a0f1e] overflow-hidden border border-gray-200/50 dark:border-white/[0.05]">
@@ -325,7 +325,7 @@ export default function Home() {
       <TrustMarquee />
 
       {/* CORE FEATURES SECTION (Detailed) */}
-      <section className="px-6 py-24 md:py-40 max-w-7xl mx-auto">
+      <section id="services" className="px-6 py-24 md:py-40 max-w-7xl mx-auto">
         <div ref={el => { if(el && !revealRefs.current.includes(el)) revealRefs.current.push(el); }} className="reveal text-center mb-16 md:mb-32">
           <span className="inline-flex items-center gap-3 mb-6 md:mb-8 px-5 md:px-6 py-2 md:py-2.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[8px] md:text-[10px] font-black text-emerald-600 uppercase tracking-[0.2em] md:tracking-[0.4em]">INTELLIGENCE MODULES</span>
           <h2 className="text-3xl md:text-6xl font-black mb-6 md:mb-10 tracking-tighter leading-tight md:leading-[1.1]">Clinical-Grade <br /><span className="bg-gradient-to-r from-blue-600 to-emerald-500 bg-clip-text text-transparent italic">AI Engines</span></h2>
