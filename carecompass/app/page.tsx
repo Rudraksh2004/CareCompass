@@ -291,7 +291,7 @@ export default function Home() {
       </section>
 
       {/* DASHBOARD PREVIEW */}
-      <section className="px-4 md:px-6 pb-24 md:pb-40">
+      <section id="network" className="px-4 md:px-6 pb-24 md:pb-40">
         <div ref={el => { if(el && !revealRefs.current.includes(el)) revealRefs.current.push(el); }} className="reveal max-w-6xl mx-auto perspective-1000">
           <div className="relative group p-1.5 md:p-3 rounded-[1.5rem] md:rounded-[3.5rem] bg-white/[0.4] dark:bg-[#030712]/40 border border-white/60 dark:border-white/[0.08] backdrop-blur-[60px] shadow-[0_60px_150px_-30px_rgba(0,0,0,0.25)] transition-all hover:rotate-x-2 preserve-3d glass-grain glass-liquid glass-refraction">
              <div className="rounded-[1.3rem] md:rounded-[2.8rem] bg-gray-50 dark:bg-[#0a0f1e] overflow-hidden border border-gray-200/50 dark:border-white/[0.05]">
