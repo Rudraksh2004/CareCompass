@@ -132,16 +132,27 @@ export default function Home() {
   const isDark = mounted ? theme === "dark" : false;
   const [mobileMenu, setMobileMenu] = useState(false);
   const [statsVisible, setStatsVisible] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const statsRef = useRef<HTMLDivElement>(null);
   const revealRefs = useRef<HTMLDivElement[]>([]);
 
   useEffect(() => {
     if (!mounted) return;
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50);
+    };
+    window.addEventListener("scroll", handleScroll);
+    
     const observer = new IntersectionObserver((es) => { es.forEach((e) => { if (e.isIntersecting) e.target.classList.add("visible"); }); }, { threshold: 0.1 });
     revealRefs.current.forEach((r) => r && observer.observe(r));
     const statsObs = new IntersectionObserver(([e]) => { if (e.isIntersecting) setStatsVisible(true); }, { threshold: 0.3 });
     if (statsRef.current) statsObs.observe(statsRef.current);
-    return () => { observer.disconnect(); statsObs.disconnect(); };
+    
+    return () => { 
+      window.removeEventListener("scroll", handleScroll);
+      observer.disconnect(); 
+      statsObs.disconnect(); 
+    };
   }, [mounted]);
 
   if (!mounted) return null;
@@ -161,15 +172,15 @@ export default function Home() {
         <div className="absolute inset-0 opacity-[0.10] dark:opacity-[0.04]" style={{ backgroundImage: 'radial-gradient(circle, rgba(148,163,184,0.3) 1.5px, transparent 1.5px)', backgroundSize: '64px 64px' }} />
       </div>
 
-      <header className="fixed top-4 md:top-6 left-4 md:left-6 right-4 md:right-6 mx-auto max-w-7xl border border-white/60 dark:border-white/[0.08] backdrop-blur-[40px] bg-white/40 dark:bg-[#030712]/40 z-50 glass-grain glass-liquid glass-refraction rounded-[1.5rem] md:rounded-[2.5rem] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.2)] transition-all duration-500">
-        <div className="px-5 md:px-10 py-2.5 md:py-4 flex items-center justify-between gap-4">
+      <header className={`fixed ${scrolled ? "top-2 md:top-4 max-w-6xl shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] md:rounded-[2rem]" : "top-4 md:top-6 max-w-7xl shadow-2xl md:rounded-[2.5rem]"} left-4 md:left-6 right-4 md:right-6 mx-auto border border-white/60 dark:border-white/[0.08] backdrop-blur-[40px] bg-white/50 dark:bg-[#030712]/50 z-50 glass-grain glass-liquid glass-refraction rounded-[1.5rem] transition-all duration-700 ease-out`}>
+        <div className={`px-5 md:px-10 ${scrolled ? "py-1.5 md:py-3" : "py-2.5 md:py-4"} flex items-center justify-between gap-4 transition-all duration-700`}>
           <Link href="/" className="flex items-center gap-3 md:gap-4 group shrink-0">
-            <img src="/logo.png" alt="Logo" className="w-7 h-7 md:w-11 md:h-11 transition-all duration-500 group-hover:scale-110 drop-shadow-[0_0_15px_rgba(59,130,246,0.3)]" />
-            <span className="text-base md:text-2xl font-black tracking-tighter bg-gradient-to-r from-blue-600 via-indigo-600 to-emerald-500 dark:from-blue-400 dark:via-indigo-400 dark:to-emerald-400 bg-clip-text text-transparent italic leading-none">CareCompass</span>
+            <img src="/logo.png" alt="Logo" className={`${scrolled ? "w-6 h-6 md:w-8 md:h-8" : "w-7 h-7 md:w-11 md:h-11"} transition-all duration-500 group-hover:scale-110 drop-shadow-[0_0_15px_rgba(59,130,246,0.3)]`} />
+            <span className={`${scrolled ? "text-sm md:text-xl" : "text-base md:text-2xl"} font-black tracking-tighter bg-gradient-to-r from-blue-600 via-indigo-600 to-emerald-500 dark:from-blue-400 dark:via-indigo-400 dark:to-emerald-400 bg-clip-text text-transparent italic leading-none transition-all duration-500`}>CareCompass</span>
           </Link>
           <nav className="hidden md:flex items-center gap-8 lg:gap-10">
             {["Services", "Network", "Compliance", "Protocol"].map(l => (
-              <a key={l} href={`#${l.toLowerCase()}`} className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-700 dark:text-gray-400 hover:text-blue-500 transition-all">{l}</a>
+              <a key={l} href={`#${l.toLowerCase()}`} className={`${scrolled ? "text-[9px]" : "text-[10px]"} font-black uppercase tracking-[0.3em] text-gray-700 dark:text-gray-400 hover:text-blue-500 transition-all duration-500`}>{l}</a>
             ))}
           </nav>
           <div className="flex items-center gap-2 md:gap-5">
@@ -177,13 +188,13 @@ export default function Home() {
               {isDark ? <Moon className="w-4 h-4 md:w-5 md:h-5 text-blue-400" /> : <Sun className="w-4 h-4 md:w-5 md:h-5 text-amber-500" />}
             </button>
             {user ? (
-              <Link href="/dashboard" className="bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-6 md:px-8 py-3 md:py-3.5 rounded-xl md:rounded-[1.2rem] font-black uppercase tracking-widest text-[9px] md:text-[10px] shadow-2xl hover:scale-[1.05] btn-liquid transition-all inline-flex items-center gap-2">
+              <Link href="/dashboard" className={`${scrolled ? "px-4 md:px-6 py-2 md:py-2.5" : "px-6 md:px-8 py-3 md:py-3.5"} bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl md:rounded-[1.2rem] font-black uppercase tracking-widest text-[9px] md:text-[10px] shadow-2xl hover:scale-[1.05] btn-liquid transition-all inline-flex items-center gap-2`}>
                 Go to Hub <ArrowRight className="w-3 h-3 md:w-4 md:h-4" />
               </Link>
             ) : (
               <>
                 <Link href="/auth/login" className="hidden lg:inline-flex text-[10px] font-black uppercase tracking-widest text-gray-700 dark:text-gray-400 hover:text-blue-500 transition-colors">Login</Link>
-                <Link href="/auth/signup" className="hidden sm:inline-flex bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-6 md:px-8 py-3 md:py-3.5 rounded-xl md:rounded-[1.2rem] font-black uppercase tracking-widest text-[9px] md:text-[10px] shadow-2xl hover:scale-[1.05] btn-liquid transition-all">Get Started</Link>
+                <Link href="/auth/signup" className={`${scrolled ? "px-4 md:px-6 py-2 md:py-2.5" : "px-6 md:px-8 py-3 md:py-3.5"} hidden sm:inline-flex bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl md:rounded-[1.2rem] font-black uppercase tracking-widest text-[9px] md:text-[10px] shadow-2xl hover:scale-[1.05] btn-liquid transition-all`}>Get Started</Link>
               </>
             )}
             <button onClick={() => setMobileMenu(!mobileMenu)} className="md:hidden w-9 h-9 rounded-xl border border-gray-200 dark:border-white/[0.1] bg-white/40 dark:bg-white/[0.05] flex items-center justify-center transition-all z-[60]">
