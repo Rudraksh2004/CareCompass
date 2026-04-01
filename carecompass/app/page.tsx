@@ -135,19 +135,17 @@ export default function Home() {
   const [scrolled, setScrolled] = useState(false);
   const [visible, setVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const statsRef = useRef<HTMLDivElement>(null);
   const revealRefs = useRef<HTMLDivElement[]>([]);
 
   useEffect(() => {
     if (!mounted) return;
     
-    // Header Visibility & Scrolled Logic
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
       setScrolled(currentScrollY > 50);
-      
-      // Hide on scroll down, show on scroll up
-      if (currentScrollY > lastScrollY && currentScrollY > 150) {
+      if (currentScrollY > lastScrollY && currentScrollY > 200) {
         setVisible(false);
       } else {
         setVisible(true);
@@ -155,25 +153,23 @@ export default function Home() {
       setLastScrollY(currentScrollY);
     };
 
+    const handleMouseMove = (e: MouseEvent) => {
+      const x = (e.clientX - window.innerWidth / 2) / (window.innerWidth / 2);
+      const y = (e.clientY - window.innerHeight / 2) / (window.innerHeight / 2);
+      setMousePos({ x, y });
+    };
+
     window.addEventListener("scroll", handleScroll);
+    window.addEventListener("mousemove", handleMouseMove);
     
-    // Intersection Observers for Reveal & Stats
-    const observer = new IntersectionObserver((es) => { 
-      es.forEach((e) => { 
-        if (e.isIntersecting) e.target.classList.add("visible"); 
-      }); 
-    }, { threshold: 0.1 });
-    
+    const observer = new IntersectionObserver((es) => { es.forEach((e) => { if (e.isIntersecting) e.target.classList.add("visible"); }); }, { threshold: 0.1 });
     revealRefs.current.forEach((r) => r && observer.observe(r));
-    
-    const statsObs = new IntersectionObserver(([e]) => { 
-      if (e.isIntersecting) setStatsVisible(true); 
-    }, { threshold: 0.3 });
-    
+    const statsObs = new IntersectionObserver(([e]) => { if (e.isIntersecting) setStatsVisible(true); }, { threshold: 0.3 });
     if (statsRef.current) statsObs.observe(statsRef.current);
     
     return () => { 
       window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("mousemove", handleMouseMove);
       observer.disconnect(); 
       statsObs.disconnect(); 
     };
@@ -196,7 +192,13 @@ export default function Home() {
         <div className="absolute inset-0 opacity-[0.10] dark:opacity-[0.04]" style={{ backgroundImage: 'radial-gradient(circle, rgba(148,163,184,0.3) 1.5px, transparent 1.5px)', backgroundSize: '64px 64px' }} />
       </div>
 
-      <header className={`fixed ${visible ? "translate-y-0 opacity-100" : "-translate-y-[120%] opacity-0"} ${scrolled ? "top-2 md:top-4 max-w-[95%] md:max-w-6xl shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] md:rounded-[2rem]" : "top-4 md:top-6 max-w-[95%] md:max-w-7xl shadow-2xl md:rounded-[2.5rem]"} left-0 right-0 mx-auto border border-white/60 dark:border-white/[0.08] backdrop-blur-[40px] bg-white/50 dark:bg-[#030712]/50 z-50 glass-grain glass-liquid glass-refraction rounded-[1.5rem] transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)]`}>
+      <header 
+        style={{ 
+          transform: `translate(${mousePos.x * 12}px, ${mousePos.y * 6}px) ${visible ? 'translateY(0)' : 'translateY(-150%)'}`,
+          transition: 'transform 0.4s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.4s ease, max-width 0.7s ease, top 0.7s ease'
+        }}
+        className={`fixed ${visible ? "opacity-100" : "opacity-0"} ${scrolled ? "top-3 md:top-6 max-w-[90%] md:max-w-5xl shadow-[0_30px_70px_-15px_rgba(0,0,0,0.4)] md:rounded-[3rem]" : "top-6 md:top-10 max-w-[95%] md:max-w-7xl shadow-2xl md:rounded-[3.5rem]"} left-0 right-0 mx-auto border border-white/60 dark:border-white/[0.08] backdrop-blur-[40px] bg-white/50 dark:bg-[#030712]/50 z-50 glass-grain glass-liquid glass-refraction rounded-[2rem]`}
+      >
         <div className={`px-5 md:px-10 ${scrolled ? "py-1.5 md:py-3" : "py-2.5 md:py-4"} flex items-center justify-between gap-4 transition-all duration-700`}>
           <Link href="/" className="flex items-center gap-3 md:gap-4 group shrink-0">
             <img src="/logo.png" alt="Logo" className={`${scrolled ? "w-6 h-6 md:w-8 md:h-8" : "w-7 h-7 md:w-11 md:h-11"} transition-all duration-500 group-hover:scale-110 drop-shadow-[0_0_15px_rgba(59,130,246,0.3)]`} />
