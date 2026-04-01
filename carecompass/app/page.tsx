@@ -205,7 +205,7 @@ export default function Home() {
             <span className={`${scrolled ? "text-sm md:text-xl" : "text-base md:text-2xl"} font-black tracking-tighter bg-gradient-to-r from-blue-600 via-indigo-600 to-emerald-500 dark:from-blue-400 dark:via-indigo-400 dark:to-emerald-400 bg-clip-text text-transparent italic leading-none transition-all duration-500`}>CareCompass</span>
           </Link>
           <nav className="hidden md:flex items-center gap-8 lg:gap-10">
-            {["Services", "Network", "Compliance", "Protocol"].map(l => (
+            {["Services", "FAQ", "Compliance", "Protocol"].map(l => (
               <a key={l} href={`#${l.toLowerCase()}`} className={`${scrolled ? "text-[9px]" : "text-[10px]"} font-black uppercase tracking-[0.3em] text-gray-700 dark:text-gray-400 hover:text-blue-500 transition-all duration-500`}>{l}</a>
             ))}
           </nav>
@@ -234,7 +234,7 @@ export default function Home() {
           <div className="md:hidden absolute top-[115%] left-2 right-2 p-1 rounded-[2.5rem] overflow-hidden border border-white/40 dark:border-white/[0.08] backdrop-blur-[100px] bg-white/90 dark:bg-[#030712]/90 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.5)] animate-in zoom-in-95 fade-in duration-500 z-50">
             <div className="glass-grain p-8 space-y-8">
               <div className="flex flex-col gap-6 items-center text-center">
-                {["Services", "Network", "Compliance", "Protocol"].map(l => (
+                {["Services", "FAQ", "Compliance", "Protocol"].map(l => (
                     <a key={l} href={`#${l.toLowerCase()}`} onClick={() => setMobileMenu(false)} className="text-2xl font-black uppercase tracking-tighter text-gray-900 dark:text-white hover:text-blue-500 transition-all italic leading-tight active:scale-95">{l}</a>
                 ))}
                 <div className="w-full h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-white/10 to-transparent" />
@@ -291,7 +291,7 @@ export default function Home() {
       </section>
 
       {/* DASHBOARD PREVIEW */}
-      <section id="network" className="px-4 md:px-6 pb-24 md:pb-40">
+      <section className="px-4 md:px-6 pb-24 md:pb-40">
         <div ref={el => { if(el && !revealRefs.current.includes(el)) revealRefs.current.push(el); }} className="reveal max-w-6xl mx-auto perspective-1000">
           <div className="relative group p-1.5 md:p-3 rounded-[1.5rem] md:rounded-[3.5rem] bg-white/[0.4] dark:bg-[#030712]/40 border border-white/60 dark:border-white/[0.08] backdrop-blur-[60px] shadow-[0_60px_150px_-30px_rgba(0,0,0,0.25)] transition-all hover:rotate-x-2 preserve-3d glass-grain glass-liquid glass-refraction">
              <div className="rounded-[1.3rem] md:rounded-[2.8rem] bg-gray-50 dark:bg-[#0a0f1e] overflow-hidden border border-gray-200/50 dark:border-white/[0.05]">
@@ -416,7 +416,7 @@ export default function Home() {
       </section>
 
       {/* FAQ SECTION */}
-      <section className="py-24 md:py-40 px-6 bg-white/10 dark:bg-white/[0.01] glass-grain glass-liquid">
+      <section id="faq" className="py-24 md:py-40 px-6 bg-white/10 dark:bg-white/[0.01] glass-grain glass-liquid">
         <div className="max-w-4xl mx-auto">
             <div ref={el => { if(el && !revealRefs.current.includes(el)) revealRefs.current.push(el); }} className="reveal text-center mb-16 md:mb-24">
                 <span className="text-[9px] md:text-[10px] font-black text-blue-500 tracking-[0.4em] mb-4 block uppercase leading-none">Common Inquiries</span>
