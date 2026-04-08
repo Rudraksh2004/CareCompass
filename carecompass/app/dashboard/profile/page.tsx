@@ -42,9 +42,9 @@ interface InputProps {
 
 function BioInput({ label, value, setValue, icon, placeholder, type = "text" }: InputProps) {
   return (
-    <div className="space-y-3 group/field">
-      <label className="text-sm font-black text-gray-950 dark:text-gray-300 flex items-center gap-2 transition-colors group-focus-within/field:text-indigo-500">
-        <span className="shrink-0">{icon}</span> {label}
+    <div className="space-y-4 group/field">
+      <label className="text-[10px] font-black uppercase tracking-[0.5em] text-text-muted ml-2 flex items-center gap-3 transition-colors group-focus-within/field:text-accent-primary italic">
+        <span className="shrink-0 scale-125">{icon}</span> {label}
       </label>
       <div className="relative group/input">
         <input
@@ -52,9 +52,9 @@ function BioInput({ label, value, setValue, icon, placeholder, type = "text" }: 
           value={value}
           onChange={(e) => setValue(e.target.value)}
           placeholder={placeholder}
-          className="w-full border border-white/60 dark:border-white/[0.1] bg-white/40 dark:bg-black/20 backdrop-blur-md px-5 py-4 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/20 transition text-base font-bold text-gray-950 dark:text-gray-100 shadow-inner placeholder-gray-400/50"
+          className="input-void px-6 py-5 italic text-sm"
         />
-        <div className="absolute inset-0 rounded-2xl ring-1 ring-white/20 pointer-events-none" />
+        <div className="absolute right-6 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-accent-primary opacity-0 group-focus-within/input:opacity-100 transition-opacity blur-[2px]" />
       </div>
     </div>
   );
@@ -214,35 +214,48 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto space-y-12 text-gray-900 dark:text-gray-100 animate-in fade-in slide-in-from-bottom-4 duration-1000 pb-12 px-4">
-      
-      {/* 🌟 Premium Clinical Header */}
-      <div className="relative overflow-hidden rounded-[3.5rem] border border-white/80 border-t-white border-l-white/90 dark:border-white/[0.05] dark:border-t-white/[0.15] dark:border-l-white/[0.1] bg-white/[0.5] dark:bg-[#030712]/30 backdrop-blur-[40px] p-10 lg:p-14 shadow-2xl transition-all duration-700">
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-600/10 via-blue-600/5 to-emerald-600/10 pointer-events-none" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(99,102,241,0.15),_transparent_40%)]" />
-        
+    <div className="max-w-6xl mx-auto space-y-12 pb-20 px-4">
+      {/* 🔮 LUMINA PROFILE HEADER */}
+      <div className="relative group overflow-hidden rounded-[2.5rem] border border-ghost-border bg-surface-container-low/40 backdrop-blur-[60px] p-8 md:p-14 transition-all duration-700 hover:shadow-2xl">
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-accent-primary/5 blur-[150px] -mr-80 -mt-80 transition-all group-hover:bg-accent-primary/10" />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-accent-emerald/5 blur-[120px] -ml-40 -mb-40" />
+
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-12">
           <div className="space-y-6 flex-1">
-            <h1 className="text-4xl lg:text-7xl font-black bg-gradient-to-r from-indigo-600 via-blue-600 to-emerald-500 dark:from-indigo-400 dark:via-blue-400 dark:to-emerald-400 bg-clip-text text-transparent italic leading-[0.9] tracking-tighter">
-              Bio-Metric <br /> <span className="not-italic text-gray-900 dark:text-white opacity-90">Protocol Hub</span>
-            </h1>
-            <p className="text-gray-950 dark:text-gray-400 font-bold text-lg max-w-2xl leading-relaxed">
-               Calibrate your foundational biometric signatures for hyper-accurate AI synthesis.
+            <div className="flex items-center gap-4">
+               <div className="p-3 rounded-2xl bg-accent-primary/10 text-accent-primary shadow-inner">
+                  <User className="w-8 h-8 md:w-10 md:h-10" strokeWidth={2.5} />
+               </div>
+               <div className="flex flex-col">
+                  <h1 className="text-4xl md:text-6xl font-black tracking-tighter text-text-primary italic">
+                    Bio-Metric <span className="bg-gradient-to-r from-accent-primary via-accent-secondary to-accent-emerald bg-clip-text text-transparent">Nexus</span>
+                  </h1>
+                  <div className="flex items-center gap-2 mt-1">
+                     <div className="w-2 h-2 rounded-full bg-accent-emerald animate-vital-pulse" />
+                     <span className="text-[10px] font-black uppercase tracking-[0.4em] text-text-muted">Clinical Profile Calibrated</span>
+                  </div>
+               </div>
+            </div>
+            <p className="text-text-secondary font-bold text-lg md:text-xl max-w-2xl leading-relaxed italic">
+               Calibrate your foundational biometric signatures for hyper-accurate AI synthesis and epidemiological alignment.
             </p>
-            <div className="flex items-center gap-4 px-6 py-3 rounded-2xl bg-white/40 dark:bg-black/20 border border-white/40 dark:border-white/5 backdrop-blur-md w-fit">
-              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-600 dark:text-gray-400 opacity-70">Authenticated: {user?.email}</span>
+            <div className="chip-vital bg-surface-container-high/40 border-ghost-border py-4 px-6 rounded-2xl">
+               <div className="w-2 h-2 rounded-full bg-accent-emerald animate-vital-pulse" />
+               <span className="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted">Authenticated: {user?.email}</span>
             </div>
           </div>
-          <div className="shrink-0 relative group perspective-1000">
-             <div className="absolute -inset-10 bg-indigo-500/20 blur-[60px] rounded-full opacity-50 group-hover:opacity-100 transition-opacity duration-1000" />
+
+          <div className="relative group perspective-1000 shrink-0">
+             <div className="absolute -inset-12 bg-accent-primary/10 blur-[80px] rounded-full opacity-60 group-hover:opacity-100 transition-opacity duration-1000" />
              
              <div className="relative z-10">
-                <div className="w-40 h-40 rounded-[3.5rem] bg-gradient-to-br from-indigo-600 to-emerald-500 p-[1.5px] shadow-2xl transform-gpu transition-all duration-700 group-hover:rotate-y-12 group-hover:rotate-x-6 group-hover:scale-110 overflow-hidden relative">
+                <div className="w-48 h-48 rounded-[3.5rem] bg-ghost-border p-[1.5px] shadow-3xl transform-gpu transition-all duration-1000 group-hover:rotate-y-12 group-hover:rotate-x-6 group-hover:scale-110 overflow-hidden relative">
+                   <div className="absolute inset-0 bg-gradient-to-br from-accent-primary via-transparent to-accent-emerald opacity-20" />
+                   
                    {photoURL ? (
-                      <img src={photoURL} alt="Profile" className="w-full h-full object-cover rounded-[3.4rem]" />
+                      <img src={photoURL} alt="Profile" className="w-full h-full object-cover rounded-[2.5rem]" />
                    ) : (
-                      <div className="w-full h-full rounded-[3.4rem] bg-white dark:bg-[#030712] flex items-center justify-center text-6xl font-black text-indigo-600 dark:text-indigo-400 shadow-inner">
+                      <div className="w-full h-full rounded-[3.4rem] bg-surface-base flex items-center justify-center text-7xl font-black text-accent-primary shadow-inner italic">
                          {name ? name.charAt(0).toUpperCase() : "U"}
                       </div>
                    )}
@@ -250,20 +263,20 @@ export default function ProfilePage() {
                    <input id="calibration-input" type="file" className="hidden" accept="image/*" onChange={handlePhotoUpload} disabled={uploadingPhoto} />
                    <div 
                       onClick={() => document.getElementById('calibration-input')?.click()}
-                      className="absolute inset-0 cursor-pointer group/label transition-all duration-500 hover:backdrop-blur-sm z-30"
+                      className="absolute inset-0 cursor-pointer group/label transition-all duration-500 hover:backdrop-blur-md z-30"
                    >
-                      <div className="absolute inset-x-0 bottom-0 opacity-0 group-hover/label:opacity-100 transition-all duration-500 transform translate-y-4 group-hover/label:translate-y-0 bg-gradient-to-t from-gray-950/80 to-transparent p-4 flex flex-col items-center">
-                         <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white mb-2 border border-white/20">
-                            {uploadingPhoto ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Camera size={20} />}
+                      <div className="absolute inset-x-0 bottom-0 opacity-0 group-hover/label:opacity-100 transition-all duration-500 transform translate-y-4 group-hover/label:translate-y-0 bg-gradient-to-t from-gray-950/80 to-transparent p-6 flex flex-col items-center">
+                         <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white mb-2 border border-white/20 shadow-lg">
+                            {uploadingPhoto ? <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Camera size={24} />}
                          </div>
-                         <span className="text-[8px] font-black text-white uppercase tracking-widest leading-none">Calibration</span>
+                         <span className="text-[9px] font-black text-white uppercase tracking-widest leading-none italic">Calibrate</span>
                       </div>
                    </div>
                 </div>
 
                 {/* Status Indicator */}
-                <div className="absolute -bottom-2 -right-2 w-12 h-12 rounded-2xl bg-white dark:bg-[#030712] border border-gray-100 dark:border-white/10 flex items-center justify-center shadow-xl z-20">
-                    <div className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse" />
+                <div className="absolute -bottom-2 -right-2 w-14 h-14 rounded-2xl bg-surface-container-high border border-ghost-border flex items-center justify-center shadow-xl z-20">
+                    <div className="w-4 h-4 rounded-full bg-accent-emerald animate-vital-pulse shadow-[0_0_15px_rgba(16,185,129,0.5)]" />
                 </div>
              </div>
           </div>
@@ -274,121 +287,124 @@ export default function ProfilePage() {
         
         {/* 🧠 Core Identity Module */}
         <div className="lg:col-span-12 xl:col-span-8 space-y-10 order-2 xl:order-1">
-          <div className="relative border border-white/80 border-t-white border-l-white/90 dark:border-white/[0.05] dark:border-t-white/[0.15] dark:border-l-white/[0.1] bg-white/[0.65] dark:bg-[#030712]/40 backdrop-blur-[40px] p-8 lg:p-12 rounded-[4rem] shadow-2xl space-y-12">
+          <div className="card-biometric p-8 lg:p-14 transition-all duration-700">
+            <div className="absolute inset-0 bg-gradient-to-br from-accent-primary/[0.02] via-transparent to-accent-emerald/[0.02] pointer-events-none" />
             
-            <div className="flex items-center justify-between pb-10 border-b border-gray-100 dark:border-white/5">
+            <div className="relative z-10 flex items-center justify-between pb-12 border-b border-ghost-border">
               <div className="flex items-center gap-6">
-                <div className="p-4 rounded-3xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 shadow-lg border border-indigo-500/5">
-                   <User size={32} strokeWidth={2.5} />
+                <div className="p-4 rounded-3xl bg-accent-indigo/10 text-accent-indigo shadow-lg border border-accent-indigo/5">
+                   <User size={36} strokeWidth={2.5} />
                 </div>
                 <div>
-                  <h2 className="text-3xl font-black text-gray-950 dark:text-white uppercase tracking-tighter italic leading-none">Personal Manifest</h2>
-                  <p className="text-xs font-black text-gray-900 dark:text-gray-400 uppercase tracking-widest mt-2 opacity-80">Secure Clinical Record</p>
+                  <h2 className="text-3xl md:text-4xl font-black text-text-primary uppercase tracking-tighter italic leading-none">Personal Manifest</h2>
+                  <div className="chip-vital mt-3">
+                     <ShieldCheck size={14} className="text-accent-emerald" />
+                     <span className="text-[9px] font-black uppercase tracking-[0.3em]">Secure Clinical Record</span>
+                  </div>
                 </div>
               </div>
-              <ShieldCheck size={48} className="text-emerald-500/20" />
+              <Activity size={56} className="text-accent-primary/5 absolute right-0 top-0 mt-8 mr-8" />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-12">
-              <BioInput label="Full Name" value={name} setValue={setName} icon={<User size={16} />} placeholder="Enter identity..." />
+            <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-12 pt-12">
+              <BioInput label="Full Name" value={name} setValue={setName} icon={<User size={14} />} placeholder="Enter identity..." />
               
-              <div className="space-y-4">
-                <label className="text-sm font-black text-gray-950 dark:text-gray-300 flex items-center gap-2">
-                   <Droplet size={14} className="text-red-500" /> Serology Type
+              <div className="space-y-4 group/field">
+                <label className="text-[10px] font-black uppercase tracking-[0.5em] text-text-muted ml-2 flex items-center gap-3 italic">
+                   <Droplet size={14} className="text-accent-rose" /> Serology Type
                 </label>
                 <div className="relative group/select">
                   <select
                     value={bloodGroup}
                     onChange={(e) => setBloodGroup(e.target.value)}
-                    className="w-full border border-white/60 dark:border-white/[0.1] bg-white/40 dark:bg-black/20 backdrop-blur-md px-6 py-5 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/20 transition text-base font-bold text-gray-900 dark:text-gray-100 appearance-none cursor-pointer shadow-inner"
+                    className="w-full input-void px-6 py-5 appearance-none cursor-pointer italic text-sm"
                   >
-                    <option value="" className="bg-white dark:bg-gray-900 font-bold opacity-30">SELECT TYPE...</option>
+                    <option value="" className="bg-surface-base font-bold opacity-30 italic">SELECT TYPE...</option>
                     {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map(bg => (
-                      <option key={bg} value={bg} className="bg-white dark:bg-gray-900 font-bold">{bg}</option>
+                      <option key={bg} value={bg} className="bg-surface-base font-bold italic">{bg}</option>
                     ))}
                   </select>
-                  <ArrowRight size={18} className="absolute right-6 top-1/2 -translate-y-1/2 text-gray-400 group-hover:text-indigo-500 transition-all group-hover:translate-x-1" />
+                  <ChevronRight size={18} className="absolute right-6 top-1/2 -translate-y-1/2 text-text-muted group-hover:text-accent-primary transition-all group-hover:translate-x-1 rotate-90" />
                 </div>
               </div>
 
-              <BioInput label="Age" value={age} setValue={setAge} icon={<Calendar size={16} />} placeholder="YY..." type="number" />
+              <BioInput label="Age" value={age} setValue={setAge} icon={<Calendar size={14} />} placeholder="YY..." type="number" />
               
-              <div className="space-y-4">
-                <label className="text-sm font-black text-gray-950 dark:text-gray-300 flex items-center gap-2">
-                   <Activity size={14} className="text-blue-500" /> Physiological Axis
+              <div className="space-y-4 group/field">
+                <label className="text-[10px] font-black uppercase tracking-[0.4em] text-text-muted ml-2 flex items-center gap-3 italic">
+                   <Activity size={14} className="text-accent-indigo" /> Physiological Axis
                 </label>
                 <div className="relative group/select">
                   <select
                     value={gender}
                     onChange={(e) => setGender(e.target.value)}
-                    className="w-full border border-white/60 dark:border-white/[0.1] bg-white/40 dark:bg-black/20 backdrop-blur-md px-6 py-5 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/20 transition text-base font-bold text-gray-900 dark:text-gray-100 appearance-none cursor-pointer shadow-inner"
+                    className="w-full input-void px-6 py-5 appearance-none cursor-pointer italic text-sm"
                   >
-                    <option value="" className="bg-white dark:bg-gray-900 font-bold opacity-30">SELECT AXIS...</option>
-                    <option value="Male" className="bg-white dark:bg-gray-900 font-bold">Male</option>
-                    <option value="Female" className="bg-white dark:bg-gray-900 font-bold">Female</option>
-                    <option value="Other" className="bg-white dark:bg-gray-900 font-bold">Other</option>
+                    <option value="" className="bg-surface-base font-bold opacity-30 italic">SELECT AXIS...</option>
+                    <option value="Male" className="bg-surface-base font-bold italic">Male</option>
+                    <option value="Female" className="bg-surface-base font-bold italic">Female</option>
+                    <option value="Other" className="bg-surface-base font-bold italic">Other</option>
                   </select>
-                  <ArrowRight size={18} className="absolute right-6 top-1/2 -translate-y-1/2 text-gray-400 group-hover:text-indigo-500 transition-all group-hover:translate-x-1" />
+                  <ChevronRight size={18} className="absolute right-6 top-1/2 -translate-y-1/2 text-text-muted group-hover:text-accent-primary transition-all group-hover:translate-x-1 rotate-90" />
                 </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-12 pt-12 border-t border-gray-100 dark:border-white/5">
-               <BioInput label="Height (cm)" value={height} setValue={setHeight} icon={<Ruler size={16} />} placeholder="180..." type="number" />
-               <BioInput label="Weight (kg)" value={weight} setValue={setWeight} icon={<Weight size={16} />} placeholder="75..." type="number" />
+            <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-12 pt-12 mt-12 border-t border-ghost-border">
+               <BioInput label="Height (cm)" value={height} setValue={setHeight} icon={<Ruler size={14} />} placeholder="180..." type="number" />
+               <BioInput label="Weight (kg)" value={weight} setValue={setWeight} icon={<Weight size={14} />} placeholder="75..." type="number" />
                
-               <div className="space-y-4">
-                  <label className="text-sm font-black text-gray-950 dark:text-gray-300 flex items-center gap-2">
-                     <Zap size={14} className="text-amber-500" /> Metabolism Scale
+               <div className="space-y-4 group/field">
+                  <label className="text-[10px] font-black uppercase tracking-[0.4em] text-text-muted ml-2 flex items-center gap-3 italic">
+                     <Zap size={14} className="text-accent-amber" /> Metabolism Scale
                   </label>
                   <div className="relative group/select">
                     <select
                       value={activityLevel}
                       onChange={(e) => setActivityLevel(e.target.value)}
-                      className="w-full border border-white/60 dark:border-white/[0.1] bg-white/40 dark:bg-black/20 backdrop-blur-md px-6 py-5 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/20 transition text-base font-bold text-gray-900 dark:text-gray-100 appearance-none cursor-pointer shadow-inner"
+                      className="w-full input-void px-6 py-5 appearance-none cursor-pointer italic text-sm"
                     >
-                      <option value="" className="bg-white dark:bg-gray-900 font-bold opacity-30">SELECT LEVEL...</option>
-                      <option value="Sedentary" className="bg-white dark:bg-gray-900 font-bold">Sedentary</option>
-                      <option value="Moderate" className="bg-white dark:bg-gray-900 font-bold">Moderate</option>
-                      <option value="Active" className="bg-white dark:bg-gray-900 font-bold">Active</option>
-                      <option value="Professional" className="bg-white dark:bg-gray-900 font-bold">Professional</option>
+                      <option value="" className="bg-surface-base font-bold opacity-30 italic">SELECT LEVEL...</option>
+                      <option value="Sedentary" className="bg-surface-base font-bold italic">Sedentary</option>
+                      <option value="Moderate" className="bg-surface-base font-bold italic">Moderate</option>
+                      <option value="Active" className="bg-surface-base font-bold italic">Active</option>
+                      <option value="Professional" className="bg-surface-base font-bold italic">Professional</option>
                     </select>
-                    <ArrowRight size={18} className="absolute right-6 top-1/2 -translate-y-1/2 text-gray-400 group-hover:text-indigo-500 transition-all group-hover:translate-x-1" />
+                    <ChevronRight size={18} className="absolute right-6 top-1/2 -translate-y-1/2 text-text-muted group-hover:text-accent-primary transition-all group-hover:translate-x-1 rotate-90" />
                   </div>
                </div>
 
-               <div className="space-y-4">
-                  <label className="text-sm font-black text-gray-950 dark:text-gray-300 flex items-center gap-2">
-                     <Target size={14} className="text-emerald-500" /> Primary Health Objective
+               <div className="space-y-4 group/field">
+                  <label className="text-[10px] font-black uppercase tracking-[0.4em] text-text-muted ml-2 flex items-center gap-3 italic">
+                     <Target size={14} className="text-accent-emerald" /> Primary Health Objective
                   </label>
                   <div className="relative group/select">
                     <select
                       value={healthGoal}
                       onChange={(e) => setHealthGoal(e.target.value)}
-                      className="w-full border border-white/60 dark:border-white/[0.1] bg-white/40 dark:bg-black/20 backdrop-blur-md px-6 py-5 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/20 transition text-base font-bold text-gray-900 dark:text-gray-100 appearance-none cursor-pointer shadow-inner"
+                      className="w-full input-void px-6 py-5 appearance-none cursor-pointer italic text-sm"
                     >
-                      <option value="" className="bg-white dark:bg-gray-900 font-bold opacity-30">SELECT GOAL...</option>
-                      <option value="Maintenance" className="bg-white dark:bg-gray-900 font-bold">Maintenance</option>
-                      <option value="Weight Loss" className="bg-white dark:bg-gray-900 font-bold">Weight Loss</option>
-                      <option value="Muscle Gain" className="bg-white dark:bg-gray-900 font-bold">Muscle Gain</option>
-                      <option value="Recovery" className="bg-white dark:bg-gray-900 font-bold">Recovery</option>
+                      <option value="" className="bg-surface-base font-bold opacity-30 italic">SELECT GOAL...</option>
+                      <option value="Maintenance" className="bg-surface-base font-bold italic">Maintenance</option>
+                      <option value="Weight Loss" className="bg-surface-base font-bold italic">Weight Loss</option>
+                      <option value="Muscle Gain" className="bg-surface-base font-bold italic">Muscle Gain</option>
+                      <option value="Recovery" className="bg-surface-base font-bold italic">Recovery</option>
                     </select>
-                    <ArrowRight size={18} className="absolute right-6 top-1/2 -translate-y-1/2 text-gray-400 group-hover:text-indigo-500 transition-all group-hover:translate-x-1" />
+                    <ChevronRight size={18} className="absolute right-6 top-1/2 -translate-y-1/2 text-text-muted group-hover:text-accent-primary transition-all group-hover:translate-x-1 rotate-90" />
                   </div>
                </div>
             </div>
 
-            <div className="mt-16 flex justify-end pt-12 border-t border-gray-100 dark:border-white/5">
+            <div className="relative z-10 mt-16 flex justify-end pt-12 border-t border-ghost-border">
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className="w-full sm:w-auto overflow-hidden group/save bg-gradient-to-r from-indigo-600 via-blue-600 to-emerald-600 hover:scale-[1.05] hover:shadow-[0_15px_40px_rgba(79,70,229,0.4)] transition-all text-white px-16 py-6 rounded-3xl font-black shadow-2xl disabled:opacity-50 text-base relative"
+                className="btn-gem px-20 py-6 text-lg tracking-[0.2em] shadow-2xl shadow-accent-primary/20 disabled:opacity-50"
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent translate-x-[-100%] group-hover/save:translate-x-[100%] transition-transform duration-1000" />
-                <div className="relative flex items-center justify-center gap-4">
-                   {saving ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Save size={22} />}
-                   {saving ? "SYNCING..." : "COMMIT BIO-LEDGER"}
-                </div>
+                 <span className="flex items-center gap-4 italic uppercase">
+                   {saving ? <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Save size={24} />}
+                   {saving ? "SYNCING CORE..." : "COMMIT BIO-LEDGER"}
+                 </span>
               </button>
             </div>
           </div>
@@ -397,69 +413,78 @@ export default function ProfilePage() {
         {/* 📟 Sidebar Shards */}
         <div className="lg:col-span-12 xl:col-span-4 order-1 xl:order-2 space-y-10">
            
-           <div className="relative border border-white/80 border-t-white border-l-white/90 dark:border-white/[0.05] dark:border-t-white/[0.15] dark:border-l-white/[0.1] bg-white/[0.5] dark:bg-[#030712]/30 backdrop-blur-[40px] p-10 rounded-[4rem] shadow-2xl transition-all duration-700 group flex flex-col items-center text-center">
-              <div className="p-6 rounded-[2.5rem] bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 mb-8 border border-indigo-500/10 shadow-xl group-hover:scale-110 transition-transform duration-700">
-                 <Sparkles size={48} className="animate-pulse" />
+           <div className="card-biometric p-10 flex flex-col items-center text-center group">
+              <div className="p-6 rounded-[2.5rem] bg-accent-primary/10 text-accent-primary mb-8 border border-ghost-border shadow-xl group-hover:scale-110 transition-transform duration-700">
+                 <Sparkles size={48} className="animate-vital-pulse" />
               </div>
-              <h3 className="text-2xl font-black uppercase tracking-tighter italic mb-4 leading-none">AI Synthesis</h3>
-              <p className="text-gray-950 dark:text-gray-400 text-sm font-bold leading-relaxed mb-8">
+              <h3 className="text-2xl font-black uppercase tracking-tighter italic mb-4 text-text-primary">AI Synthesis</h3>
+              <p className="text-text-secondary text-sm font-bold leading-relaxed mb-8 italic">
                  Calibrating these fields optimizes the CareCompass Neural Engine for hyper-relevant diagnostic synthesis.
               </p>
-              <div className="w-full p-6 rounded-3xl bg-indigo-500/5 border border-indigo-500/10 text-xs font-bold text-indigo-700 dark:text-indigo-300 leading-relaxed italic">
-                 ✨ Maintenance of bio-signatures ensures protocol integrity.
+              <div className="chip-vital bg-accent-primary/5 border-accent-primary/20 w-full py-4 justify-center">
+                 <span className="text-[10px] font-black uppercase tracking-[0.2em] italic text-accent-primary">✨ Bio-Signature Integrity Verified</span>
               </div>
            </div>
 
-           <div className="relative border border-white/80 border-t-white border-l-white/90 dark:border-white/[0.05] dark:border-t-white/[0.15] dark:border-l-white/[0.1] bg-white/[0.5] dark:bg-[#030712]/30 backdrop-blur-[40px] p-10 rounded-[4rem] shadow-2xl transition-all duration-700">
+           <div className="card-biometric p-10">
               <div className="space-y-6">
                  <div className="flex items-center gap-4">
-                    <ShieldCheck size={28} className="text-emerald-500" />
-                    <h3 className="text-xl font-black uppercase tracking-tighter italic">Data Privacy</h3>
+                    <div className="p-2 rounded-xl bg-accent-emerald/10 text-accent-emerald border border-ghost-border">
+                       <ShieldCheck size={24} />
+                    </div>
+                    <h3 className="text-xl font-black uppercase tracking-tighter italic text-text-primary">Data Sovereignty</h3>
                  </div>
-                 <p className="text-[10px] font-black text-gray-600 dark:text-gray-400 uppercase tracking-widest leading-loose text-justify opacity-70">
-                    ENCRYPTION: AES-256 <br />
-                    PROTOCOL: SECURE BIO-LEDGER <br />
-                    ACCESS: SUBJECT ONLY
-                 </p>
+                 <div className="space-y-3 pt-2">
+                    {[
+                      { label: "Encryption", val: "AES-256-GCM" },
+                      { label: "Protocol", val: "SECURE-LEDGER-V3" },
+                      { label: "Visibility", val: "SUBJECT-BOUND" }
+                    ].map((item, i) => (
+                      <div key={i} className="flex justify-between items-center py-2 border-b border-ghost-border/50">
+                        <span className="text-[9px] font-black uppercase tracking-widest text-text-muted">{item.label}</span>
+                        <span className="text-[10px] font-black text-accent-emerald italic">{item.val}</span>
+                      </div>
+                    ))}
+                 </div>
               </div>
            </div>
 
-           <div className="p-8 rounded-[3rem] bg-amber-500/5 border border-amber-500/10 text-center">
-              <p className="text-[10px] font-black text-amber-800 dark:text-amber-500 uppercase tracking-widest leading-relaxed">
-                 AI HEALTH HUB | CLINICAL ASSIST
-              </p>
-           </div>
-
-           {/* 🧨 Dangerous Protocol: Account Termination */}
-           <div className="relative overflow-hidden border border-red-500/20 dark:border-red-500/10 bg-red-500/[0.02] dark:bg-red-500/[0.01] p-10 rounded-[4rem] group transition-all duration-500 shadow-xl shadow-red-500/[0.03]">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-red-500/5 blur-[60px] rounded-full translate-x-1/2 -translate-y-1/2" />
+           {/* 🧨 Dangerous Protocol: Session Halt */}
+           <div className="relative overflow-hidden border border-accent-rose/20 bg-accent-rose/[0.02] p-10 rounded-[3rem] group transition-all duration-500 hover:shadow-2xl hover:shadow-accent-rose/5">
+              <div className="absolute top-0 right-0 w-40 h-40 bg-accent-rose/5 blur-[80px] rounded-full translate-x-1/2 -translate-y-1/2" />
               
               <div className="relative z-10 space-y-8">
                  <div className="flex items-center gap-4">
-                    <div className="p-3 rounded-2xl bg-red-500/10 text-red-500">
-                       <Power size={24} />
+                    <div className="p-3 rounded-2xl bg-accent-rose/10 text-accent-rose border border-accent-rose/10 shadow-lg">
+                       <Power size={24} strokeWidth={3} />
                     </div>
                     <div>
-                       <h3 className="text-xl font-black uppercase tracking-tighter italic text-red-600 dark:text-red-500">Session Halt</h3>
-                       <p className="text-[9px] font-black text-gray-950 dark:text-gray-400 uppercase tracking-widest leading-none mt-1 opacity-80">Clinical Disconnect</p>
+                       <h3 className="text-xl font-black uppercase tracking-tighter italic text-accent-rose">Session Halt</h3>
+                       <div className="flex items-center gap-2 mt-1">
+                          <div className="w-1.5 h-1.5 rounded-full bg-accent-rose animate-pulse" />
+                          <span className="text-[9px] font-black text-text-muted uppercase tracking-widest">Clinical Disconnect</span>
+                       </div>
                     </div>
                  </div>
 
-                 <p className="text-xs font-bold text-gray-900 dark:text-gray-400 opacity-90 leading-relaxed">
+                 <p className="text-xs font-bold text-text-secondary leading-relaxed italic">
                     Terminate the active clinical session and seal all neural links until next biometric authentication.
                  </p>
 
                  <button
                     onClick={handleLogout}
                     disabled={loggingOut}
-                    className="w-full flex items-center justify-center gap-3 px-8 py-5 rounded-2xl bg-red-600 text-white font-black uppercase tracking-widest text-[11px] shadow-xl shadow-red-600/20 hover:bg-red-700 hover:scale-[1.02] transition-all disabled:opacity-50"
+                    className="w-full relative overflow-hidden group/btn flex items-center justify-center gap-3 px-8 py-5 rounded-2xl bg-accent-rose text-white font-black uppercase tracking-widest text-[11px] shadow-2xl shadow-accent-rose/20 hover:scale-[1.02] transition-all disabled:opacity-50"
                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-700" />
                     {loggingOut ? (
                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                     ) : (
-                       <LogOut size={16} />
+                       <LogOut size={16} strokeWidth={3} />
                     )}
-                    {loggingOut ? "DISCONNECTING..." : "HALT SESSION"}
+                    <span className="relative z-10 italic">
+                       {loggingOut ? "DISCONNECTING..." : "HALT SESSION PROTOCOL"}
+                    </span>
                  </button>
               </div>
            </div>
