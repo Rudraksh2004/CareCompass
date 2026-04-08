@@ -225,191 +225,218 @@ function ReminderContent() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-12 pb-20">
-      {/* 🔮 Ultra-Premium Dashboard Header */}
-      <div className="relative group overflow-hidden rounded-[2rem] md:rounded-[2.5rem] border border-white/80 dark:border-white/[0.05] bg-white/[0.4] dark:bg-[#030712]/30 backdrop-blur-[60px] p-6 md:p-12 transition-all duration-700 hover:shadow-2xl">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/20 blur-[120px] -mr-48 -mt-48 transition-all group-hover:bg-blue-500/30 animate-pulse" />
-        <div className="absolute bottom-0 left-0 w-80 h-80 bg-emerald-500/10 blur-[100px] -ml-40 -mb-40" />
+    <div className="max-w-7xl mx-auto space-y-12 pb-20 px-4">
+      {/* 🔮 LUMINA CHRONO-HEADER */}
+      <div className="relative group overflow-hidden rounded-[2.5rem] border border-ghost-border bg-surface-container-low/40 backdrop-blur-[60px] p-8 md:p-14 transition-all duration-700 hover:shadow-2xl">
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-accent-primary/5 blur-[120px] -mr-80 -mt-80 animate-vital-pulse" />
         
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6 md:gap-8">
-          <div className="space-y-4">
-            <div className="flex items-center gap-3 md:gap-4">
-              <div className="p-3 md:p-4 rounded-[1.2rem] md:rounded-[1.5rem] bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-xl shadow-blue-500/20">
-                <Bell className="w-6 h-6 md:w-8 md:h-8" strokeWidth={2.5} />
-              </div>
-              <h1 className="text-3xl md:text-5xl font-black tracking-tighter bg-gradient-to-r from-gray-900 via-gray-700 to-gray-500 dark:from-white dark:via-gray-300 dark:to-gray-500 bg-clip-text text-transparent leading-none">
-                Adherence Tracker
-              </h1>
+        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-10">
+          <div className="space-y-6 flex-1">
+            <div className="flex items-center gap-4">
+               <div className="p-4 rounded-2xl bg-accent-primary/10 text-accent-primary shadow-inner border border-ghost-border">
+                  <Bell className="w-8 h-8 md:w-10 md:h-10" strokeWidth={2.5} />
+               </div>
+               <div className="flex flex-col">
+                  <h1 className="text-4xl md:text-6xl font-black tracking-tighter text-text-primary italic">
+                    Chrono <span className="text-accent-primary">Adherence</span>
+                  </h1>
+                  <div className="flex items-center gap-2 mt-1">
+                     <div className="w-2 h-2 rounded-full bg-accent-primary animate-vital-pulse" />
+                     <span className="text-[10px] font-black uppercase tracking-[0.4em] text-text-muted">Temporal Sync Active</span>
+                  </div>
+               </div>
             </div>
-            <p className="text-gray-700 dark:text-gray-400 font-bold max-w-xl text-base md:text-lg leading-relaxed">
-              Precision medication management with behavioral adherence analytics. Ensure therapeutic continuity through multi-dose temporal tracking.
+            <p className="text-text-secondary font-bold text-lg md:text-xl max-w-2xl leading-relaxed italic">
+               Precision medication management with behavioral adherence analytics. Ensure therapeutic continuity through multi-dose temporal tracking.
             </p>
           </div>
           
-          <div className="flex flex-wrap gap-4">
-             <div className="px-6 py-4 md:px-8 md:py-5 rounded-[1.5rem] md:rounded-[2rem] bg-white/40 dark:bg-white/5 border border-white/60 dark:border-white/[0.05] backdrop-blur-md flex flex-row md:flex-col items-center gap-3 md:gap-0">
-                <div className="flex flex-col md:items-center">
-                   <p className="text-[10px] font-black uppercase tracking-widest text-gray-600 dark:text-gray-400 leading-none md:mb-2 text-center">Compliance</p>
-                   <div className="hidden md:block w-32 h-2 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
-                      <div className="h-full bg-gradient-to-r from-blue-500 to-emerald-500 transition-all duration-1000" style={{ width: `${adherence}%` }} />
-                   </div>
-                   <span className="text-[10px] font-black text-blue-500 mt-2 uppercase leading-none">{adherence}% SYNCED</span>
+          <div className="shrink-0 flex flex-col items-center md:items-end gap-4">
+             <div className="card-biometric bg-surface-container-high/40 border-ghost-border p-6 md:p-8 flex flex-col items-center md:items-end min-w-[240px]">
+                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-text-muted mb-4 italic">Global Compliance</p>
+                <div className="w-full h-2.5 bg-surface-base rounded-full overflow-hidden border border-ghost-border mb-3">
+                   <div className="h-full bg-gradient-to-r from-accent-primary to-accent-emerald transition-all duration-1000 shadow-[0_0_10px_rgba(59,130,246,0.3)]" style={{ width: `${adherence}%` }} />
+                </div>
+                <div className="flex items-center gap-3">
+                   <Activity size={14} className="text-accent-primary" />
+                   <span className="text-2xl font-black italic text-text-primary">{adherence}% <span className="text-[10px] not-italic uppercase tracking-widest text-accent-emerald">Synced</span></span>
                 </div>
              </div>
           </div>
         </div>
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-12">
+      <div className="grid lg:grid-cols-12 gap-12 items-start">
         {/* 📋 Configuration Panel */}
-        <div className="lg:col-span-1 space-y-8">
-          <div className="relative group overflow-hidden rounded-[2rem] md:rounded-[3rem] border border-white/60 dark:border-white/[0.05] bg-white/[0.3] dark:bg-[#030712]/30 backdrop-blur-[60px] p-6 md:p-8 shadow-xl transition-all h-full">
-            <div className="relative z-10 space-y-8">
-              <div className="flex items-center gap-3">
-                <Settings2 className="text-blue-500" size={24} />
-                <h2 className="text-xl md:text-2xl font-black tracking-tighter">Schedule Setup</h2>
+        <div className="lg:col-span-12 xl:col-span-4 space-y-8">
+          <div className="card-biometric p-8 md:p-10 space-y-10 group overflow-visible">
+            <div className="relative z-10 flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                 <div className="p-3 rounded-xl bg-accent-primary/10 text-accent-primary border border-ghost-border">
+                    <Settings2 size={24} />
+                 </div>
+                 <h2 className="text-2xl font-black tracking-tighter text-text-primary uppercase italic">Schedule Setup</h2>
               </div>
+              <Pill className="text-text-muted/10 group-hover:text-accent-primary/10 transition-colors" size={40} />
+            </div>
 
-              <div className="space-y-6">
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-600 dark:text-gray-500 ml-2">Medication Name</label>
-                  <div className="relative">
-                    <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-600 dark:text-gray-400" size={18} />
-                    <input
-                      className="w-full bg-white/40 dark:bg-black/40 border border-white/80 dark:border-white/10 pl-12 pr-6 py-4 rounded-xl md:rounded-2xl font-bold outline-none focus:ring-4 focus:ring-blue-500/10 transition-all text-sm"
-                      placeholder="e.g., Metformin..."
-                      value={medicineName}
-                      onChange={(e) => setMedicineName(e.target.value)}
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-600 dark:text-gray-500 ml-2">Dosage Instructions</label>
+            <div className="relative z-10 space-y-8">
+              <div className="space-y-4 group/field">
+                <label className="text-[10px] font-black uppercase tracking-[0.5em] text-text-muted ml-2 flex items-center gap-3 italic">
+                   <Pill size={14} className="text-accent-primary" /> Medication Name
+                </label>
+                <div className="relative">
+                  <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-text-muted group-focus-within/field:text-accent-primary transition-colors" size={18} />
                   <input
-                    className="w-full bg-white/40 dark:bg-black/40 border border-white/80 dark:border-white/10 px-6 py-4 rounded-xl md:rounded-2xl font-bold outline-none focus:ring-4 focus:ring-blue-500/10 transition-all text-sm"
-                    placeholder="e.g., 500mg daily..."
-                    value={dosage}
-                    onChange={(e) => setDosage(e.target.value)}
+                    className="input-void pl-14 pr-6 py-5 text-sm italic"
+                    placeholder="Enter clinical identifier..."
+                    value={medicineName}
+                    onChange={(e) => setMedicineName(e.target.value)}
                   />
                 </div>
+              </div>
 
-                <div className="space-y-3">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-600 dark:text-gray-500 ml-2">Temporal Markers</label>
-                  <div className="flex gap-2">
-                    <input
-                      type="time"
-                      className="flex-1 bg-white/40 dark:bg-black/40 border border-white/80 dark:border-white/10 px-6 py-4 rounded-xl md:rounded-2xl font-bold outline-none focus:ring-4 focus:ring-emerald-500/10 transition-all text-sm"
-                      value={time}
-                      onChange={(e) => setTime(e.target.value)}
-                    />
-                    <button
-                      onClick={handleAddDoseTime}
-                      className="p-4 bg-emerald-500/10 text-emerald-600 rounded-2xl border border-emerald-500/20 hover:bg-emerald-500 hover:text-white transition-all shadow-lg shadow-emerald-500/10"
-                    >
-                      <Plus size={24} strokeWidth={3} />
-                    </button>
-                  </div>
+              <div className="space-y-4 group/field">
+                <label className="text-[10px] font-black uppercase tracking-[0.5em] text-text-muted ml-2 flex items-center gap-3 italic">
+                   <Activity size={14} className="text-accent-indigo" /> Dosage Instructions
+                </label>
+                <input
+                  className="input-void px-6 py-5 text-sm italic"
+                  placeholder="e.g., 500mg therapeutic dose..."
+                  value={dosage}
+                  onChange={(e) => setDosage(e.target.value)}
+                />
+              </div>
 
-                  <div className="flex flex-wrap gap-2 mt-4">
-                    {doseTimes.map((t) => (
-                      <div key={t} className="px-4 py-2 rounded-xl bg-blue-500/10 text-blue-600 border border-blue-500/20 flex items-center gap-2 font-black text-xs animate-in zoom-in-95">
-                        <Clock size={12} /> {t}
-                        <button onClick={() => removeDoseTime(t)}><X size={12} className="text-red-500" /></button>
-                      </div>
-                    ))}
-                  </div>
+              <div className="space-y-4 group/field">
+                <label className="text-[10px] font-black uppercase tracking-[0.5em] text-text-muted ml-2 flex items-center gap-3 italic">
+                   <Clock size={14} className="text-accent-emerald" /> Temporal Markers
+                </label>
+                <div className="flex gap-4">
+                  <input
+                    type="time"
+                    className="input-void flex-1 px-6 py-5 text-center text-lg font-black italic appearance-none"
+                    value={time}
+                    onChange={(e) => setTime(e.target.value)}
+                  />
+                  <button
+                    onClick={handleAddDoseTime}
+                    className="p-5 rounded-2xl bg-accent-emerald/10 text-accent-emerald border border-accent-emerald/20 hover:bg-accent-emerald hover:text-white transition-all shadow-xl shadow-accent-emerald/10 scale-100 hover:scale-105 active:scale-95"
+                  >
+                    <Plus size={24} strokeWidth={3} />
+                  </button>
                 </div>
 
-                <button
-                  onClick={handleAddReminder}
-                  className="w-full bg-gray-900 dark:bg-blue-600 text-white py-5 rounded-2xl font-black text-lg hover:scale-[1.02] active:scale-95 transition-all shadow-2xl shadow-blue-600/20 flex items-center justify-center gap-3"
-                >
-                  INITIALIZE TRACKING <ChevronRight size={20} />
-                </button>
+                <div className="flex flex-wrap gap-3 mt-4">
+                  {doseTimes.map((t) => (
+                    <div key={t} className="chip-vital bg-accent-primary/10 text-accent-primary border-accent-primary/20 py-2.5 px-4 animate-in zoom-in-95 group/pill">
+                      <Clock size={12} strokeWidth={3} /> 
+                      <span className="font-black italic">{t}</span>
+                      <button onClick={() => removeDoseTime(t)} className="ml-1 hover:text-accent-rose transition-colors">
+                         <X size={12} strokeWidth={3} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
               </div>
+
+              <button
+                onClick={handleAddReminder}
+                className="btn-gem w-full py-6 text-base tracking-[0.2em] shadow-2xl shadow-accent-primary/20"
+              >
+                <span className="flex items-center justify-center gap-3 italic">
+                   INITIALIZE TRACKING <ChevronRight size={20} strokeWidth={3} />
+                </span>
+              </button>
             </div>
           </div>
         </div>
 
         {/* 📅 Active Regimens */}
-        <div className="lg:col-span-2 space-y-10">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 px-2 md:px-4">
+        <div className="lg:col-span-12 xl:col-span-8 space-y-10">
+          <div className="flex items-center justify-between px-4">
             <div className="flex items-center gap-4">
-              <Calendar className="text-blue-600" size={24} />
-              <h2 className="text-2xl md:text-3xl font-black tracking-tighter">Clinical Regimen</h2>
+               <div className="p-3 rounded-xl bg-accent-primary/10 text-accent-primary">
+                  <Calendar size={24} />
+               </div>
+               <h2 className="text-2xl md:text-3xl font-black tracking-tighter text-text-primary uppercase italic">Clinical Regimen</h2>
             </div>
-            <div className="w-fit flex items-center gap-2 px-6 py-2 rounded-full bg-white/40 dark:bg-white/5 border border-white/60 dark:border-white/[0.05] backdrop-blur-md">
-               <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-               <span className="text-[10px] font-black uppercase tracking-widest text-gray-600 dark:text-gray-400">Sync Active</span>
+            <div className="chip-vital bg-surface-container-high/40 border-ghost-border px-6 py-3">
+               <div className="w-1.5 h-1.5 rounded-full bg-accent-emerald animate-vital-pulse" />
+               <span className="text-[10px] font-black uppercase tracking-[0.3em] text-text-muted">Live Sync</span>
             </div>
           </div>
 
           {!reminders || reminders.length === 0 ? (
-            <div className="border border-white/80 dark:border-white/[0.05] bg-white/[0.4] dark:bg-white/[0.02] backdrop-blur-2xl p-10 md:p-20 rounded-[2rem] md:rounded-[3rem] text-center space-y-6">
-              <div className="w-16 h-16 md:w-24 md:h-24 rounded-full bg-gray-100 dark:bg-white/5 flex items-center justify-center mx-auto text-gray-400">
-                 <Pill className="w-8 h-8 md:w-12 md:h-12" />
+            <div className="card-biometric p-14 md:p-24 text-center space-y-8">
+              <div className="w-24 h-24 rounded-full bg-surface-container-low flex items-center justify-center mx-auto text-text-muted/20 border border-ghost-border shadow-inner">
+                 <Pill className="w-12 h-12" />
               </div>
-              <p className="text-gray-600 dark:text-gray-400 font-bold text-lg md:text-xl italic">No pharmacological schedules detected.</p>
+              <div>
+                <p className="text-text-primary font-black text-2xl uppercase italic tracking-tighter">System Idle</p>
+                <p className="text-text-muted font-bold text-sm italic mt-2">No pharmacological schedules detected in current timeline.</p>
+              </div>
             </div>
           ) : (
             <div className="grid gap-8 md:gap-10">
               {reminders.map((reminder) => (
-                <div key={reminder.id} className="relative group border border-white/80 dark:border-white/[0.05] bg-white/[0.6] dark:bg-[#030712]/40 backdrop-blur-[60px] p-6 md:p-10 rounded-[2.5rem] md:rounded-[3rem] shadow-xl hover:shadow-2xl transition-all duration-700 overflow-hidden">
-                  <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none group-hover:opacity-10 transition-opacity">
-                     <Pill size={120} />
+                <div key={reminder.id} className="card-biometric p-8 md:p-12 hover:shadow-2xl transition-all duration-700 overflow-hidden group/regimen">
+                  <div className="absolute top-0 right-0 p-10 opacity-5 pointer-events-none group-hover/regimen:opacity-10 transition-opacity">
+                     <Pill size={160} />
                   </div>
 
-                  <div className="relative z-10 space-y-6 md:space-y-8">
-                    <div className="flex flex-col md:flex-row justify-between items-start gap-6 border-b border-gray-100 dark:border-white/5 pb-6 md:pb-8">
-                      <div className="flex gap-6 items-start">
-                         <div className="relative flex-shrink-0 w-16 h-16 flex items-center justify-center">
+                  <div className="relative z-10 space-y-10">
+                    <div className="flex flex-col md:flex-row justify-between items-start gap-8 border-b border-ghost-border pb-10">
+                      <div className="flex gap-8 items-start">
+                         <div className="relative flex-shrink-0 w-20 h-20 flex items-center justify-center">
                             <svg className="w-full h-full transform -rotate-90">
                                <circle
-                                  cx="32" cy="32" r="28"
+                                  cx="40" cy="40" r="36"
                                   fill="transparent"
                                   stroke="currentColor"
-                                  strokeWidth="6"
-                                  className="text-gray-100 dark:text-white/5"
+                                  strokeWidth="8"
+                                  className="text-surface-container-low"
                                />
                                <circle
-                                  cx="32" cy="32" r="28"
+                                  cx="40" cy="40" r="36"
                                   fill="transparent"
                                   stroke="currentColor"
-                                  strokeWidth="6"
-                                  strokeDasharray={176}
-                                  strokeDashoffset={176 - (176 * (reminder.times.filter(t => isDoseTakenToday(reminder, t)).length / reminder.times.length))}
-                                  className="text-blue-500 transition-all duration-1000"
+                                  strokeWidth="8"
+                                  strokeDasharray={226}
+                                  strokeDashoffset={226 - (226 * (reminder.times.filter(t => isDoseTakenToday(reminder, t)).length / reminder.times.length))}
+                                  className="text-accent-primary transition-all duration-1000"
                                   strokeLinecap="round"
                                 />
                             </svg>
-                            <span className="absolute text-[10px] font-black text-blue-500">
+                            <span className="absolute text-xs font-black text-accent-primary italic">
                                {Math.round((reminder.times.filter(t => isDoseTakenToday(reminder, t)).length / reminder.times.length) * 100)}%
                             </span>
                          </div>
 
-                         <div className="space-y-2">
+                         <div className="space-y-3">
                            {editingId === reminder.id ? (
-                              <div className="flex flex-col gap-3">
+                              <div className="flex flex-col gap-4">
                                  <input 
                                    value={editMedicine} 
                                    onChange={e => setEditMedicine(e.target.value)} 
-                                   className="text-2xl md:text-3xl font-black bg-transparent border-b-2 border-blue-500 outline-none" 
+                                   className="text-3xl font-black bg-transparent border-b-2 border-accent-primary outline-none italic text-text-primary" 
                                  />
                                  <input 
                                    value={editDosage} 
                                    onChange={e => setEditDosage(e.target.value)} 
-                                   className="text-gray-500 font-bold bg-transparent border-b border-white/10 outline-none" 
+                                   className="text-text-secondary font-bold bg-transparent border-b border-ghost-border outline-none italic" 
                                  />
                               </div>
                            ) : (
                               <div className="flex flex-col">
-                                <h3 className="text-xl md:text-3xl font-black tracking-tighter leading-tight">
+                                <h3 className="text-2xl md:text-4xl font-black tracking-tighter text-text-primary italic leading-none">
                                   {reminder.medicineName}
                                 </h3>
-                                <div className="flex flex-wrap items-center gap-2 mt-2">
-                                   <span className="px-3 py-1 rounded-full bg-blue-500/10 text-blue-500 text-[10px] font-black uppercase tracking-widest border border-blue-500/20">Active Regimen</span>
-                                   <p className="text-gray-700 dark:text-gray-400 font-bold italic text-xs md:text-base">{reminder.dosage || "Generic regimen"}</p>
+                                <div className="flex flex-wrap items-center gap-3 mt-4">
+                                   <div className="chip-vital">
+                                      <span className="text-[9px] font-black uppercase tracking-[0.2em] text-accent-primary">Protocol Active</span>
+                                   </div>
+                                   <p className="text-text-secondary font-bold italic text-sm md:text-lg">{reminder.dosage || "Generic therapeutic regimen"}</p>
                                 </div>
                               </div>
                             )}
@@ -417,45 +444,45 @@ function ReminderContent() {
                       </div>
 
                       <div className="flex gap-4 self-end md:self-center">
-                        <button onClick={() => handleDescribeMedicine(reminder.medicineName)} className="p-4 rounded-2xl bg-white/50 dark:bg-white/5 hover:bg-white transition-all text-blue-500 border border-white/80 dark:border-white/10 group/btn">
+                        <button onClick={() => handleDescribeMedicine(reminder.medicineName)} className="p-4 rounded-[1.5rem] bg-surface-container-high/50 hover:bg-surface-container-high transition-all text-accent-primary border border-ghost-border shadow-lg group/btn">
                            <ShieldCheck size={20} className="group-hover/btn:scale-110 transition-transform" />
                         </button>
                         {editingId === reminder.id ? (
-                           <button onClick={saveReminderEdit} className="p-4 rounded-2xl bg-emerald-500 text-white shadow-lg shadow-emerald-500/20"><Check size={20} /></button>
+                           <button onClick={saveReminderEdit} className="p-4 rounded-[1.5rem] bg-accent-emerald text-white shadow-xl shadow-accent-emerald/20"><Check size={20} strokeWidth={3} /></button>
                         ) : (
-                           <button onClick={() => startEditReminder(reminder)} className="p-4 rounded-2xl bg-amber-500/10 text-amber-600 border border-amber-500/20 hover:bg-amber-500 hover:text-white transition-all"><Edit3 size={20} /></button>
+                           <button onClick={() => startEditReminder(reminder)} className="p-4 rounded-[1.5rem] bg-accent-amber/10 text-accent-amber border border-accent-amber/20 hover:bg-accent-amber hover:text-white transition-all shadow-lg"><Edit3 size={20} /></button>
                         )}
-                        <button onClick={() => handleDelete(reminder.id)} className="p-4 rounded-2xl bg-red-500/10 text-red-500 border border-red-500/20 hover:bg-red-500 hover:text-white transition-all"><Trash2 size={20} /></button>
+                        <button onClick={() => handleDelete(reminder.id)} className="p-4 rounded-[1.5rem] bg-accent-rose/10 text-accent-rose border border-accent-rose/20 hover:bg-accent-rose hover:text-white transition-all shadow-lg"><Trash2 size={20} /></button>
                       </div>
                     </div>
 
-                    <div className="grid md:grid-cols-2 gap-6">
+                    <div className="grid md:grid-cols-2 gap-8">
                       {reminder.times.map((t) => {
                         const key = `${reminder.id}-${t}`;
                         const status = getDoseStatus(reminder, t);
                         const isTaken = status === "taken";
 
                         return (
-                          <div key={key} className={`group/time relative p-6 md:p-8 rounded-[1.8rem] md:rounded-[2rem] border transition-all duration-500 ${isTaken ? "bg-emerald-500/5 border-emerald-500/20" : status === "missed" ? "bg-red-500/5 border-red-500/20 shadow-inner" : "bg-white/40 dark:bg-white/[0.02] border-white/80 dark:border-white/5 shadow-inner"}`}>
-                            <div className="flex justify-between items-center h-full gap-4">
-                              <div className="space-y-4">
-                                <div className="flex items-center gap-3">
-                                   <Clock size={20} className={isTaken ? "text-emerald-500" : "text-blue-500"} />
+                          <div key={key} className={`group/time relative p-8 rounded-[2.5rem] border transition-all duration-700 ${isTaken ? "bg-accent-emerald/[0.03] border-accent-emerald/20 shadow-inner" : status === "missed" ? "bg-accent-rose/[0.03] border-accent-rose/20 shadow-inner" : "bg-surface-container-low/40 border-ghost-border shadow-xl"}`}>
+                            <div className="flex justify-between items-center h-full gap-6">
+                              <div className="space-y-5">
+                                <div className="flex items-center gap-4">
+                                   <Clock size={24} className={isTaken ? "text-accent-emerald" : "text-accent-primary"} />
                                    {editingTimeKey === key ? (
-                                      <div className="flex items-center gap-2">
-                                        <input type="time" value={editTimeValue} onChange={e => setEditTimeValue(e.target.value)} className="bg-transparent text-lg md:text-2xl font-black outline-none border-b-2 border-blue-500" autoFocus />
-                                        <button onClick={() => saveTimeEdit(reminder, t)} className="p-2 rounded-lg bg-emerald-500 text-white shadow-lg"><Check size={16} /></button>
+                                      <div className="flex items-center gap-3">
+                                        <input type="time" value={editTimeValue} onChange={e => setEditTimeValue(e.target.value)} className="bg-transparent text-2xl font-black outline-none border-b-2 border-accent-primary italic text-text-primary" autoFocus />
+                                        <button onClick={() => saveTimeEdit(reminder, t)} className="p-2.5 rounded-xl bg-accent-emerald text-white shadow-xl"><Check size={18} strokeWidth={3} /></button>
                                       </div>
                                    ) : (
-                                      <div className="flex items-center gap-3">
-                                        <h4 className="text-lg md:text-2xl font-black tracking-tighter cursor-pointer" onDoubleClick={() => startEditTime(reminder.id, t)}>{t}</h4>
+                                      <div className="flex items-center gap-4">
+                                        <h4 className="text-3xl font-black tracking-tighter cursor-pointer text-text-primary italic" onDoubleClick={() => startEditTime(reminder.id, t)}>{t}</h4>
                                         {!isTaken && (
                                           <button 
                                             onClick={() => startEditTime(reminder.id, t)}
-                                            className="p-2 rounded-lg bg-gray-100 dark:bg-white/5 text-gray-600 dark:text-gray-400 hover:text-blue-500 hover:bg-blue-500/10 transition-all opacity-0 md:group-hover/time:opacity-100 pointer-events-auto"
-                                            title="Edit Time"
+                                            className="p-2.5 rounded-xl bg-surface-container-high/50 text-text-muted hover:text-accent-primary hover:bg-accent-primary/10 transition-all opacity-0 md:group-hover/time:opacity-100 shadow-md border border-ghost-border"
+                                            title="Recalibrate Time"
                                           >
-                                            <Edit3 className="w-3.5 h-3.5" />
+                                            <Edit3 className="w-4 h-4" />
                                           </button>
                                         )}
                                       </div>
@@ -464,25 +491,25 @@ function ReminderContent() {
                                 
                                 <div className="flex flex-col gap-2">
                                   {status === "missed" && (
-                                     <div className="flex items-center gap-2 text-red-500 font-black text-[10px] uppercase tracking-widest"><AlertCircle size={12} /> Critical Overdue</div>
+                                     <div className="flex items-center gap-2 text-accent-rose font-black text-[10px] uppercase tracking-[0.2em] italic"><AlertCircle size={14} /> Critical Overdue</div>
                                   )}
                                   {status === "upcoming" && (
-                                     <div className="flex items-center gap-2 text-amber-500 font-black text-[10px] uppercase tracking-widest"><TrendingUp size={12} /> Next in {countdowns[key]}</div>
+                                     <div className="flex items-center gap-2 text-accent-amber font-black text-[10px] uppercase tracking-[0.2em] italic"><TrendingUp size={14} /> Next in {countdowns[key]}</div>
                                   )}
                                   {status === "taken" && (
-                                     <div className="flex items-center gap-2 text-emerald-500 font-black text-[10px] uppercase tracking-widest"><CheckCircle2 size={12} /> Adherence Verified</div>
+                                     <div className="flex items-center gap-2 text-accent-emerald font-black text-[10px] uppercase tracking-[0.2em] italic"><CheckCircle2 size={14} /> Adherence Verified</div>
                                   )}
                                 </div>
                               </div>
 
                               {!isTaken && (
-                                 <button onClick={() => handleMarkTaken(reminder, t)} className="whitespace-nowrap px-4 md:px-8 py-3 md:py-4 rounded-xl md:rounded-2xl bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-black text-xs md:text-sm hover:scale-105 active:scale-95 transition-all shadow-xl">
-                                    TAKEN
+                                 <button onClick={() => handleMarkTaken(reminder, t)} className="btn-gem px-8 py-5 text-xs tracking-widest shadow-xl">
+                                    <span className="italic">TAKEN</span>
                                  </button>
                               )}
                               {isTaken && (
-                                 <div className="w-12 h-12 rounded-full bg-emerald-500 flex items-center justify-center text-white shadow-lg shadow-emerald-500/20">
-                                    <CheckCircle2 size={24} strokeWidth={3} />
+                                 <div className="w-16 h-16 rounded-[2rem] bg-accent-emerald/10 border border-accent-emerald/20 flex items-center justify-center text-accent-emerald shadow-2xl shadow-accent-emerald/10">
+                                    <CheckCircle2 size={32} strokeWidth={3} />
                                  </div>
                               )}
                             </div>
@@ -499,29 +526,37 @@ function ReminderContent() {
       </div>
 
       {/* 📊 Adherence Analytics Snapshot */}
-      <div className="relative group overflow-hidden rounded-[2.5rem] md:rounded-[3rem] border border-white/80 dark:border-white/[0.05] bg-white/[0.8] dark:bg-[#030712]/60 backdrop-blur-[60px] p-8 md:p-16 shadow-2xl transition-all duration-700">
-         <div className="relative z-10 grid md:grid-cols-3 gap-8 md:gap-12">
-            <div className="flex flex-col gap-4">
-               <div className="flex items-center gap-3 text-blue-500">
-                  <Activity size={24} />
-                  <h3 className="text-lg md:text-xl font-black uppercase tracking-tighter leading-none">Behavioral Sync</h3>
+      <div className="card-biometric p-10 md:p-16 transition-all duration-1000 hover:shadow-3xl">
+         <div className="relative z-10 grid md:grid-cols-3 gap-12 md:gap-20 items-center">
+            <div className="flex flex-col gap-6">
+               <div className="flex items-center gap-4 text-accent-primary">
+                  <div className="p-3 rounded-2xl bg-accent-primary/10 border border-ghost-border">
+                     <Activity size={28} />
+                  </div>
+                  <h3 className="text-xl md:text-2xl font-black uppercase tracking-tighter italic text-text-primary">Behavioral Nexus</h3>
                </div>
-               <p className="text-gray-700 dark:text-gray-400 font-bold leading-relaxed text-xs md:text-sm italic">Adherence metrics are synchronized with your clinical profile for AI accuracy.</p>
+               <p className="text-text-secondary font-bold leading-relaxed text-sm italic">Adherence metrics are synchronized with your clinical profile for ultra-accurate AI diagnostic synthesis and trend modeling.</p>
             </div>
             
-            <div className="flex flex-col gap-4">
-               <div className="flex items-center gap-3 text-emerald-500">
-                  <Stethoscope size={24} />
-                  <h3 className="text-lg md:text-xl font-black uppercase tracking-tighter leading-none">Clinical Integrity</h3>
+            <div className="flex flex-col gap-6">
+               <div className="flex items-center gap-4 text-accent-emerald">
+                  <div className="p-3 rounded-2xl bg-accent-emerald/10 border border-ghost-border">
+                     <Stethoscope size={28} />
+                  </div>
+                  <h3 className="text-xl md:text-2xl font-black uppercase tracking-tighter italic text-text-primary">Continuity Protocol</h3>
                </div>
-               <p className="text-gray-700 dark:text-gray-400 font-bold leading-relaxed text-xs md:text-sm italic">Consistent medication timing reduces physiological variability and improves prognostic outcomes.</p>
+               <p className="text-text-secondary font-bold leading-relaxed text-sm italic">Consistent medication timing reduces physiological variability and improves prognostic outcomes in long-term treatment cycles.</p>
             </div>
 
-            <div className="flex flex-row md:flex-col items-center justify-center p-6 md:p-8 rounded-[2rem] md:rounded-[2.5rem] bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-2xl gap-6 md:gap-0">
-               <div className="flex flex-col items-center">
-                  <span className="text-[10px] font-black uppercase tracking-widest opacity-80 mb-1 leading-none">Protocol Adherence</span>
-                  <span className="text-4xl md:text-6xl font-black italic leading-none">{adherence}%</span>
-                  <span className="hidden md:block text-[10px] font-black uppercase tracking-widest mt-4">Verified Continuity</span>
+            <div className="relative group/score flex flex-col items-center justify-center p-10 py-12 rounded-[3.5rem] bg-surface-container-high/40 border-ghost-border shadow-2xl transition-all duration-700 hover:scale-105">
+               <div className="absolute inset-0 bg-gradient-to-br from-accent-primary/10 via-transparent to-accent-emerald/10 opacity-0 group-hover/score:opacity-100 transition-opacity rounded-[3.5rem]" />
+               <span className="text-[10px] font-black uppercase tracking-[0.4em] text-text-muted mb-4 italic">Protocol Adherence</span>
+               <div className="text-6xl md:text-8xl font-black italic bg-gradient-to-br from-accent-primary via-accent-secondary to-accent-emerald bg-clip-text text-transparent leading-none">
+                  {adherence}%
+               </div>
+               <div className="chip-vital mt-6 bg-accent-emerald/10 border-accent-emerald/20">
+                  <CheckCircle2 size={12} className="text-accent-emerald" />
+                  <span className="text-[9px] font-black uppercase tracking-[0.2em] text-accent-emerald">Verified Continuity</span>
                </div>
             </div>
          </div>
